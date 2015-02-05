@@ -1,0 +1,29 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 10.00
+# Visual Studio 2008
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "HallQueFrontForPageConnectToServer", "HallQueFront\HallQueFront.vcproj", "{55260B31-06DF-427D-9081-78EE3C62799A}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "HallQueFrontServer", "HallQueFrontServer\HallQueFrontServer.vcproj", "{198F0D27-E8C9-4AD2-80C5-16570F7DC796}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Win32 = Debug|Win32
+		Release|Win32 = Release|Win32
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{55260B31-06DF-427D-9081-78EE3C62799A}.Debug|Win32.ActiveCfg = Debug|Win32
+		{55260B31-06DF-427D-9081-78EE3C62799A}.Debug|Win32.Build.0 = Debug|Win32
+		{55260B31-06DF-427D-9081-78EE3C62799A}.Release|Win32.ActiveCfg = Release|Win32
+		{55260B31-06DF-427D-9081-78EE3C62799A}.Release|Win32.Build.0 = Release|Win32
+		{198F0D27-E8C9-4AD2-80C5-16570F7DC796}.Debug|Win32.ActiveCfg = Debug|Win32
+		{198F0D27-E8C9-4AD2-80C5-16570F7DC796}.Debug|Win32.Build.0 = Debug|Win32
+		{198F0D27-E8C9-4AD2-80C5-16570F7DC796}.Release|Win32.ActiveCfg = Release|Win32
+		{198F0D27-E8C9-4AD2-80C5-16570F7DC796}.Release|Win32.Build.0 = Release|Win32
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(DPCodeReviewSolutionGUID) = preSolution
+		DPCodeReviewSolutionGUID = {00000000-0000-0000-0000-000000000000}
+	EndGlobalSection
+EndGlobal
