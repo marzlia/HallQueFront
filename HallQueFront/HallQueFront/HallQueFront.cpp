@@ -132,7 +132,7 @@ BOOL CHallQueFrontApp::InitInstance()
 
 	
 	//让程序开机启动
-	AddAutoRun(_T("HallQueFront"));
+//	AddAutoRun(_T("HallQueFront"));
 	// 唯一的一个窗口已初始化，因此显示它并对其进行更新
 	m_pMainWnd->SetWindowText(_T("大厅排队叫号系统"));
 	m_pMainWnd->ShowWindow(SW_SHOW);
