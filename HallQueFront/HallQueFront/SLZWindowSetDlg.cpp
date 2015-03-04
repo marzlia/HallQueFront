@@ -214,6 +214,7 @@ void SLZWindowSetDlg::OnBnClickedAddwnd()
 	windowinfo.SetEvaluatorId(iMaxID+1);
 	windowinfo.SetWndScreenId(iMaxID+1);
 	windowinfo.SetComScreenId(iMaxID+1);
+	windowinfo.SetShowWndId(iMaxID+1);
 	CString strNewNum;
 	CCommonConvert::intToCString(iMaxID+1,strNewNum);
 	m_List_WindowInfo.AddTail(windowinfo);
