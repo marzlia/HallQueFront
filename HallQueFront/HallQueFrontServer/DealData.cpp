@@ -4,18 +4,18 @@
 #include "../HallQueFront/CommonConvert.h"
 CDealData::CDealData(void) : m_pAnaPecket(NULL)
 {
-	if(!m_conMySql.IsConnect())
-	{
-		CDbaConfig dbaConfig;
-		CString account = dbaConfig.GetServerAcount();
-		CString ip = dbaConfig.GetServerIP();
-		CString pass = dbaConfig.GetServerPassword();
-		CString port = dbaConfig.GetDBPort();
-		int i_port = 0;
-		CCommonConvert::CStringToint(i_port,port);
-		m_conMySql.ConnectToDB(ip,i_port,account,pass);
-	}
-	Start();
+// 	if(!m_conMySql.IsConnect())
+// 	{
+// 		CDbaConfig dbaConfig;
+// 		CString account = dbaConfig.GetServerAcount();
+// 		CString ip = dbaConfig.GetServerIP();
+// 		CString pass = dbaConfig.GetServerPassword();
+// 		CString port = dbaConfig.GetDBPort();
+// 		int i_port = 0;
+// 		CCommonConvert::CStringToint(i_port,port);
+// 		m_conMySql.ConnectToDB(ip,i_port,account,pass);
+// 	}
+// 	Start();
 }
 
 CDealData* CDealData::GetInstance()

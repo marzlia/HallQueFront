@@ -232,11 +232,11 @@ DWORD WINAPI CDoComInOut::WriteComThread(LPVOID pParam)
 					}
 				}
 				
-#ifdef _DEBUG
-				CString strCount;
-				strCount.Format(_T("dwAcWrite:%d"),dwAcWrite);
-				MyWriteConsole(strCount);
-#endif
+// #ifdef _DEBUG
+// 				CString strCount;
+// 				strCount.Format(_T("dwAcWrite:%d"),dwAcWrite);
+// 				MyWriteConsole(strCount);
+// #endif
 //			}while(dwAcWrite < (UINT)pMsg->length);
 			
 // 			PurgeComm( pComInit->m_hComWndScreen, PURGE_TXABORT | PURGE_RXABORT | PURGE_TXCLEAR

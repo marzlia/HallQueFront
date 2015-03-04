@@ -8,17 +8,17 @@ extern void MyWriteConsole(CString str);
 
 CProducePacket::CProducePacket(void)
 {
-	if(!m_mySql.IsConnect())
-	{
-		CDbaConfig dbaConfig;
-		CString account = dbaConfig.GetServerAcount();
-		CString ip = dbaConfig.GetServerIP();
-		CString pass = dbaConfig.GetServerPassword();
-		CString port = dbaConfig.GetDBPort();
-		int i_port = 0;
-		CCommonConvert::CStringToint(i_port,port);
-		m_mySql.ConnectToDB(ip,i_port,account,pass);
-	}
+// 	if(!m_mySql.IsConnect())
+// 	{
+// 		CDbaConfig dbaConfig;
+// 		CString account = dbaConfig.GetServerAcount();
+// 		CString ip = dbaConfig.GetServerIP();
+// 		CString pass = dbaConfig.GetServerPassword();
+// 		CString port = dbaConfig.GetDBPort();
+// 		int i_port = 0;
+// 		CCommonConvert::CStringToint(i_port,port);
+// 		m_mySql.ConnectToDB(ip,i_port,account,pass);
+// 	}
 }
 
 CProducePacket::~CProducePacket(void)

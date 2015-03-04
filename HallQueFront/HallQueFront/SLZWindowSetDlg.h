@@ -1,10 +1,6 @@
 #pragma once
 #include "SLZWindow.h"
 #include "ListCtrlCl.h"
-#include "CommonConvert.h"
-#include "DoFile.h"
-#include "SLZStaff.h"
-#include "ComputeFuncationTime.h"
 #include "QueueInfo.h"
 #include "SLZWindowManager.h"
 // SLZWindowSetDlg ¶Ô»°¿ò
