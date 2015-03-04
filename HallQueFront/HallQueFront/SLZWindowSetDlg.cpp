@@ -1,4 +1,4 @@
-// SLZWindowSetDlg.cpp : ÊµÏÖÎÄ¼ş
+// SLZWindowSetDlg.cpp : å®ç°æ–‡ä»¶
 //
 
 #include "stdafx.h"
@@ -21,7 +21,7 @@
 #define  WNDSCR 6
 #define  COMSCR 7
 #define  LOGSTAFF 8
-// SLZWindowSetDlg ¶Ô»°¿ò
+// SLZWindowSetDlg å¯¹è¯æ¡†
 
 IMPLEMENT_DYNAMIC(SLZWindowSetDlg, CDialog)
 
@@ -95,7 +95,7 @@ BEGIN_MESSAGE_MAP(SLZWindowSetDlg, CDialog)
 END_MESSAGE_MAP()
 
 extern unsigned int golbal_windowserial_id;
-// CSLZWindowSetDlg ÏûÏ¢´¦Àí³ÌĞò
+// CSLZWindowSetDlg æ¶ˆæ¯å¤„ç†ç¨‹åº
 
 BOOL SLZWindowSetDlg::OnInitDialog()
 {
@@ -109,16 +109,16 @@ BOOL SLZWindowSetDlg::OnInitDialog()
 	GetWindowRect(rect);
 	ScreenToClient(&rect);
 	//rect.right-=2;
-	m_ListCtr_Window.InsertColumn(SERNUM,_T("ĞòºÅ"),LVCFMT_CENTER,rect.Width()*6/100,-1);
-	m_ListCtr_Window.InsertColumn(WNDNUM,_T("´°¿Ú±àºÅ"),LVCFMT_CENTER,rect.Width()*9/100,-1);
-	m_ListCtr_Window.InsertColumn(WNDNAME,_T("´°¿ÚÃû³Æ"),LVCFMT_CENTER,rect.Width()*10/100,-1);
-	m_ListCtr_Window.InsertColumn(CALLNAME,_T("ºô½ĞÃû³Æ"),LVCFMT_CENTER,rect.Width()*10/100,-1);
-	m_ListCtr_Window.InsertColumn(CALLERNUM,_T("ºô½ĞÆ÷"),LVCFMT_CENTER,rect.Width()*7/100,-1);
-	m_ListCtr_Window.InsertColumn(EVALNUM,_T("ÆÀ¼ÛÆ÷"),LVCFMT_CENTER,rect.Width()*7/100,-1);
-	m_ListCtr_Window.InsertColumn(WNDSCR,_T("´°¿ÚÆÁ"),LVCFMT_CENTER,rect.Width()*7/100,-1);
-	m_ListCtr_Window.InsertColumn(COMSCR,_T("×ÛºÏÆÁ"),LVCFMT_CENTER,rect.Width()*7/100,-1);
-	m_ListCtr_Window.InsertColumn(LOGSTAFF,_T("×Ô¶¯µÇÂ¼Ô±¹¤"),LVCFMT_CENTER,rect.Width()*12/100,-1);
-	m_cs_LogStaff.AddString(L"ÎŞ");
+	m_ListCtr_Window.InsertColumn(SERNUM,_T("åºå·"),LVCFMT_CENTER,rect.Width()*6/100,-1);
+	m_ListCtr_Window.InsertColumn(WNDNUM,_T("çª—å£ç¼–å·"),LVCFMT_CENTER,rect.Width()*9/100,-1);
+	m_ListCtr_Window.InsertColumn(WNDNAME,_T("çª—å£åç§°"),LVCFMT_CENTER,rect.Width()*10/100,-1);
+	m_ListCtr_Window.InsertColumn(CALLNAME,_T("å‘¼å«åç§°"),LVCFMT_CENTER,rect.Width()*10/100,-1);
+	m_ListCtr_Window.InsertColumn(CALLERNUM,_T("å‘¼å«å™¨"),LVCFMT_CENTER,rect.Width()*7/100,-1);
+	m_ListCtr_Window.InsertColumn(EVALNUM,_T("è¯„ä»·å™¨"),LVCFMT_CENTER,rect.Width()*7/100,-1);
+	m_ListCtr_Window.InsertColumn(WNDSCR,_T("çª—å£å±"),LVCFMT_CENTER,rect.Width()*7/100,-1);
+	m_ListCtr_Window.InsertColumn(COMSCR,_T("ç»¼åˆå±"),LVCFMT_CENTER,rect.Width()*7/100,-1);
+	m_ListCtr_Window.InsertColumn(LOGSTAFF,_T("è‡ªåŠ¨ç™»å½•å‘˜å·¥"),LVCFMT_CENTER,rect.Width()*12/100,-1);
+	m_cs_LogStaff.AddString(L"æ— ");
 	ReadMaxIdFromFile();
 	ReadStaffInfoFromFile();
 	ReadQueInfoFromFile();
@@ -184,7 +184,7 @@ int SLZWindowSetDlg::GetNumFromString(CString strNum)
 
 void SLZWindowSetDlg::OnBnClickedAddwnd()
 {
-	// TODO: ÔÚ´ËÌí¼Ó¿Ø¼şÍ¨Öª´¦Àí³ÌĞò´úÂë
+	// TODO: åœ¨æ­¤æ·»åŠ æ§ä»¶é€šçŸ¥å¤„ç†ç¨‹åºä»£ç 
 	golbal_windowserial_id++;
 	SLZWindow windowinfo;
 	int count=m_ListCtr_Window.GetItemCount()+1;
@@ -204,7 +204,7 @@ void SLZWindowSetDlg::OnBnClickedAddwnd()
 	CString WindowSerNum;
 	convert.intToCString(count,WindowSerNum);
 	CString n_WindowName;
-	n_WindowName.Format(_T("%dºÅ´°¿Ú"), iMaxID+1);
+	n_WindowName.Format(_T("%då·çª—å£"), iMaxID+1);
 	/*CString windowid;
 	convert.intToCString(golbal_windowserial_id,windowid);*/
 	windowinfo.SetWindowId(golbal_windowserial_id);
@@ -214,19 +214,20 @@ void SLZWindowSetDlg::OnBnClickedAddwnd()
 	windowinfo.SetEvaluatorId(iMaxID+1);
 	windowinfo.SetWndScreenId(iMaxID+1);
 	windowinfo.SetComScreenId(iMaxID+1);
+	windowinfo.SetShowWndId(iMaxID+1);
 	CString strNewNum;
 	CCommonConvert::intToCString(iMaxID+1,strNewNum);
 	m_List_WindowInfo.AddTail(windowinfo);
 	m_ListCtr_Window.InsertItem(count-1,WindowSerNum);
-	m_ListCtr_Window.SetItemText(count-1,WNDNUM,_T("0"));
+	m_ListCtr_Window.SetItemText(count-1,WNDNUM,strNewNum);
 	m_ListCtr_Window.SetItemText(count-1,WNDNAME,n_WindowName);
 	m_ListCtr_Window.SetItemText(count-1,CALLNAME,n_WindowName);
 	m_ListCtr_Window.SetItemText(count-1,CALLERNUM,strNewNum);
 	m_ListCtr_Window.SetItemText(count-1,EVALNUM,strNewNum);
 	m_ListCtr_Window.SetItemText(count-1,WNDSCR,strNewNum);
 	m_ListCtr_Window.SetItemText(count-1,COMSCR,strNewNum);
-	//m_ListCtr_Window.SetItemText(count-1,8,_T("·ñ"));
-	m_ListCtr_Window.SetItemText(count-1,LOGSTAFF,_T("ÎŞ"));
+	//m_ListCtr_Window.SetItemText(count-1,8,_T("å¦"));
+	m_ListCtr_Window.SetItemText(count-1,LOGSTAFF,_T("æ— "));
 	m_ListCtr_Window.SetItemState(count-1, LVIS_SELECTED, LVIS_SELECTED);
 	
 	//	SetModified();
@@ -235,12 +236,12 @@ void SLZWindowSetDlg::OnBnClickedAddwnd()
 
 void SLZWindowSetDlg::OnBnClickedDelwnd()
 {
-	// TODO: ÔÚ´ËÌí¼Ó¿Ø¼şÍ¨Öª´¦Àí³ÌĞò´úÂë
+	// TODO: åœ¨æ­¤æ·»åŠ æ§ä»¶é€šçŸ¥å¤„ç†ç¨‹åºä»£ç 
 	POSITION pos=m_ListCtr_Window.GetFirstSelectedItemPosition();
 	int index=m_ListCtr_Window.GetNextSelectedItem(pos);
 	if (index<0)
 	{
-		AfxMessageBox(_T("ÇëÑ¡ÔñÒ»¸ö´°¿Ú"));
+		AfxMessageBox(_T("è¯·é€‰æ‹©ä¸€ä¸ªçª—å£"));
 		return;
 	}
 	CString WindowSerNum;
@@ -252,7 +253,7 @@ void SLZWindowSetDlg::OnBnClickedDelwnd()
 		m_ListCtr_Window.SetItemText(i,SERNUM,WindowSerNum);
 	}
 	m_List_WindowInfo.RemoveAt(m_List_WindowInfo.FindIndex(index));
-	//É¾µ½¶¥¶ËÊ±°Ñ½¹µãÉèÖÃÔÚ×îÉÏ±ß
+	//åˆ åˆ°é¡¶ç«¯æ—¶æŠŠç„¦ç‚¹è®¾ç½®åœ¨æœ€ä¸Šè¾¹
 	if(index>0)
 	{
 		m_ListCtr_Window.SetItemState(index-1,LVIS_SELECTED,LVIS_SELECTED);
@@ -266,18 +267,18 @@ void SLZWindowSetDlg::OnBnClickedDelwnd()
 
 void SLZWindowSetDlg::OnEnChangeEditWndid()
 {
-	// TODO:  Èç¹û¸Ã¿Ø¼şÊÇ RICHEDIT ¿Ø¼ş£¬ÔòËü½«²»»á
-	// ·¢ËÍ¸ÃÍ¨Öª£¬³ı·ÇÖØĞ´ CDialog::OnInitDialog()
-	// º¯Êı²¢µ÷ÓÃ CRichEditCtrl().SetEventMask()£¬
-	// Í¬Ê±½« ENM_CHANGE ±êÖ¾¡°»ò¡±ÔËËãµ½ÑÚÂëÖĞ¡£
+	// TODO:  å¦‚æœè¯¥æ§ä»¶æ˜¯ RICHEDIT æ§ä»¶ï¼Œåˆ™å®ƒå°†ä¸ä¼š
+	// å‘é€è¯¥é€šçŸ¥ï¼Œé™¤éé‡å†™ CDialog::OnInitDialog()
+	// å‡½æ•°å¹¶è°ƒç”¨ CRichEditCtrl().SetEventMask()ï¼Œ
+	// åŒæ—¶å°† ENM_CHANGE æ ‡å¿—â€œæˆ–â€è¿ç®—åˆ°æ©ç ä¸­ã€‚
 
-	// TODO:  ÔÚ´ËÌí¼Ó¿Ø¼şÍ¨Öª´¦Àí³ÌĞò´úÂë
+	// TODO:  åœ¨æ­¤æ·»åŠ æ§ä»¶é€šçŸ¥å¤„ç†ç¨‹åºä»£ç 
 	UpdateData();
 	POSITION pos=m_ListCtr_Window.GetFirstSelectedItemPosition();
 	int index=m_ListCtr_Window.GetNextSelectedItem(pos);
 	if (index<0)
 	{
-		AfxMessageBox(_T("ÇëÑ¡ÔñÒ»¸ö´°¿Ú"));
+		AfxMessageBox(_T("è¯·é€‰æ‹©ä¸€ä¸ªçª—å£"));
 		return;
 	}
 	SLZWindow windowinfo=m_List_WindowInfo.GetAt(m_List_WindowInfo.FindIndex(index));
@@ -299,18 +300,18 @@ void SLZWindowSetDlg::OnEnChangeEditWndid()
 
 void SLZWindowSetDlg::OnEnChangeEditWndname()
 {
-	// TODO:  Èç¹û¸Ã¿Ø¼şÊÇ RICHEDIT ¿Ø¼ş£¬ÔòËü½«²»»á
-	// ·¢ËÍ¸ÃÍ¨Öª£¬³ı·ÇÖØĞ´ CPropertyPage::OnInitDialog()
-	// º¯Êı²¢µ÷ÓÃ CRichEditCtrl().SetEventMask()£¬
-	// Í¬Ê±½« ENM_CHANGE ±êÖ¾¡°»ò¡±ÔËËãµ½ÑÚÂëÖĞ¡£
+	// TODO:  å¦‚æœè¯¥æ§ä»¶æ˜¯ RICHEDIT æ§ä»¶ï¼Œåˆ™å®ƒå°†ä¸ä¼š
+	// å‘é€è¯¥é€šçŸ¥ï¼Œé™¤éé‡å†™ CPropertyPage::OnInitDialog()
+	// å‡½æ•°å¹¶è°ƒç”¨ CRichEditCtrl().SetEventMask()ï¼Œ
+	// åŒæ—¶å°† ENM_CHANGE æ ‡å¿—â€œæˆ–â€è¿ç®—åˆ°æ©ç ä¸­ã€‚
 
-	// TODO:  ÔÚ´ËÌí¼Ó¿Ø¼şÍ¨Öª´¦Àí³ÌĞò´úÂë
+	// TODO:  åœ¨æ­¤æ·»åŠ æ§ä»¶é€šçŸ¥å¤„ç†ç¨‹åºä»£ç 
 	UpdateData();
 	POSITION pos=m_ListCtr_Window.GetFirstSelectedItemPosition();
 	int index=m_ListCtr_Window.GetNextSelectedItem(pos);
 	if (index<0)
 	{
-		AfxMessageBox(_T("ÇëÑ¡ÔñÒ»¸ö´°¿Ú"));
+		AfxMessageBox(_T("è¯·é€‰æ‹©ä¸€ä¸ªçª—å£"));
 		return;
 	}
 	SLZWindow windowinfo=m_List_WindowInfo.GetAt(m_List_WindowInfo.FindIndex(index));
@@ -325,18 +326,18 @@ void SLZWindowSetDlg::OnEnChangeEditWndname()
 
 void SLZWindowSetDlg::OnEnChangeEditWndcallname()
 {
-	// TODO:  Èç¹û¸Ã¿Ø¼şÊÇ RICHEDIT ¿Ø¼ş£¬ÔòËü½«²»»á
-	// ·¢ËÍ¸ÃÍ¨Öª£¬³ı·ÇÖØĞ´ CPropertyPage::OnInitDialog()
-	// º¯Êı²¢µ÷ÓÃ CRichEditCtrl().SetEventMask()£¬
-	// Í¬Ê±½« ENM_CHANGE ±êÖ¾¡°»ò¡±ÔËËãµ½ÑÚÂëÖĞ¡£
+	// TODO:  å¦‚æœè¯¥æ§ä»¶æ˜¯ RICHEDIT æ§ä»¶ï¼Œåˆ™å®ƒå°†ä¸ä¼š
+	// å‘é€è¯¥é€šçŸ¥ï¼Œé™¤éé‡å†™ CPropertyPage::OnInitDialog()
+	// å‡½æ•°å¹¶è°ƒç”¨ CRichEditCtrl().SetEventMask()ï¼Œ
+	// åŒæ—¶å°† ENM_CHANGE æ ‡å¿—â€œæˆ–â€è¿ç®—åˆ°æ©ç ä¸­ã€‚
 
-	// TODO:  ÔÚ´ËÌí¼Ó¿Ø¼şÍ¨Öª´¦Àí³ÌĞò´úÂë
+	// TODO:  åœ¨æ­¤æ·»åŠ æ§ä»¶é€šçŸ¥å¤„ç†ç¨‹åºä»£ç 
 	UpdateData();
 	POSITION pos=m_ListCtr_Window.GetFirstSelectedItemPosition();
 	int index=m_ListCtr_Window.GetNextSelectedItem(pos);
 	if (index<0)
 	{
-		AfxMessageBox(_T("ÇëÑ¡ÔñÒ»¸ö´°¿Ú"));
+		AfxMessageBox(_T("è¯·é€‰æ‹©ä¸€ä¸ªçª—å£"));
 		return;
 	}
 	SLZWindow windowinfo=m_List_WindowInfo.GetAt(m_List_WindowInfo.FindIndex(index));
@@ -351,18 +352,18 @@ void SLZWindowSetDlg::OnEnChangeEditWndcallname()
 
 void SLZWindowSetDlg::OnEnChangeEditCallid()
 {
-	// TODO:  Èç¹û¸Ã¿Ø¼şÊÇ RICHEDIT ¿Ø¼ş£¬ÔòËü½«²»»á
-	// ·¢ËÍ¸ÃÍ¨Öª£¬³ı·ÇÖØĞ´ CPropertyPage::OnInitDialog()
-	// º¯Êı²¢µ÷ÓÃ CRichEditCtrl().SetEventMask()£¬
-	// Í¬Ê±½« ENM_CHANGE ±êÖ¾¡°»ò¡±ÔËËãµ½ÑÚÂëÖĞ¡£
+	// TODO:  å¦‚æœè¯¥æ§ä»¶æ˜¯ RICHEDIT æ§ä»¶ï¼Œåˆ™å®ƒå°†ä¸ä¼š
+	// å‘é€è¯¥é€šçŸ¥ï¼Œé™¤éé‡å†™ CPropertyPage::OnInitDialog()
+	// å‡½æ•°å¹¶è°ƒç”¨ CRichEditCtrl().SetEventMask()ï¼Œ
+	// åŒæ—¶å°† ENM_CHANGE æ ‡å¿—â€œæˆ–â€è¿ç®—åˆ°æ©ç ä¸­ã€‚
 
-	// TODO:  ÔÚ´ËÌí¼Ó¿Ø¼şÍ¨Öª´¦Àí³ÌĞò´úÂë
+	// TODO:  åœ¨æ­¤æ·»åŠ æ§ä»¶é€šçŸ¥å¤„ç†ç¨‹åºä»£ç 
 	UpdateData();
 	POSITION pos=m_ListCtr_Window.GetFirstSelectedItemPosition();
 	int index=m_ListCtr_Window.GetNextSelectedItem(pos);
 	if (index<0)
 	{
-		AfxMessageBox(_T("ÇëÑ¡ÔñÒ»¸ö´°¿Ú"));
+		AfxMessageBox(_T("è¯·é€‰æ‹©ä¸€ä¸ªçª—å£"));
 		return;
 	}
 	SLZWindow windowinfo=m_List_WindowInfo.GetAt(m_List_WindowInfo.FindIndex(index));
@@ -392,18 +393,18 @@ void SLZWindowSetDlg::OnEnChangeEditCallid()
 
 void SLZWindowSetDlg::OnEnChangeEditEvaid()
 {
-	// TODO:  Èç¹û¸Ã¿Ø¼şÊÇ RICHEDIT ¿Ø¼ş£¬ÔòËü½«²»»á
-	// ·¢ËÍ¸ÃÍ¨Öª£¬³ı·ÇÖØĞ´ CPropertyPage::OnInitDialog()
-	// º¯Êı²¢µ÷ÓÃ CRichEditCtrl().SetEventMask()£¬
-	// Í¬Ê±½« ENM_CHANGE ±êÖ¾¡°»ò¡±ÔËËãµ½ÑÚÂëÖĞ¡£
+	// TODO:  å¦‚æœè¯¥æ§ä»¶æ˜¯ RICHEDIT æ§ä»¶ï¼Œåˆ™å®ƒå°†ä¸ä¼š
+	// å‘é€è¯¥é€šçŸ¥ï¼Œé™¤éé‡å†™ CPropertyPage::OnInitDialog()
+	// å‡½æ•°å¹¶è°ƒç”¨ CRichEditCtrl().SetEventMask()ï¼Œ
+	// åŒæ—¶å°† ENM_CHANGE æ ‡å¿—â€œæˆ–â€è¿ç®—åˆ°æ©ç ä¸­ã€‚
 
-	// TODO:  ÔÚ´ËÌí¼Ó¿Ø¼şÍ¨Öª´¦Àí³ÌĞò´úÂë
+	// TODO:  åœ¨æ­¤æ·»åŠ æ§ä»¶é€šçŸ¥å¤„ç†ç¨‹åºä»£ç 
 	UpdateData();
 	POSITION pos=m_ListCtr_Window.GetFirstSelectedItemPosition();
 	int index=m_ListCtr_Window.GetNextSelectedItem(pos);
 	if (index<0)
 	{
-		AfxMessageBox(_T("ÇëÑ¡ÔñÒ»¸ö´°¿Ú"));
+		AfxMessageBox(_T("è¯·é€‰æ‹©ä¸€ä¸ªçª—å£"));
 		return;
 	}
 	SLZWindow windowinfo=m_List_WindowInfo.GetAt(m_List_WindowInfo.FindIndex(index));
@@ -430,18 +431,18 @@ void SLZWindowSetDlg::OnEnChangeEditEvaid()
 
 void SLZWindowSetDlg::OnEnChangeEditWndscrid()
 {
-	// TODO:  Èç¹û¸Ã¿Ø¼şÊÇ RICHEDIT ¿Ø¼ş£¬ÔòËü½«²»»á
-	// ·¢ËÍ¸ÃÍ¨Öª£¬³ı·ÇÖØĞ´ CPropertyPage::OnInitDialog()
-	// º¯Êı²¢µ÷ÓÃ CRichEditCtrl().SetEventMask()£¬
-	// Í¬Ê±½« ENM_CHANGE ±êÖ¾¡°»ò¡±ÔËËãµ½ÑÚÂëÖĞ¡£
+	// TODO:  å¦‚æœè¯¥æ§ä»¶æ˜¯ RICHEDIT æ§ä»¶ï¼Œåˆ™å®ƒå°†ä¸ä¼š
+	// å‘é€è¯¥é€šçŸ¥ï¼Œé™¤éé‡å†™ CPropertyPage::OnInitDialog()
+	// å‡½æ•°å¹¶è°ƒç”¨ CRichEditCtrl().SetEventMask()ï¼Œ
+	// åŒæ—¶å°† ENM_CHANGE æ ‡å¿—â€œæˆ–â€è¿ç®—åˆ°æ©ç ä¸­ã€‚
 
-	// TODO:  ÔÚ´ËÌí¼Ó¿Ø¼şÍ¨Öª´¦Àí³ÌĞò´úÂë
+	// TODO:  åœ¨æ­¤æ·»åŠ æ§ä»¶é€šçŸ¥å¤„ç†ç¨‹åºä»£ç 
 	UpdateData();
 	POSITION pos=m_ListCtr_Window.GetFirstSelectedItemPosition();
 	int index=m_ListCtr_Window.GetNextSelectedItem(pos);
 	if (index<0)
 	{
-		AfxMessageBox(_T("ÇëÑ¡ÔñÒ»¸ö´°¿Ú"));
+		AfxMessageBox(_T("è¯·é€‰æ‹©ä¸€ä¸ªçª—å£"));
 		return;
 	}
 	SLZWindow windowinfo=m_List_WindowInfo.GetAt(m_List_WindowInfo.FindIndex(index));
@@ -470,18 +471,18 @@ void SLZWindowSetDlg::OnEnChangeEditWndscrid()
 
 void SLZWindowSetDlg::OnEnChangeEditComscrid()
 {
-	// TODO:  Èç¹û¸Ã¿Ø¼şÊÇ RICHEDIT ¿Ø¼ş£¬ÔòËü½«²»»á
-	// ·¢ËÍ¸ÃÍ¨Öª£¬³ı·ÇÖØĞ´ CPropertyPage::OnInitDialog()
-	// º¯Êı²¢µ÷ÓÃ CRichEditCtrl().SetEventMask()£¬
-	// Í¬Ê±½« ENM_CHANGE ±êÖ¾¡°»ò¡±ÔËËãµ½ÑÚÂëÖĞ¡£
+	// TODO:  å¦‚æœè¯¥æ§ä»¶æ˜¯ RICHEDIT æ§ä»¶ï¼Œåˆ™å®ƒå°†ä¸ä¼š
+	// å‘é€è¯¥é€šçŸ¥ï¼Œé™¤éé‡å†™ CPropertyPage::OnInitDialog()
+	// å‡½æ•°å¹¶è°ƒç”¨ CRichEditCtrl().SetEventMask()ï¼Œ
+	// åŒæ—¶å°† ENM_CHANGE æ ‡å¿—â€œæˆ–â€è¿ç®—åˆ°æ©ç ä¸­ã€‚
 
-	// TODO:  ÔÚ´ËÌí¼Ó¿Ø¼şÍ¨Öª´¦Àí³ÌĞò´úÂë
+	// TODO:  åœ¨æ­¤æ·»åŠ æ§ä»¶é€šçŸ¥å¤„ç†ç¨‹åºä»£ç 
 	UpdateData();
 	POSITION pos=m_ListCtr_Window.GetFirstSelectedItemPosition();
 	int index=m_ListCtr_Window.GetNextSelectedItem(pos);
 	if (index<0)
 	{
-		AfxMessageBox(_T("ÇëÑ¡ÔñÒ»¸ö´°¿Ú"));
+		AfxMessageBox(_T("è¯·é€‰æ‹©ä¸€ä¸ªçª—å£"));
 		return;
 	}
 	SLZWindow windowinfo=m_List_WindowInfo.GetAt(m_List_WindowInfo.FindIndex(index));
@@ -507,7 +508,7 @@ void SLZWindowSetDlg::OnEnChangeEditComscrid()
 
 //void SLZWindowSetDlg::OnBnClickedAutologin()
 //{
-//	// TODO: ÔÚ´ËÌí¼Ó¿Ø¼şÍ¨Öª´¦Àí³ÌĞò´úÂë
+//	// TODO: åœ¨æ­¤æ·»åŠ æ§ä»¶é€šçŸ¥å¤„ç†ç¨‹åºä»£ç 
 //	UpdateData();
 //	POSITION pos=m_ListCtr_Window.GetFirstSelectedItemPosition();
 //	int index=m_ListCtr_Window.GetNextSelectedItem(pos);
@@ -516,22 +517,22 @@ void SLZWindowSetDlg::OnEnChangeEditComscrid()
 //	SLZWindow windowinfo=m_List_WindowInfo.GetAt(posFind);
 //	if (index<0)
 //	{
-//		AfxMessageBox(_T("ÇëÑ¡ÔñÒ»¸ö´°¿Ú"));
+//		AfxMessageBox(_T("è¯·é€‰æ‹©ä¸€ä¸ªçª—å£"));
 //		return;
 //	}
 //
-//	if(m_ListCtr_Window.GetItemText(index,8)==_T("·ñ"))
+//	if(m_ListCtr_Window.GetItemText(index,8)==_T("å¦"))
 //	{
-//		m_ListCtr_Window.SetItemText(index,8,_T("ÊÇ"));
+//		m_ListCtr_Window.SetItemText(index,8,_T("æ˜¯"));
 //		GetDlgItem(IDC_COMBO_LOGSTAFF)->EnableWindow(TRUE);
 //		if(!m_cs_LogStaff.GetCount())
 //			ReadStaffInfoFromFile();
 //	}
 //	else
 //	{
-//		m_ListCtr_Window.SetItemText(index,8,_T("·ñ"));
+//		m_ListCtr_Window.SetItemText(index,8,_T("å¦"));
 //		GetDlgItem(IDC_COMBO_LOGSTAFF)->EnableWindow(FALSE);
-//		m_ListCtr_Window.SetItemText(index,9,_T("ÎŞ"));
+//		m_ListCtr_Window.SetItemText(index,9,_T("æ— "));
 //		CString str;
 //		windowinfo.SetLoginStaff(str);
 //		m_List_WindowInfo.GetAt(m_List_WindowInfo.FindIndex(index))=windowinfo;
@@ -542,13 +543,13 @@ void SLZWindowSetDlg::OnEnChangeEditComscrid()
 
 void SLZWindowSetDlg::OnCbnSelchangeComboLogstaff()
 {
-	// TODO: ÔÚ´ËÌí¼Ó¿Ø¼şÍ¨Öª´¦Àí³ÌĞò´úÂë
+	// TODO: åœ¨æ­¤æ·»åŠ æ§ä»¶é€šçŸ¥å¤„ç†ç¨‹åºä»£ç 
 	UpdateData();
 	POSITION pos=m_ListCtr_Window.GetFirstSelectedItemPosition();
 	int index=m_ListCtr_Window.GetNextSelectedItem(pos);
 	if (index<0)
 	{
-		AfxMessageBox(_T("ÇëÑ¡ÔñÒ»¸ö´°¿Ú"));
+		AfxMessageBox(_T("è¯·é€‰æ‹©ä¸€ä¸ªçª—å£"));
 		return;
 	}
 	SLZWindow windowinfo=m_List_WindowInfo.GetAt(m_List_WindowInfo.FindIndex(index));
@@ -573,12 +574,12 @@ void SLZWindowSetDlg::OnCbnSelchangeComboLogstaff()
 
 void SLZWindowSetDlg::OnBnClickedBtnChooseque()
 {
-	// TODO: ÔÚ´ËÌí¼Ó¿Ø¼şÍ¨Öª´¦Àí³ÌĞò´úÂë
+	// TODO: åœ¨æ­¤æ·»åŠ æ§ä»¶é€šçŸ¥å¤„ç†ç¨‹åºä»£ç 
 	POSITION pos=m_ListCtr_Window.GetFirstSelectedItemPosition();
 	int index=m_ListCtr_Window.GetNextSelectedItem(pos);
 	if (index<0)
 	{
-		AfxMessageBox(_T("ÇëÑ¡ÔñÒ»¸ö´°¿Ú"));
+		AfxMessageBox(_T("è¯·é€‰æ‹©ä¸€ä¸ªçª—å£"));
 		return;
 	}
 	SLZWindow windowinfo=m_List_WindowInfo.GetAt(m_List_WindowInfo.FindIndex(index));
@@ -614,7 +615,7 @@ void SLZWindowSetDlg::OnBnClickedBtnChooseque()
 void SLZWindowSetDlg::OnNMClickWndlist(NMHDR *pNMHDR, LRESULT *pResult)
 {
 	LPNMITEMACTIVATE pNMItemActivate = reinterpret_cast<LPNMITEMACTIVATE>(pNMHDR);
-	// TODO: ÔÚ´ËÌí¼Ó¿Ø¼şÍ¨Öª´¦Àí³ÌĞò´úÂë
+	// TODO: åœ¨æ­¤æ·»åŠ æ§ä»¶é€šçŸ¥å¤„ç†ç¨‹åºä»£ç 
 	int index=m_ListCtr_Window.GetItemCount();
 	SLZStaff staffinfo;
 	for (int i=0;i<index;i++)
@@ -660,8 +661,8 @@ void SLZWindowSetDlg::OnNMClickWndlist(NMHDR *pNMHDR, LRESULT *pResult)
 			else 
 			{
 				/*pBtn->SetCheck(0);*/
-				m_cs_LogStaff.SelectString(-1,L"ÎŞ");
-				//m_ListCtr_Window.SetItemText(i,8,_T("·ñ"));
+				m_cs_LogStaff.SelectString(-1,L"æ— ");
+				//m_ListCtr_Window.SetItemText(i,8,_T("å¦"));
 				//GetDlgItem(IDC_COMBO_LOGSTAFF)->EnableWindow(FALSE);
 			}
 			UpdateData(FALSE);
@@ -673,7 +674,7 @@ void SLZWindowSetDlg::OnNMClickWndlist(NMHDR *pNMHDR, LRESULT *pResult)
 void SLZWindowSetDlg::OnLvnItemchangedWndlist(NMHDR *pNMHDR, LRESULT *pResult)
 {
 	LPNMLISTVIEW pNMLV = reinterpret_cast<LPNMLISTVIEW>(pNMHDR);
-	// TODO: ÔÚ´ËÌí¼Ó¿Ø¼şÍ¨Öª´¦Àí³ÌĞò´úÂë
+	// TODO: åœ¨æ­¤æ·»åŠ æ§ä»¶é€šçŸ¥å¤„ç†ç¨‹åºä»£ç 
 	for (int i=0;i<m_ListCtr_Window.GetItemCount();i++)
 	{
 		if (m_ListCtr_Window.GetItemState(i,LVIS_SELECTED)==LVIS_SELECTED)
@@ -722,9 +723,9 @@ void SLZWindowSetDlg::OnLvnItemchangedWndlist(NMHDR *pNMHDR, LRESULT *pResult)
 			else 
 			{
 				/*pBtn->SetCheck(0);*/
-				m_cs_LogStaff.SelectString(-1,L"ÎŞ");
-				//m_ListCtr_Window.SetItemText(i,8,_T("·ñ"));
-				m_ListCtr_Window.SetItemText(i,LOGSTAFF,_T("ÎŞ"));
+				m_cs_LogStaff.SelectString(-1,L"æ— ");
+				//m_ListCtr_Window.SetItemText(i,8,_T("å¦"));
+				m_ListCtr_Window.SetItemText(i,LOGSTAFF,_T("æ— "));
 				//GetDlgItem(IDC_COMBO_LOGSTAFF)->EnableWindow(FALSE);
 			}
 
@@ -831,14 +832,14 @@ m_ReadMaxSerialID:windowserid;*/
 					if (!windowinfo->GetLoginStaff().IsEmpty())
 					{
 
-						//m_ListCtr_Window.SetItemText(count-1,8,_T("ÊÇ"));
+						//m_ListCtr_Window.SetItemText(count-1,8,_T("æ˜¯"));
 						CString staffname=GetStaffNameFromMap(windowinfo->GetLoginStaff());
 						m_ListCtr_Window.SetItemText(count-1,LOGSTAFF,staffname);
 					}
 					else 
 					{
-						//m_ListCtr_Window.SetItemText(count-1,8,_T("·ñ"));
-						m_ListCtr_Window.SetItemText(count-1,LOGSTAFF,_T("ÎŞ"));
+						//m_ListCtr_Window.SetItemText(count-1,8,_T("å¦"));
+						m_ListCtr_Window.SetItemText(count-1,LOGSTAFF,_T("æ— "));
 					}
 					
 					delete windowinfo;
@@ -872,12 +873,12 @@ void SLZWindowSetDlg::OnBnClickedWndOk()
 }
 void SLZWindowSetDlg::OnBnClickedBtnCallsound()
 {
-	// TODO: ÔÚ´ËÌí¼Ó¿Ø¼şÍ¨Öª´¦Àí³ÌĞò´úÂë
+	// TODO: åœ¨æ­¤æ·»åŠ æ§ä»¶é€šçŸ¥å¤„ç†ç¨‹åºä»£ç 
 	POSITION pos=m_ListCtr_Window.GetFirstSelectedItemPosition();
 	int index=m_ListCtr_Window.GetNextSelectedItem(pos);
 	if (index<0)
 	{
-		AfxMessageBox(_T("ÇëÑ¡ÔñÒ»¸ö´°¿Ú"));
+		AfxMessageBox(_T("è¯·é€‰æ‹©ä¸€ä¸ªçª—å£"));
 		return;
 	}
 	SLZWindow windowinfo=m_List_WindowInfo.GetAt(m_List_WindowInfo.FindIndex(index));
@@ -937,12 +938,12 @@ void SLZWindowSetDlg::OnBnClickedBtnCallsound()
 
 void SLZWindowSetDlg::OnBnClickedBtnWaitsound()
 {
-	// TODO: ÔÚ´ËÌí¼Ó¿Ø¼şÍ¨Öª´¦Àí³ÌĞò´úÂë
+	// TODO: åœ¨æ­¤æ·»åŠ æ§ä»¶é€šçŸ¥å¤„ç†ç¨‹åºä»£ç 
 	POSITION pos=m_ListCtr_Window.GetFirstSelectedItemPosition();
 	int index=m_ListCtr_Window.GetNextSelectedItem(pos);
 	if (index<0)
 	{
-		AfxMessageBox(_T("ÇëÑ¡ÔñÒ»¸ö´°¿Ú"));
+		AfxMessageBox(_T("è¯·é€‰æ‹©ä¸€ä¸ªçª—å£"));
 		return;
 	}
 	SLZWindow windowinfo=m_List_WindowInfo.GetAt(m_List_WindowInfo.FindIndex(index));
@@ -1002,12 +1003,12 @@ void SLZWindowSetDlg::OnBnClickedBtnWaitsound()
 
 void SLZWindowSetDlg::OnBnClickedBtnCallshow()
 {
-	// TODO: ÔÚ´ËÌí¼Ó¿Ø¼şÍ¨Öª´¦Àí³ÌĞò´úÂë
+	// TODO: åœ¨æ­¤æ·»åŠ æ§ä»¶é€šçŸ¥å¤„ç†ç¨‹åºä»£ç 
 	POSITION pos=m_ListCtr_Window.GetFirstSelectedItemPosition();
 	int index=m_ListCtr_Window.GetNextSelectedItem(pos);
 	if (index<0)
 	{
-		AfxMessageBox(_T("ÇëÑ¡ÔñÒ»¸ö´°¿Ú"));
+		AfxMessageBox(_T("è¯·é€‰æ‹©ä¸€ä¸ªçª—å£"));
 		return;
 	}
 	SLZWindow windowinfo=m_List_WindowInfo.GetAt(m_List_WindowInfo.FindIndex(index));
@@ -1047,12 +1048,12 @@ void SLZWindowSetDlg::OnBnClickedBtnCallshow()
 
 void SLZWindowSetDlg::OnBnClickedBtnWaitshow()
 {
-	// TODO: ÔÚ´ËÌí¼Ó¿Ø¼şÍ¨Öª´¦Àí³ÌĞò´úÂë
+	// TODO: åœ¨æ­¤æ·»åŠ æ§ä»¶é€šçŸ¥å¤„ç†ç¨‹åºä»£ç 
 	POSITION pos=m_ListCtr_Window.GetFirstSelectedItemPosition();
 	int index=m_ListCtr_Window.GetNextSelectedItem(pos);
 	if (index<0)
 	{
-		AfxMessageBox(_T("ÇëÑ¡ÔñÒ»¸ö´°¿Ú"));
+		AfxMessageBox(_T("è¯·é€‰æ‹©ä¸€ä¸ªçª—å£"));
 		return;
 	}
 	SLZWindow windowinfo=m_List_WindowInfo.GetAt(m_List_WindowInfo.FindIndex(index));
@@ -1192,18 +1193,18 @@ BOOL SLZWindowSetDlg::ReadQueInfoFromFile()
 
 void SLZWindowSetDlg::OnEnChangeEditEvaltimeout()
 {
-	// TODO:  Èç¹û¸Ã¿Ø¼şÊÇ RICHEDIT ¿Ø¼ş£¬ÔòËü½«²»»á
-	// ·¢ËÍ¸ÃÍ¨Öª£¬³ı·ÇÖØĞ´ CDialog::OnInitDialog()
-	// º¯Êı²¢µ÷ÓÃ CRichEditCtrl().SetEventMask()£¬
-	// Í¬Ê±½« ENM_CHANGE ±êÖ¾¡°»ò¡±ÔËËãµ½ÑÚÂëÖĞ¡£
+	// TODO:  å¦‚æœè¯¥æ§ä»¶æ˜¯ RICHEDIT æ§ä»¶ï¼Œåˆ™å®ƒå°†ä¸ä¼š
+	// å‘é€è¯¥é€šçŸ¥ï¼Œé™¤éé‡å†™ CDialog::OnInitDialog()
+	// å‡½æ•°å¹¶è°ƒç”¨ CRichEditCtrl().SetEventMask()ï¼Œ
+	// åŒæ—¶å°† ENM_CHANGE æ ‡å¿—â€œæˆ–â€è¿ç®—åˆ°æ©ç ä¸­ã€‚
 
-	// TODO:  ÔÚ´ËÌí¼Ó¿Ø¼şÍ¨Öª´¦Àí³ÌĞò´úÂë
+	// TODO:  åœ¨æ­¤æ·»åŠ æ§ä»¶é€šçŸ¥å¤„ç†ç¨‹åºä»£ç 
 	UpdateData();
 	POSITION pos=m_ListCtr_Window.GetFirstSelectedItemPosition();
 	int index=m_ListCtr_Window.GetNextSelectedItem(pos);
 	if (index<0)
 	{
-		AfxMessageBox(_T("ÇëÑ¡ÔñÒ»¸ö´°¿Ú"));
+		AfxMessageBox(_T("è¯·é€‰æ‹©ä¸€ä¸ªçª—å£"));
 		return;
 	}
 	SLZWindow windowinfo=m_List_WindowInfo.GetAt(m_List_WindowInfo.FindIndex(index));
@@ -1221,18 +1222,18 @@ void SLZWindowSetDlg::OnEnChangeEditEvaltimeout()
 
 void SLZWindowSetDlg::OnEnChangeEditLedphyid()
 {
-	// TODO:  Èç¹û¸Ã¿Ø¼şÊÇ RICHEDIT ¿Ø¼ş£¬ÔòËü½«²»»á
-	// ·¢ËÍ¸ÃÍ¨Öª£¬³ı·ÇÖØĞ´ CDialog::OnInitDialog()
-	// º¯Êı²¢µ÷ÓÃ CRichEditCtrl().SetEventMask()£¬
-	// Í¬Ê±½« ENM_CHANGE ±êÖ¾¡°»ò¡±ÔËËãµ½ÑÚÂëÖĞ¡£
+	// TODO:  å¦‚æœè¯¥æ§ä»¶æ˜¯ RICHEDIT æ§ä»¶ï¼Œåˆ™å®ƒå°†ä¸ä¼š
+	// å‘é€è¯¥é€šçŸ¥ï¼Œé™¤éé‡å†™ CDialog::OnInitDialog()
+	// å‡½æ•°å¹¶è°ƒç”¨ CRichEditCtrl().SetEventMask()ï¼Œ
+	// åŒæ—¶å°† ENM_CHANGE æ ‡å¿—â€œæˆ–â€è¿ç®—åˆ°æ©ç ä¸­ã€‚
 
-	// TODO:  ÔÚ´ËÌí¼Ó¿Ø¼şÍ¨Öª´¦Àí³ÌĞò´úÂë
+	// TODO:  åœ¨æ­¤æ·»åŠ æ§ä»¶é€šçŸ¥å¤„ç†ç¨‹åºä»£ç 
 	UpdateData();
 	POSITION pos=m_ListCtr_Window.GetFirstSelectedItemPosition();
 	int index=m_ListCtr_Window.GetNextSelectedItem(pos);
 	if (index<0)
 	{
-		AfxMessageBox(_T("ÇëÑ¡ÔñÒ»¸ö´°¿Ú"));
+		AfxMessageBox(_T("è¯·é€‰æ‹©ä¸€ä¸ªçª—å£"));
 		return;
 	}
 	SLZWindow windowinfo=m_List_WindowInfo.GetAt(m_List_WindowInfo.FindIndex(index));
@@ -1247,18 +1248,18 @@ void SLZWindowSetDlg::OnEnChangeEditLedphyid()
 
 void SLZWindowSetDlg::OnEnChangeEditLedpipe()
 {
-	// TODO:  Èç¹û¸Ã¿Ø¼şÊÇ RICHEDIT ¿Ø¼ş£¬ÔòËü½«²»»á
-	// ·¢ËÍ¸ÃÍ¨Öª£¬³ı·ÇÖØĞ´ CDialog::OnInitDialog()
-	// º¯Êı²¢µ÷ÓÃ CRichEditCtrl().SetEventMask()£¬
-	// Í¬Ê±½« ENM_CHANGE ±êÖ¾¡°»ò¡±ÔËËãµ½ÑÚÂëÖĞ¡£
+	// TODO:  å¦‚æœè¯¥æ§ä»¶æ˜¯ RICHEDIT æ§ä»¶ï¼Œåˆ™å®ƒå°†ä¸ä¼š
+	// å‘é€è¯¥é€šçŸ¥ï¼Œé™¤éé‡å†™ CDialog::OnInitDialog()
+	// å‡½æ•°å¹¶è°ƒç”¨ CRichEditCtrl().SetEventMask()ï¼Œ
+	// åŒæ—¶å°† ENM_CHANGE æ ‡å¿—â€œæˆ–â€è¿ç®—åˆ°æ©ç ä¸­ã€‚
 
-	// TODO:  ÔÚ´ËÌí¼Ó¿Ø¼şÍ¨Öª´¦Àí³ÌĞò´úÂë
+	// TODO:  åœ¨æ­¤æ·»åŠ æ§ä»¶é€šçŸ¥å¤„ç†ç¨‹åºä»£ç 
 	UpdateData();
 	POSITION pos=m_ListCtr_Window.GetFirstSelectedItemPosition();
 	int index=m_ListCtr_Window.GetNextSelectedItem(pos);
 	if (index<0)
 	{
-		AfxMessageBox(_T("ÇëÑ¡ÔñÒ»¸ö´°¿Ú"));
+		AfxMessageBox(_T("è¯·é€‰æ‹©ä¸€ä¸ªçª—å£"));
 		return;
 	}
 	SLZWindow windowinfo=m_List_WindowInfo.GetAt(m_List_WindowInfo.FindIndex(index));
@@ -1272,18 +1273,18 @@ void SLZWindowSetDlg::OnEnChangeEditLedpipe()
 
 void SLZWindowSetDlg::OnEnChangeEditLedipid()
 {
-	// TODO:  Èç¹û¸Ã¿Ø¼şÊÇ RICHEDIT ¿Ø¼ş£¬ÔòËü½«²»»á
-	// ·¢ËÍ¸ÃÍ¨Öª£¬³ı·ÇÖØĞ´ CDialog::OnInitDialog()
-	// º¯Êı²¢µ÷ÓÃ CRichEditCtrl().SetEventMask()£¬
-	// Í¬Ê±½« ENM_CHANGE ±êÖ¾¡°»ò¡±ÔËËãµ½ÑÚÂëÖĞ¡£
+	// TODO:  å¦‚æœè¯¥æ§ä»¶æ˜¯ RICHEDIT æ§ä»¶ï¼Œåˆ™å®ƒå°†ä¸ä¼š
+	// å‘é€è¯¥é€šçŸ¥ï¼Œé™¤éé‡å†™ CDialog::OnInitDialog()
+	// å‡½æ•°å¹¶è°ƒç”¨ CRichEditCtrl().SetEventMask()ï¼Œ
+	// åŒæ—¶å°† ENM_CHANGE æ ‡å¿—â€œæˆ–â€è¿ç®—åˆ°æ©ç ä¸­ã€‚
 
-	// TODO:  ÔÚ´ËÌí¼Ó¿Ø¼şÍ¨Öª´¦Àí³ÌĞò´úÂë
+	// TODO:  åœ¨æ­¤æ·»åŠ æ§ä»¶é€šçŸ¥å¤„ç†ç¨‹åºä»£ç 
 	UpdateData();
 	POSITION pos=m_ListCtr_Window.GetFirstSelectedItemPosition();
 	int index=m_ListCtr_Window.GetNextSelectedItem(pos);
 	if (index<0)
 	{
-		AfxMessageBox(_T("ÇëÑ¡ÔñÒ»¸ö´°¿Ú"));
+		AfxMessageBox(_T("è¯·é€‰æ‹©ä¸€ä¸ªçª—å£"));
 		return;
 	}
 	BOOL btemp= TRUE;
@@ -1338,7 +1339,7 @@ BOOL SLZWindowSetDlg::ReadMaxIdFromFile()
 
 void SLZWindowSetDlg::OnBnClickedAutologin()
 {
-	// TODO: ÔÚ´ËÌí¼Ó¿Ø¼şÍ¨Öª´¦Àí³ÌĞò´úÂë
+	// TODO: åœ¨æ­¤æ·»åŠ æ§ä»¶é€šçŸ¥å¤„ç†ç¨‹åºä»£ç 
 	for (int i=0;i<m_List_WindowInfo.GetCount();i++)
 	{
 		POSITION pos = m_List_WindowInfo.FindIndex(i);
@@ -1364,13 +1365,13 @@ void SLZWindowSetDlg::OnBnClickedAutologin()
 	}	
 
 	int index=m_ListCtr_Window.GetItemCount()-1;
-	m_ListCtr_Window.SetItemState(index, LVIS_FOCUSED | LVIS_SELECTED,LVIS_FOCUSED | LVIS_SELECTED);   //Ñ¡ÖĞĞĞ
+	m_ListCtr_Window.SetItemState(index, LVIS_FOCUSED | LVIS_SELECTED,LVIS_FOCUSED | LVIS_SELECTED);   //é€‰ä¸­è¡Œ
 	m_ListCtr_Window.SetSelectionMark(index);
 }
 
 void SLZWindowSetDlg::OnBnClickedCancelautologin()
 {
-	// TODO: ÔÚ´ËÌí¼Ó¿Ø¼şÍ¨Öª´¦Àí³ÌĞò´úÂë
+	// TODO: åœ¨æ­¤æ·»åŠ æ§ä»¶é€šçŸ¥å¤„ç†ç¨‹åºä»£ç 
 	for (int i=0;i<m_List_WindowInfo.GetCount();i++)
 	{
 		POSITION pos = m_List_WindowInfo.FindIndex(i);
@@ -1378,11 +1379,11 @@ void SLZWindowSetDlg::OnBnClickedCancelautologin()
 		{
 			SLZWindow window = m_List_WindowInfo.GetAt(pos);
 			window.SetLoginStaff(L"");
-			m_ListCtr_Window.SetItemText(i,LOGSTAFF,L"ÎŞ");
+			m_ListCtr_Window.SetItemText(i,LOGSTAFF,L"æ— ");
 			m_List_WindowInfo.SetAt(pos,window);
 		}
 	}	
 	int index=m_ListCtr_Window.GetItemCount()-1;
-	m_ListCtr_Window.SetItemState(index, LVIS_FOCUSED | LVIS_SELECTED,LVIS_FOCUSED | LVIS_SELECTED);   //Ñ¡ÖĞĞĞ
+	m_ListCtr_Window.SetItemState(index, LVIS_FOCUSED | LVIS_SELECTED,LVIS_FOCUSED | LVIS_SELECTED);   //é€‰ä¸­è¡Œ
 	m_ListCtr_Window.SetSelectionMark(index);
 }
