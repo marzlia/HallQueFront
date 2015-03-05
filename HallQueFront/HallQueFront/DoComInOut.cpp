@@ -67,26 +67,26 @@ DWORD WINAPI CDoComInOut::ReadCallerThread(LPVOID pParam)
 			}
 			if(dwReaded>0)//读到了
 			{
-// #ifdef _DEBUG
-// 				unsigned char uBuf[1024]={0};
-// 				memcpy(uBuf,buf,dwReaded);
-// 				CString temp;
-// 				for(UINT i=0;i<dwReaded;i++)
-// 				{
-// 					temp+=_T("0x");
-// 					temp.AppendFormat(_T("%08x"),uBuf[i]);
-// 					temp+=_T(" ");
-// 				}
-// 				MyWriteConsole(temp);
-// 				MyWriteConsole(_T("------------------------------------------"));
-// 				CString strBuf;
-// 				CCommonConvert convert;
-// 				convert.CharToCstring(strBuf,buf);
-// 				MyWriteConsole(strBuf);
-// 				MyWriteConsole(_T("------------------------------------------"));
-// 				CString strDwread;
-// 				MyWriteConsole(strDwread);
-// #endif
+#ifdef _DEBUG
+				unsigned char uBuf[1024]={0};
+				memcpy(uBuf,buf,dwReaded);
+				CString temp;
+				for(UINT i=0;i<dwReaded;i++)
+				{
+					temp+=_T("0x");
+					temp.AppendFormat(_T("%08x"),uBuf[i]);
+					temp+=_T(" ");
+				}
+				MyWriteConsole(temp);
+				MyWriteConsole(_T("------------------------------------------"));
+				CString strBuf;
+				CCommonConvert convert;
+				convert.CharToCstring(strBuf,buf);
+				MyWriteConsole(strBuf);
+				MyWriteConsole(_T("------------------------------------------"));
+				CString strDwread;
+				MyWriteConsole(strDwread);
+#endif
 				//////不是呼叫器和评价的数据,注：呼叫器评价器数据以0xff,0x68开始,0x16结束
 				if(buf[0]==(char)0xA0 && buf[1]==(char)0x90 && buf[dwReaded-1]==(char)0xAA && 
 					buf[dwReaded-2]==(char)0xA5)
@@ -115,37 +115,30 @@ DWORD WINAPI CDoComInOut::ReadCallerThread(LPVOID pParam)
 				{
 					if(buf[5]>0xffffff80)
 					{/////////平价器消息
-						//评价器信息
-						char evabuf[10]={0};
+						//返回给评价器信息
+						char evabuf[8]={0};
 						pThis->m_pSlzEvaluator->SystemSendToEva(evabuf,buf);
-						WriteComMsg* pMsg = new WriteComMsg;
-// 						pMsg->buf = new char[dwReaded+1];
+						WriteComMsg* pMsg = new WriteComMsg;;
  						memset(pMsg->buf,0,DATABUFLEN);
-						memcpy(pMsg->buf,buf,dwReaded);
-						pMsg->length = dwReaded;
+						memcpy(pMsg->buf,evabuf,8);
+						pMsg->length = 8;
 						pThis->AddWriteComMsg(pMsg);
-						WaitForSingleObject(pThis->m_hWriteComThread,40);
-//						Sleep(10);
-//						WriteFile(pComInit->m_hComWndScreen,
-//							evabuf,10,&dwReaded,NULL);//收到返回
-					//判断评价超时并改值(当前一次评价没结束时，（同一个评价器）
-					//又来一个评价，需要判断改值
+						WaitForSingleObject(pThis->m_hWriteComThread,80);
+						//判断评价超时并改值(当前一次评价没结束时，（同一个评价器）
+						//又来一个评价，需要判断改值
 						pThis->m_pSlzEvaluator->IsOutTimeAndReser(buf);
-					//处理评价数据
+						//处理评价数据
 						pThis->m_pSlzEvaluator->DoEvaltorMsg(buf);
 					}
 					else
 					{//////////呼叫器消息
 						//呼叫器消息
-// 						Sleep(10);
-// 						WriteFile(pComInit->m_hComWndScreen,
-// 							buf,dwReaded,&dwReaded,NULL);
 						WriteComMsg* pMsg = new WriteComMsg;
 						memset(pMsg->buf,0,DATABUFLEN);
 						memcpy(pMsg->buf,buf,dwReaded);
 						pMsg->length = dwReaded;
 						pThis->AddWriteComMsg(pMsg);
-						WaitForSingleObject(pThis->m_hWriteComThread,40);
+						WaitForSingleObject(pThis->m_hWriteComThread,80);
 						pThis->m_pSlzCaller->DoReadMsg(dwReaded,buf);
 					}	
 				}

@@ -89,12 +89,6 @@ void CCallThread::DoEvaMsg(const MSG& msg)
 	BOOL flag = m_rInlineQueData.m_rWindowTable.QueryWindowByEvaId(pEvaData->GetEvaluatorId(),Window);
 	if(flag)
 	{
-// #ifdef _DEBUG
-// 		CString str;
-// 		str.Format(_T("%d"),pEvaData->GetEvaluatorId());
-// 		str+=_T(" evalutorID");
-// 		MyWriteConsole(str);
-// #endif
 		SLZData data;
 		//找出正在呼叫的那条数据
 		if(m_rCalledQueData.GetCalledQueData(Window.GetWindowId(),data))
@@ -106,12 +100,6 @@ void CCallThread::DoEvaMsg(const MSG& msg)
 			if(m_rCalledQueData.DeleteCalledQueData(data))//删除正在呼叫的那条数据
 			{
 				m_rFinshQueData.Add(data);//加入完成队列
-// #ifdef _DEBUG
-// 			CString str;
-// 			str.Format(_T("%d"),pEvaData->GetEvaluatorId());
-// 			str+=_T(" evalutorID");
-// 			MyWriteConsole(str);
-// #endif
 			}
 		}
 		else//不呼叫只评价
@@ -124,10 +112,10 @@ void CCallThread::DoEvaMsg(const MSG& msg)
 			data.SetWindowShowId(Window.GetShowWndId());
 			CString staffID = m_map_login[Window.GetWindowId()];
 			data.SetStaffId(staffID);
-			data.SetBussinessType(_T("0"));
+			data.SetBussinessType(_T("1"));
 			data.SetOrganId(theApp.m_logicVariables.strOrganID);
 			data.SetOrganName(theApp.m_logicVariables.strOrganNmae);
-			data.SetQueSerialID(_T("0"));
+			data.SetQueSerialID(_T("1"));
 			data.SetQueueNumber(_T("0"));
 			data.SetCallTime(curTime);
 			data.SetTakingNumTime(curTime);

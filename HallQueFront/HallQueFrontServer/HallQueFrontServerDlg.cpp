@@ -118,7 +118,13 @@ BOOL CHallQueFrontServerDlg::OnInitDialog()
 	//////
 	AddTrayIcon();
 	/////
+
 	SetTimer(11,10,NULL);
+
+	CConnectToMySql mySql;
+	int i_port = 0;
+	CCommonConvert::CStringToint(i_port,m_dbaConfig.GetDBPort());
+	mySql.ConnectToDB(m_dbaConfig.GetServerIP(),i_port,m_dbaConfig.GetServerAcount(),m_dbaConfig.GetServerPassword());
 	return TRUE;  // 除非将焦点设置到控件，否则返回 TRUE
 }
 
