@@ -38,7 +38,7 @@ private:
 	CStatic m_sta_CellPhone;
 	CStatic m_sta_QueNum;
 	CStatic m_sta_WaitNum;
-	CStatic m_sta_Msg;
+//	CStatic m_sta_Msg;
 	CString m_strMsgPath;
 	CString m_strPhoneNum;
 	CString m_strQueNum;

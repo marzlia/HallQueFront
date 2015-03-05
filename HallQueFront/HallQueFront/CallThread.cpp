@@ -114,6 +114,25 @@ void CCallThread::DoEvaMsg(const MSG& msg)
 // #endif
 			}
 		}
+		else//不呼叫只评价
+		{
+			data.SetEvaluateLevel(pEvaData->GetEvaLevel());
+			data.SetIsFinshEva(TRUE);
+			CTime curTime = CTime::GetCurrentTime();
+			data.SetFinishTime(curTime);
+			data.SetWindowId(Window.GetWindowId());
+			data.SetWindowShowId(Window.GetShowWndId());
+			CString staffID = m_map_login[Window.GetWindowId()];
+			data.SetStaffId(staffID);
+			data.SetBussinessType(_T("0"));
+			data.SetOrganId(theApp.m_logicVariables.strOrganID);
+			data.SetOrganName(theApp.m_logicVariables.strOrganNmae);
+			data.SetQueSerialID(_T("0"));
+			data.SetQueueNumber(_T("0"));
+			data.SetCallTime(curTime);
+			data.SetTakingNumTime(curTime);
+			m_rFinshQueData.Add(data);//加入完成队列
+		}
 	}
 	if(pEvaData)//释放资源
 		delete pEvaData;

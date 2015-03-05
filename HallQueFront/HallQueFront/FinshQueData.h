@@ -3,8 +3,7 @@
 #include <list>
 #include "SLZData.h"
 #include <string>
-using namespace std;
-
+#include "JudyeShortMsg.h"
 using namespace std;
 
 class CFinshQueData
@@ -17,9 +16,16 @@ public:
 	BOOL GetFinshedData();
 private:
 	std::list<SLZData> m_listFinshQue;//完成队列
+	std::list<CJudgeShortMsg*> m_list_shortmsg;//发送评价消息队列
 	CMutex m_mtFinshQue;//完成队列锁
+	CString m_filePath;//读文件路径
 private:
 	static UINT DoFinshedData(LPVOID pParam);
 	CWinThread* m_pDoFinshedDataThread;//处理完成数据线程
 	BOOL Start();
+	void ReleaseListShorMsg();
+	BOOL ReadJudgeShortMsg();
+	BOOL SendMsgToPhone(const SLZData& data);
+public:
+	BOOL ReFlushListShortMsg();//接口刷新出现差评发送短信的队列
 };

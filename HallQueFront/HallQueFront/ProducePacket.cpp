@@ -70,12 +70,10 @@ int CProducePacket::JudgePacketRet(const std::string strPacket)
 		writeLogErr.WriteErrLog(_T("刷卡返回报文中找不到</retCode>"));
 		return -1;
 	}
-	std::string errCode = strPacket.substr(firstIndex+9,lastIndex-firstIndex-9);
-	if(errCode=="1")
-	{
-		return 1;//成功
-	}
-	return 0;
+	std::string strErrCode = strPacket.substr(firstIndex+9,lastIndex-firstIndex-9);
+	int nErrCode = 0;
+	nErrCode = atoi(strErrCode.c_str());
+	return nErrCode;
 }
 
 int CProducePacket::JudgeSendPacket(const std::string strPacket)
@@ -127,7 +125,7 @@ int CProducePacket::JudgeSendPacket(const std::string strPacket)
 	if(firstIndex == strPacket.npos)return 18;
 	lastIndex = strPacket.find("</queNum>");
 	if(lastIndex == strPacket.npos)return 18;
-	std::string queNum = strPacket.substr(firstIndex+9,lastIndex-firstIndex-9);
+	std::string queNum = strPacket.substr(firstIndex+8,lastIndex-firstIndex-8);
 	if(queNum.empty())return 18;
 	firstIndex = strPacket.find("<enterTime>");
 	if(firstIndex == strPacket.npos)return 19;

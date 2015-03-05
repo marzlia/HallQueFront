@@ -120,7 +120,7 @@ DWORD WINAPI CDoComInOut::ReadCallerThread(LPVOID pParam)
 						pThis->m_pSlzEvaluator->SystemSendToEva(evabuf,buf);
 						WriteComMsg* pMsg = new WriteComMsg;
 // 						pMsg->buf = new char[dwReaded+1];
- 						memset(pMsg->buf,0,textNum);
+ 						memset(pMsg->buf,0,DATABUFLEN);
 						memcpy(pMsg->buf,buf,dwReaded);
 						pMsg->length = dwReaded;
 						pThis->AddWriteComMsg(pMsg);
@@ -141,7 +141,7 @@ DWORD WINAPI CDoComInOut::ReadCallerThread(LPVOID pParam)
 // 						WriteFile(pComInit->m_hComWndScreen,
 // 							buf,dwReaded,&dwReaded,NULL);
 						WriteComMsg* pMsg = new WriteComMsg;
-						memset(pMsg->buf,0,textNum);
+						memset(pMsg->buf,0,DATABUFLEN);
 						memcpy(pMsg->buf,buf,dwReaded);
 						pMsg->length = dwReaded;
 						pThis->AddWriteComMsg(pMsg);

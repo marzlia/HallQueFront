@@ -649,7 +649,10 @@ BOOL SLZController::ReFlushWindowTable()
 
 BOOL SLZController::ReFlushSysLogicVarlibles()
 {
+	///读逻辑变量
 	BOOL flag = theApp.ReadLogicVariablesFromFile();
+	///读差评时发送短信数据
+	flag = m_pFinshQueData->ReFlushListShortMsg();
 	//由于可能机构已改所以需要重新发送数据,先读数据。再发送
 	SetCursor(LoadCursor(NULL,IDC_WAIT));
 	BOOL flag1 = FALSE;BOOL flag2 = FALSE;BOOL flag3 = FALSE;
@@ -1808,4 +1811,11 @@ BOOL SLZController::InitLoginMap()
 		}
 	}
 	return TRUE;
+}
+
+CString SLZController::GetStaffNameByID(const CString& staffID)
+{
+	SLZStaff* pStaff = m_staffTable.QueryStaffById(staffID);
+	if(!pStaff)return _T("");
+	return pStaff->GetStaffName();
 }

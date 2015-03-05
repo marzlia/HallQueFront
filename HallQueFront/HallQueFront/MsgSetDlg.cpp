@@ -7,10 +7,10 @@
 
 // CMsgSetDlg 对话框
 
-IMPLEMENT_DYNAMIC(CMsgSetDlg, CDialog)
+IMPLEMENT_DYNAMIC(CMsgSetDlg, CPropertyPage)
 
-CMsgSetDlg::CMsgSetDlg(CWnd* pParent /*=NULL*/)
-	: CDialog(CMsgSetDlg::IDD, pParent)
+CMsgSetDlg::CMsgSetDlg()
+	: CPropertyPage(CMsgSetDlg::IDD)
 {
 	m_strMsgPath = CommonStrMethod::GetModuleDir()+L"ShortMsg\\";
 	CommonStrMethod::CreatePath(m_strMsgPath);
@@ -23,18 +23,17 @@ CMsgSetDlg::~CMsgSetDlg()
 
 void CMsgSetDlg::DoDataExchange(CDataExchange* pDX)
 {
-	CDialog::DoDataExchange(pDX);
+	CPropertyPage::DoDataExchange(pDX);
 	DDX_Control(pDX,IDC_LIST_MSG,m_list_Msg);
 	DDX_Control(pDX,IDC_EDIT_MSG,m_edit_Msg);
 }
 
 
-BEGIN_MESSAGE_MAP(CMsgSetDlg, CDialog)
+BEGIN_MESSAGE_MAP(CMsgSetDlg, CPropertyPage)
 	ON_BN_CLICKED(IDC_BUTTON_ADDMSG, &CMsgSetDlg::OnBnClickedButtonAddmsg)
 	ON_BN_CLICKED(IDC_BUTTON_DELMSG, &CMsgSetDlg::OnBnClickedButtonDelmsg)
 	ON_LBN_SELCHANGE(IDC_LIST_MSG, &CMsgSetDlg::OnLbnSelchangeListMsg)
 	ON_EN_CHANGE(IDC_EDIT_MSG, &CMsgSetDlg::OnEnChangeEditMsg)
-	ON_BN_CLICKED(IDOK, &CMsgSetDlg::OnBnClickedOk)
 END_MESSAGE_MAP()
 
 
@@ -42,7 +41,7 @@ END_MESSAGE_MAP()
 
 BOOL CMsgSetDlg::OnInitDialog()
 {
-	CDialog::OnInitDialog();
+	CPropertyPage::OnInitDialog();
 	ReadMsgFromFile();
 	CFont font;
 	font.CreatePointFont(110,L"微软雅黑");
@@ -109,29 +108,6 @@ void CMsgSetDlg::OnEnChangeEditMsg()
 	m_list_Msg.SetCurSel(index);
 }
 
-void CMsgSetDlg::OnBnClickedOk()
-{
-	// TODO: 在此添加控件通知处理程序代码
-	m_arr_Msg.RemoveAll();
-	int nlength = m_list_Msg.GetCount();
-	for (int i = 0;i<nlength;i++)
-	{
-		CString strMsg;
-		m_list_Msg.GetText(i,strMsg);
-		if (strMsg.GetLength()<=70)
-		{		
-			m_arr_Msg.Add(strMsg);
-		}
-		else
-		{
-			AfxMessageBox(L"提示信息过长，请控制在70个字符以内");
-			return;
-		}
-	}
-	WriteMsgIntoFile();
-	OnOK();
-}
-
 BOOL CMsgSetDlg::WriteMsgIntoFile()
 {
 	CFile file;
@@ -178,4 +154,27 @@ BOOL CMsgSetDlg::ReadMsgFromFile()
 		return TRUE;
 	}
 	else return FALSE;
+}
+
+BOOL CMsgSetDlg::OnApply()
+{
+	// TODO: 在此添加专用代码和/或调用基类
+	m_arr_Msg.RemoveAll();
+	int nlength = m_list_Msg.GetCount();
+	for (int i = 0;i<nlength;i++)
+	{
+		CString strMsg;
+		m_list_Msg.GetText(i,strMsg);
+		if (strMsg.GetLength()<=70)
+		{		
+			m_arr_Msg.Add(strMsg);
+		}
+		else
+		{
+			AfxMessageBox(L"提示信息过长，请控制在70个字符以内");
+			return FALSE;
+		}
+	}
+	WriteMsgIntoFile();
+	return CPropertyPage::OnApply();
 }

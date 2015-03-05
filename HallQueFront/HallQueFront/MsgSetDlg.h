@@ -3,12 +3,12 @@
 
 // CMsgSetDlg 对话框
 
-class CMsgSetDlg : public CDialog
+class CMsgSetDlg : public CPropertyPage
 {
 	DECLARE_DYNAMIC(CMsgSetDlg)
 
 public:
-	CMsgSetDlg(CWnd* pParent = NULL);   // 标准构造函数
+	CMsgSetDlg();   // 标准构造函数
 	virtual ~CMsgSetDlg();
 
 // 对话框数据
@@ -30,5 +30,5 @@ public:
 	afx_msg void OnBnClickedButtonDelmsg();
 	afx_msg void OnLbnSelchangeListMsg();
 	afx_msg void OnEnChangeEditMsg();
-	afx_msg void OnBnClickedOk();
+	virtual BOOL OnApply();
 };

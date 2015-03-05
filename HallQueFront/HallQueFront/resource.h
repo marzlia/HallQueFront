@@ -65,6 +65,7 @@
 #define IDD_DIALOG_SHORTMESSAGE         182
 #define IDD_DIALOG_MSGSET               183
 #define IDB_BITMAP_SENDMSG              185
+#define IDD_PROPMSG_JUDGE               186
 #define IDC_ED_BNWIDTH                  1000
 #define IDC_ED_BNHEIGHT                 1001
 #define IDC_COMBO_TRANS                 1003
@@ -146,6 +147,7 @@
 #define IDC_BN_ADDPAGE                  1074
 #define IDC_BTN_SETBK                   1074
 #define IDC_BUTTON_ADDMSG               1074
+#define IDC_BN_CONTENT                  1074
 #define IDC_DELWND                      1075
 #define IDC_BTN_DELQUE                  1075
 #define IDC_BN_CANCEL                   1075
@@ -156,9 +158,12 @@
 #define IDC_BUTTON_WNDNAME              1075
 #define IDC_BN_DELPAGE                  1075
 #define IDC_BUTTON_DELMSG               1075
+#define IDC_BN_ADDMSG                   1075
 #define IDC_EDIT_EXAMPLE                1076
 #define IDC_BTN2                        1076
 #define IDC_BUTTON_QUENUMENG            1076
+#define IDC_BN_CONTENT3                 1076
+#define IDC_BN_DELMSG                   1076
 #define IDC_COM_TIMESTYLE               1077
 #define IDC_BTN7                        1077
 #define IDC_BUTTON_WNDNAMEENG           1077
@@ -236,6 +241,7 @@
 #define IDC_LIST_LIB                    1119
 #define IDC_LIST_PAGE                   1119
 #define IDC_LIST_MSG                    1119
+#define IDC_LIST_CONTENT                1119
 #define IDC_ED_CARDTYPENAME             1120
 #define IDC_EDIT_EVALTIMEOUT            1120
 #define IDC_LIST_SOUNDMSG2              1120
@@ -270,6 +276,7 @@
 #define IDC_CHECK_MKSDALL               1138
 #define IDC_CHECK_MKJTTSALL             1138
 #define IDC_CHECK_MKSHALL               1138
+#define IDC_CHECK_OPENSHORTMSG          1138
 #define IDC_DATETIMEPICKER2             1139
 #define IDC_DATE_CLOSE                  1139
 #define IDC_CHECK2                      1140
@@ -346,6 +353,7 @@
 #define IDC_STATIC_MSG                  1202
 #define IDC_EDIT_MSG                    1203
 #define IDC_COMBO1                      1206
+#define IDC_EDIT_PHONENUM               1208
 #define ID_32771                        32771
 #define ID_32772                        32772
 #define ID_32773                        32773
@@ -407,9 +415,9 @@
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        186
+#define _APS_NEXT_RESOURCE_VALUE        187
 #define _APS_NEXT_COMMAND_VALUE         32827
-#define _APS_NEXT_CONTROL_VALUE         1208
+#define _APS_NEXT_CONTROL_VALUE         1209
 #define _APS_NEXT_SYMED_VALUE           117
 #endif
 #endif

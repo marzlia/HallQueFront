@@ -75,6 +75,7 @@ BOOL CConnectToMySql::ConnectToDB(const CString& IP,const USHORT port,const CStr
 		m_pSqlCon = m_pSqlDriver->connect(connectIP,connectUserName,connectPassWord);
 		ASSERT(m_pSqlCon!=NULL);
 		m_pSqlCon->setSchema("newinfoman");
+		//m_pSqlCon->setSchema("infoman");
 		m_pSqlCon->setClientOption("CHARSET", "GB2312");
 		m_pSqlState = m_pSqlCon->createStatement();
 		ASSERT(m_pSqlState!=NULL);

@@ -1,9 +1,12 @@
 #ifndef _HALLQUEFRONT_DATADEF_H
 #define _HALLQUEFRONT_DATADEF_H
-#include "TrackDef.h"
+
 
 #define EVA_MSG WM_USER+1019
 #define CALL_MSG WM_USER+1117
+
+#define MYBUFLEN 256
+#define DATABUFLEN 2048
 /*指令类别枚举*/
 typedef enum _tagCmdType
 {
@@ -92,13 +95,14 @@ typedef struct _tagLogicVariables//系统综合逻辑变量
 	BOOL ExchangeWindow;//转移窗口
 	BOOL IsAutoSendToServer;//是否发送生成数据到服务端
 	BOOL IsUseJtts;			//是否使用jtts语音库
-	WCHAR strOrganNmae[addNum];//机构名称
-	WCHAR strOrganID[addNum];//机构代码//支行代码
-	WCHAR strParOrgName[addNum];//父级机构名称
-	WCHAR strParOrgID[addNum];//父级机构ID
+	WCHAR strOrganNmae[MYBUFLEN];//机构名称
+	WCHAR strOrganID[MYBUFLEN];//机构代码//支行代码
+	WCHAR strParOrgName[MYBUFLEN];//父级机构名称
+	WCHAR strParOrgID[MYBUFLEN];//父级机构ID
 	int playSpeed;			//JTTS 播放速度
 	UINT iNumberCallType;	//数字播放格式 
-	BOOL IsAutoChangePage;
+	BOOL IsAutoChangePage;	//按钮选择以后自动跳回主界面
+	BOOL IsOpenJudgeShortMsg;//是否开启评价器（出现差评时）发送短信到手机
 }LogicVariables,*pLogicVariables;
 /*
 显示缺纸还是显示等候
@@ -122,11 +126,11 @@ typedef struct _tagWriteComMsg
 {
 public:
 	_tagWriteComMsg(){
-		memset(buf,0,textNum);
+		memset(buf,0,DATABUFLEN);
 		length = 0;
 	}
 	int length;
-	char buf[textNum];
+	char buf[DATABUFLEN];
 }WriteComMsg;
 
 #define STRING_QUEUEID_CALL			(_T("[排队号码]"))			//呼叫排队号码

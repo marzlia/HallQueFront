@@ -37,10 +37,11 @@ int CComInit::TryCom(int nCom)
 	CString strWndCom;
 	strWndCom.Format(_T("COM%d"),nCom);
 	HANDLE hCom=CreateFile(strWndCom,GENERIC_READ | GENERIC_WRITE,0,
-		NULL,OPEN_EXISTING,0,NULL);
+		NULL,OPEN_EXISTING,FILE_FLAG_OVERLAPPED,NULL);
 	if(INVALID_HANDLE_VALUE != hCom)
 	{
 		CloseHandle(hCom);
+		hCom = INVALID_HANDLE_VALUE;
 		return nCom;
 	}
 	else

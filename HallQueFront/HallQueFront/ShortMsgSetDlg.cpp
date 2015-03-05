@@ -13,8 +13,8 @@ CShortMsgSetDlg::CShortMsgSetDlg(CWnd* pParent /*=NULL*/,CInlineQueData& rInline
 	: CDialog(CShortMsgSetDlg::IDD, pParent)
 	,m_rInlineQueData(rInlineQueData)
 {
-	m_strMsgPath = CommonStrMethod::GetModuleDir()+L"ShortMsg\\";
-	m_strMsgPath +=L"ShortMsg.dat";
+	m_strMsgPath = CommonStrMethod::GetModuleDir() + L"ShortMsg\\";
+	m_strMsgPath += L"ShortMsg.dat";
 }
 
 CShortMsgSetDlg::~CShortMsgSetDlg()
@@ -27,7 +27,7 @@ void CShortMsgSetDlg::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX,IDC_STATIC_CELLPHONE,m_sta_CellPhone);
 	DDX_Control(pDX,IDC_STATIC_QUENUM,m_sta_QueNum);
 	DDX_Control(pDX,IDC_STATIC_WAITNUM,m_sta_WaitNum);
-	DDX_Control(pDX,IDC_STATIC_MSG,m_sta_Msg);
+//	DDX_Control(pDX,IDC_STATIC_MSG,m_sta_Msg);
 	DDX_Control(pDX,IDC_EDIT_CELLPHONE,m_edit_CellPhone);
 	DDX_Control(pDX,IDC_EDIT_QUENUM,m_edit_QueNum);
 	DDX_Control(pDX,IDC_EDIT_WAITNUM,m_edit_WaitNum);
@@ -54,15 +54,15 @@ BOOL CShortMsgSetDlg::OnInitDialog()
 	CDialog::OnInitDialog();
 	ReadMsgInfoFromFile();
 	m_sta_CellPhone.SetWindowText(L"");
-	m_sta_Msg.SetWindowText(L"");
+//	m_sta_Msg.SetWindowText(L"");
 	m_sta_QueNum.SetWindowText(L"");
 	m_sta_WaitNum.SetWindowText(L"");
-	CFont font;
-	font.CreatePointFont(100,L"ºÚÌå");
-	m_sta_CellPhone.SetFont(&font,TRUE);
-	m_sta_Msg.SetFont(&font,TRUE);
-	m_sta_QueNum.SetFont(&font,TRUE);
-	m_sta_WaitNum.SetFont(&font,TRUE);
+// 	CFont font;
+// 	font.CreatePointFont(100,L"ºÚÌå");
+// 	m_sta_CellPhone.SetFont(&font,TRUE);
+// 	m_sta_Msg.SetFont(&font,TRUE);
+// 	m_sta_QueNum.SetFont(&font,TRUE);
+// 	m_sta_WaitNum.SetFont(&font,TRUE);
 	return TRUE;
 }
 void CShortMsgSetDlg::OnBnClickedOk()

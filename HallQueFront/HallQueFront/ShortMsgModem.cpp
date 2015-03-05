@@ -10,9 +10,11 @@ CShortMsgModem::CShortMsgModem(void):m_ReadThread(NULL)
 	{
 		CComInit* pComInit = CComInit::GetInstance();
 		CString MsgCom = pComInit->GetMsgComm();
-		int i_MsgCom=0;
+		int i_MsgCom = 0;
 		CCommonConvert::CStringToint(i_MsgCom,MsgCom);
-		OpenMsgComm(i_MsgCom);
+		CloseMsgComm();//lj修改当没有ini文件时出现bug,不知道到底怎么产生的
+		if(i_MsgCom)//lj修改
+			OpenMsgComm(i_MsgCom);
 		m_ReadThread = CreateThread(NULL,0,ReadProc,this,0,0);
 	}
 	m_strLogFilePath = CommonStrMethod::GetModuleDir() + _T("ShortMsglog/");

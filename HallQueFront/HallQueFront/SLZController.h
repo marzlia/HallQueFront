@@ -146,4 +146,6 @@ public:
 	BOOL InitLoginMap();//³õÊ¼»¯µÇÂ¼±í
 private:
 	CMutex m_fileWriteInlineFile;
+public:
+	CString GetStaffNameByID(const CString& staffID);
 };

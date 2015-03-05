@@ -63,7 +63,7 @@ public:
 	CButton m_Sel_CallType2;
 	CDateTimeCtrl m_date_closeCmputer;
 	CDateTimeCtrl m_date_clearData;
-private:
+
 	LogicVariables m_logicVariables;//系统逻辑变量
 public:
 	CEdit m_ed_organName;

@@ -15,7 +15,7 @@ CDealData::CDealData(void) : m_pAnaPecket(NULL)
 // 		CCommonConvert::CStringToint(i_port,port);
 // 		m_conMySql.ConnectToDB(ip,i_port,account,pass);
 // 	}
-// 	Start();
+ 	Start();
 }
 
 CDealData* CDealData::GetInstance()

@@ -164,7 +164,7 @@ int CProducePacket::JudgeSendPacket(const std::string strPacket)
 		if(firstIndex == strPacket.npos)return 18;
 		lastIndex = strPacket.find("</queNum>");
 		if(lastIndex == strPacket.npos)return 18;
-		std::string queNum = strPacket.substr(firstIndex+9,lastIndex-firstIndex-9);
+		std::string queNum = strPacket.substr(firstIndex+8,lastIndex-firstIndex-8);
 		if(queNum.empty())return 18;
 		firstIndex = strPacket.find("<enterTime>");
 		if(firstIndex == strPacket.npos)return 19;

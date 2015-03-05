@@ -6,7 +6,7 @@
 #include "PropConnectInfo.h"
 #include "CommonStrMethod.h"
 #include "DoFile.h"
-#include "MsgSetDlg.h"
+#include "PropertyShortMsg.h"
 
 
 
@@ -617,8 +617,8 @@ void CPropConnectInfo::OnBnClickedBnSavecon()
 void CPropConnectInfo::OnBnClickedButtonMsgset()
 {
 	// TODO: 在此添加控件通知处理程序代码
-	CMsgSetDlg MsgSetDlg;
-	MsgSetDlg.DoModal();
+	CPropertyShortMsg PropertyShortMsg(_T("短息设置"),this);
+	PropertyShortMsg.DoModal();
 }
 
 

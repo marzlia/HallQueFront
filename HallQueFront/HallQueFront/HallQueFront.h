@@ -45,7 +45,6 @@ public:
 private:
 	BOOL AddAutoRun(CString strValueName);
 public:
-public:
 	list<CommDaoOrg> m_list_comOrg;
 	list<CommDaoQue> m_list_comQue;
 	list<CommDaoWnd> m_list_comWnd;

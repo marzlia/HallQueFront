@@ -285,11 +285,11 @@ DWORD WINAPI SLZCWndScreen::DoWndScreenMsgThread(LPVOID pParm)
 				int length = pDlg->DoSingleColorMsg(wndmsg.strmsg,wndmsg.address,Singlebuf);
 				
 				WriteComMsg *pMsg = new WriteComMsg;
-				memset(pMsg->buf,0,textNum);
+				memset(pMsg->buf,0,DATABUFLEN);
 				memcpy(pMsg->buf,buf,size);
 				pMsg->length = size;
 				WriteComMsg *pSingleMsg = new WriteComMsg;
-				memset(pSingleMsg->buf,0,textNum);
+				memset(pSingleMsg->buf,0,DATABUFLEN);
 				memcpy(pSingleMsg->buf,Singlebuf,length);
 				pSingleMsg->length = length;
 				CDoComInOut* pComInOut = CDoComInOut::GetInstance();
@@ -351,7 +351,7 @@ void SLZCWndScreen::InitThroughScreen(const int address)
 // 		headAddCmd,22,&dwWrite,NULL);
 	WriteComMsg *pMsg = new WriteComMsg;
 //	pMsg->buf = new char(22);
-	memset(pMsg->buf,0,textNum);
+	memset(pMsg->buf,0,DATABUFLEN);
 	memcpy(pMsg->buf,headAddCmd,22);
 	pMsg->length = 22;
 	CDoComInOut* pComInOut = CDoComInOut::GetInstance();
@@ -656,7 +656,7 @@ BOOL SLZCWndScreen::SendDataToThroughScreen(const CString& str,int address,int c
 	char buf[512]={0};
 	int length = DoScreenMsg(msg,address+channel,buf);
 	WriteComMsg *pMsg = new WriteComMsg;
-	memset(pMsg->buf,0,textNum);
+	memset(pMsg->buf,0,DATABUFLEN);
 	memcpy(pMsg->buf,buf,length);
 	pMsg->length = length;
 	CDoComInOut* pComInOut = CDoComInOut::GetInstance();

@@ -309,6 +309,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\JudyeShortMsg.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\KeyBoardEdit.cpp"
 				>
 			</File>
@@ -369,6 +373,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\PorpJudgeShortMsg.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\PrintSetDlg.cpp"
 				>
 			</File>
@@ -398,6 +406,10 @@
 			</File>
 			<File
 				RelativePath=".\PropEdText.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\PropertyShortMsg.cpp"
 				>
 			</File>
 			<File
@@ -723,6 +735,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\JudyeShortMsg.h"
+				>
+			</File>
+			<File
 				RelativePath=".\KeyBoardEdit.h"
 				>
 			</File>
@@ -787,6 +803,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\PorpJudgeShortMsg.h"
+				>
+			</File>
+			<File
 				RelativePath=".\PrintDef.h"
 				>
 			</File>
@@ -820,6 +840,10 @@
 			</File>
 			<File
 				RelativePath=".\PropEdText.h"
+				>
+			</File>
+			<File
+				RelativePath=".\PropertyShortMsg.h"
 				>
 			</File>
 			<File

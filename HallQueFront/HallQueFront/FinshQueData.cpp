@@ -4,9 +4,16 @@
 #include "HallQueFront.h"
 #include "ComplSocketClient.h"
 #include "ProducePacket.h"
+#include "ShortMsgModem.h"
+#include "DoFile.h"
 
 CFinshQueData::CFinshQueData(void) : m_pDoFinshedDataThread(NULL)
 {
+	CDoFile doFile;
+	m_filePath = doFile.GetExeFullFilePath();
+	m_filePath += _T("\\JudgeShortMsg");
+	m_filePath += _T("\\JudgeShortMsg.dat");
+	ReadJudgeShortMsg();
 	Start();
 }
 
@@ -26,6 +33,7 @@ CFinshQueData::~CFinshQueData(void)
 		delete m_pDoFinshedDataThread;
 		m_pDoFinshedDataThread = NULL;
 	}
+	ReleaseListShorMsg();
 }
 
 void CFinshQueData::Add(const SLZData& data)
@@ -76,6 +84,15 @@ BOOL CFinshQueData::GetFinshedData()
  		int errCode = packet.JudgePacketRet(recvMsg);
  		if(errCode!=1) flag=FALSE; 
 	}
+	///////////出现差评时发送短信到手机//////////////
+	if(theApp.m_logicVariables.IsOpenJudgeShortMsg)
+	{
+		if(data.GetEvaluateLevel() == evaBad)
+		{
+			//发送短信
+			SendMsgToPhone(data);
+		}	
+	}
 	return flag;
 }
 
@@ -103,4 +120,72 @@ UINT CFinshQueData::DoFinshedData(LPVOID pParam)
 		}
 	}
 	return 0;
+}
+
+void CFinshQueData::ReleaseListShorMsg()
+{
+	list<CJudgeShortMsg*>::const_iterator itera = m_list_shortmsg.begin();
+	for(itera;itera!=m_list_shortmsg.end();itera++)
+	{
+		CJudgeShortMsg* pMsg = *itera;
+		delete pMsg;
+		pMsg = NULL;
+	}
+	m_list_shortmsg.clear();
+}
+
+BOOL CFinshQueData::ReadJudgeShortMsg()
+{
+	ReleaseListShorMsg();//先释放
+	CFile file;
+	CFileException e;
+	if (file.Open(m_filePath,CFile::modeRead,&e))
+	{
+		////注意序列化出来的指针变量已经分配了内存
+		CJudgeShortMsg* pJudgeShortMsg = NULL;
+		UINT cardConfigID = 0;
+		CArchive ar(&file,CArchive::load);
+		if (file.GetLength()) 
+		{
+			do
+			{
+				ar>>pJudgeShortMsg;
+				if (pJudgeShortMsg)
+				{
+					m_list_shortmsg.push_back(pJudgeShortMsg);
+				}
+			}while(!ar.IsBufferEmpty());
+		}
+		ar.Close();
+		file.Close();
+	}
+	else return FALSE;
+	return TRUE;
+}
+
+BOOL CFinshQueData::ReFlushListShortMsg()
+{
+	return ReadJudgeShortMsg();
+}
+
+BOOL CFinshQueData::SendMsgToPhone(const SLZData& data)
+{
+	BOOL flag = FALSE;
+	list<CJudgeShortMsg*>::const_iterator itera = m_list_shortmsg.begin();
+	for(itera;itera!=m_list_shortmsg.end();itera++)
+	{
+		CJudgeShortMsg* pMsg = *itera;
+		CString strShortMsg = pMsg->GetShortMsg();
+		UINT winddowID = data.GetWindowShowId();
+		CString strWindowID;
+		strWindowID.Format(_T("%d号窗口"),winddowID);
+		strShortMsg.Replace(_T("[窗口号]"),strWindowID);
+		CString staffName = theApp.m_Controller.GetStaffNameByID(data.GetStaffId());
+		strShortMsg.Replace(_T("[员工姓名]"),staffName);
+		strShortMsg.Replace(_T("[员工工号]"),data.GetStaffId());
+		CShortMsgModem* pMsgModem = CShortMsgModem::GetInstance();
+		pMsgModem->ClearSendBox();
+		flag = pMsgModem->SendMsg(pMsg->GetPhoneNum(),strShortMsg);
+	}
+	return flag;
 }

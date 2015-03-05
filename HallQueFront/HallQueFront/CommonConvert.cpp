@@ -52,6 +52,7 @@ void CCommonConvert::intToCString(int i,CString& str)
 
 void CCommonConvert::CStringToint(int& i,CString str)
 {
+	if(str.IsEmpty())return;
 	char c_str[255]={0};
 	CStringToChar(str,c_str);
 	i=atoi(c_str);
