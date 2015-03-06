@@ -78,6 +78,7 @@ BEGIN_MESSAGE_MAP(CHallQueFrontView, CView)
 	ON_MESSAGE(WM_SHOWPAGE,&CHallQueFrontView::OnMyShowPage)
 	ON_COMMAND(ID_VIEWMINSIZE, &CHallQueFrontView::OnViewminsize)
 	ON_COMMAND(ID_LEADINWAV, &CHallQueFrontView::OnLeadinwav)
+	ON_COMMAND(ID_HIDEMAIN, &CHallQueFrontView::OnHidemain)
 END_MESSAGE_MAP()
 
 // CHallQueFrontView 构造/析构
@@ -276,58 +277,7 @@ void CHallQueFrontView::OnQuitmanage()
 	//写背景信息
 //	WriteBackPicPathToFile();
 }
-/*
-BOOL CHallQueFrontView::WriteBackPicPathToFile()
-{
-	if(!m_backPicpath.IsEmpty())
-	{
-		WCHAR backPath[MAX_PATH]={0};
-		wcsncpy_s(backPath,MAX_PATH,m_backPicpath,
-			m_backPicpath.GetLength());
 
-		CCommonConvert convert;
-		CString exepath = convert.GetExeFullFilePath();
-		exepath += _T("\\backpicinfo.dat");
-
-		CFile file;
-		CFileException e;
-		if(file.Open(exepath,CFile::modeWrite | CFile::modeCreate,&e))
-		{
-			file.Write(&backPath,MAX_PATH);
-			return TRUE;
-		}
-		else
-		{
-			return FALSE;
-		}
-	}
-	else
-	{
-		return FALSE;
-	}
-}
-
-BOOL CHallQueFrontView::ReadBackPicPathFromFile()
-{
-	CCommonConvert convert;
-	CString exepath = convert.GetExeFullFilePath();
-	exepath += _T("\\backpicinfo.dat");
-	CFile file;
-	if(file.Open(exepath,CFile::modeRead))
-	{
-		WCHAR backPicPath[MAX_PATH]={0};
-//		ULONGLONG count=file.GetLength()/sizeof(WCHAR);
-		file.Read(backPicPath,MAX_PATH);
-		CString path(backPicPath);
-		m_backPicpath = path;
-		return TRUE;
-	}
-	else
-	{
-		return FALSE;
-	}
-}
-*/
 void CHallQueFrontView::OnManage()
 {
 	// TODO: 在此添加命令处理程序代码
@@ -467,7 +417,7 @@ int CHallQueFrontView::OnCreate(LPCREATESTRUCT lpCreateStruct)
 		MyLoadBackImage(path);
 	}
 	ReadCtrInfoFromFile();
-	//////////////////////
+	
 	return 0;
 }
 
@@ -1563,4 +1513,13 @@ void CHallQueFrontView::OnLeadinwav()
 			AfxMessageBox(L"语音文件导入完毕！");
 		}
 	}
+}
+
+void CHallQueFrontView::OnHidemain()
+{
+	// TODO: 在此添加命令处理程序代码
+	CMainFrame *pFrame=(CMainFrame*)AfxGetApp()->m_pMainWnd;
+	pFrame->ShowWindow(SW_HIDE);
+	pFrame->UpdateWindow();
+	pFrame->SetFullScreen(FALSE);
 }

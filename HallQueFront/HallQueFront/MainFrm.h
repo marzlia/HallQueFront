@@ -3,6 +3,8 @@
 #pragma once
 //#include "HardWareCaller.h"
 #include "DataDef.h"
+#define  WM_MY_TRAYICON (WM_USER+2049)
+
 class CMainFrame : public CFrameWnd
 {
 	
@@ -76,6 +78,17 @@ public:
 private:
 	BOOL ShutDown();
 	BOOL DeleteLogFile();
+private:
+	//½çÃæÒþ²Ø
+	void AddTrayIcon(void);
+	BOOL TaskBarAddIcon(HWND hwnd, UINT uID, HICON hIcon, LPCWSTR lpszTip);
+	BOOL TaskBarDeleteIcon(HWND hwnd, UINT uID);
+	void RemoveTrayIcon();
+	afx_msg LRESULT OnTrayIcon(WPARAM wParam, LPARAM lParam);
+public:
+	afx_msg void OnTipShow();
+	afx_msg void OnTipExit();
+	void SetFullScreen(BOOL bFullScreen){m_bFullScreen = bFullScreen;}
 };
 
 

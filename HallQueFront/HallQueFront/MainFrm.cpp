@@ -36,6 +36,10 @@ BEGIN_MESSAGE_MAP(CMainFrame, CFrameWnd)
 	
 	ON_WM_SHOWWINDOW()
 	ON_WM_TIMER()
+	ON_MESSAGE(WM_MY_TRAYICON, &CMainFrame::OnTrayIcon)//界面隐藏
+	ON_COMMAND(ID_TIP_SHOW, &CMainFrame::OnTipShow)
+	ON_COMMAND(ID_TIP_EXIT, &CMainFrame::OnTipExit)
+//	ON_COMMAND(ID_HIDEMAIN, &CMainFrame::OnHidemain)
 END_MESSAGE_MAP()
 
 static UINT indicators[] =
@@ -53,7 +57,6 @@ CMainFrame::CMainFrame() :
 	m_bFullScreen(FALSE)
 {
 	// TODO: 在此添加成员初始化代码
-//	m_bFullScreen = FALSE;
 	m_hIcon = AfxGetApp()->LoadIcon(IDR_MAINFRAME);
 
 }
@@ -148,6 +151,9 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
 	SetTimer(AUTOSHUTDOWN,1000,NULL);
 	///////////////////////
 	DeleteLogFile();
+	//////////////////////
+	AddTrayIcon();
+	///////////////
 	return 0;
 }
 
@@ -400,3 +406,101 @@ BOOL CMainFrame::DeleteLogFile()
 	path+=_T("\\log\\");
 	return doFile.MyDeleteDirectory(path);
 }
+
+
+void CMainFrame::AddTrayIcon()
+{
+	CString strTip = _T("智能排队");
+	TaskBarAddIcon(this->m_hWnd, IDR_MAINFRAME, m_hIcon, (LPCWSTR)strTip.GetBuffer(0));
+	strTip.ReleaseBuffer();
+}
+
+BOOL CMainFrame::TaskBarAddIcon(HWND hwnd, UINT uID, HICON hIcon, LPCWSTR lpszTip)
+{
+	BOOL res;
+	NOTIFYICONDATA nid;
+	nid.cbSize = sizeof(NOTIFYICONDATA);
+	nid.hWnd = hwnd;
+	nid.uID = uID;
+	nid.uFlags = NIF_MESSAGE | NIF_ICON | NIF_TIP | NIF_INFO;
+	nid.uCallbackMessage = WM_MY_TRAYICON;
+	nid.hIcon = hIcon;
+	if (lpszTip)
+	{
+		//lstrcpyn(nid.szTip, lpszTip, sizeof(nid.szTip));
+		wcscpy_s(nid.szTip, sizeof(nid.szTip), lpszTip);
+	}
+	else
+	{
+		nid.szTip[0] = '\0';
+	}
+	res = Shell_NotifyIcon(NIM_ADD, &nid);
+
+	if (hIcon)
+	{
+		DestroyIcon(hIcon);
+	}
+	return res;
+}
+
+BOOL CMainFrame::TaskBarDeleteIcon(HWND hwnd, UINT uID)
+{
+	NOTIFYICONDATA nid;
+	nid.cbSize = sizeof(NOTIFYICONDATA);
+	nid.hWnd = hwnd;
+	nid.uID = uID;
+	return Shell_NotifyIcon(NIM_DELETE, &nid);
+}
+
+void CMainFrame::RemoveTrayIcon()
+{
+	TaskBarDeleteIcon(this->m_hWnd, IDR_MAINFRAME);
+}
+
+LRESULT CMainFrame::OnTrayIcon(WPARAM wParam, LPARAM lParam)
+{
+	if(wParam != IDR_MAINFRAME)
+	{
+		return 1;
+	}
+	switch(lParam)
+	{
+	case WM_LBUTTONUP:
+	case WM_LBUTTONDBLCLK:
+		{
+			ShowWindow(SW_NORMAL);
+			FullScreen();
+		}
+		break;
+	case WM_RBUTTONUP:
+		{
+			SetForegroundWindow();//点击界面其他位置右下角弹出菜单消失
+			CMenu menu;
+			menu.LoadMenu(IDR_TIPMENU);
+			CMenu   *pContextMenu=menu.GetSubMenu(0); //获取第一个弹出菜单，所以第一个菜单必须有子菜单 
+			CPoint point;//定义一个用于确定光标位置的位置  
+			GetCursorPos(&point);//获取当前光标的位置，以便使得菜单可以跟随光标  
+			pContextMenu->TrackPopupMenu(TPM_LEFTALIGN,point.x,point.y,AfxGetMainWnd()); //在指定位置显示弹出菜单
+		}
+		break;
+	}
+	return 0;
+}
+
+void CMainFrame::OnTipShow()
+{
+	// TODO: 在此添加命令处理程序代码
+	ShowWindow(SW_NORMAL);
+	FullScreen();
+}
+
+void CMainFrame::OnTipExit()
+{
+	// TODO: 在此添加命令处理程序代码
+	if(IDOK==MessageBox(_T("确定退出吗?"),_T("警告"),MB_OKCANCEL | MB_ICONINFORMATION))
+	{
+		RemoveTrayIcon();
+		DestroyWindow();
+	}
+}
+

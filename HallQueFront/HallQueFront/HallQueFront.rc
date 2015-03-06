@@ -197,6 +197,8 @@ BEGIN
     BEGIN
         MENUITEM "元件管理",                        ID_MANAGE
         MENUITEM SEPARATOR
+        MENUITEM "隐藏界面",                        ID_HIDEMAIN
+        MENUITEM SEPARATOR
         MENUITEM "退出系统        ",                ID_QUITSYS
     END
 END
@@ -217,6 +219,15 @@ BEGIN
     BEGIN
         MENUITEM "编辑",                          ID_PRINT_EDIT
         MENUITEM "删除",                          ID_PRINT_DELETE
+    END
+END
+
+IDR_TIPMENU MENU 
+BEGIN
+    POPUP "TIP"
+    BEGIN
+        MENUITEM "显示",                          ID_TIP_SHOW
+        MENUITEM "退出",                          ID_TIP_EXIT
     END
 END
 
@@ -904,8 +915,8 @@ END
 //
 
 VS_VERSION_INFO VERSIONINFO
- FILEVERSION 3,0,5,1
- PRODUCTVERSION 3,0,5,1
+ FILEVERSION 3,0,5,2
+ PRODUCTVERSION 3,0,5,2
  FILEFLAGSMASK 0x3fL
 #ifdef _DEBUG
  FILEFLAGS 0x1L
@@ -922,12 +933,12 @@ BEGIN
         BEGIN
             VALUE "CompanyName", "北京凌邦合创电子科技有限公司"
             VALUE "FileDescription", "智能排队系统"
-            VALUE "FileVersion", "3.0.5.1"
+            VALUE "FileVersion", "3.0.5.2"
             VALUE "InternalName", "HallQueFront.exe"
             VALUE "LegalCopyright", "TODO: (C) <公司名>。保留所有权利。"
             VALUE "OriginalFilename", "HallQueFront.exe"
             VALUE "ProductName", "智能排队系统"
-            VALUE "ProductVersion", "3.0.5.1"
+            VALUE "ProductVersion", "3.0.5.2"
         END
     END
     BLOCK "VarFileInfo"

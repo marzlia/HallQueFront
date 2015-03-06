@@ -66,6 +66,7 @@
 #define IDD_DIALOG_MSGSET               183
 #define IDB_BITMAP_SENDMSG              185
 #define IDD_PROPMSG_JUDGE               186
+#define IDR_TIPMENU                     187
 #define IDC_ED_BNWIDTH                  1000
 #define IDC_ED_BNHEIGHT                 1001
 #define IDC_COMBO_TRANS                 1003
@@ -410,13 +411,19 @@
 #define ID_VIEWMINSIZE                  32824
 #define ID_32825                        32825
 #define ID_LEADINWAV                    32826
+#define ID_TIP_32827                    32827
+#define ID_TIP_32828                    32828
+#define ID_TIP_SHOW                     32829
+#define ID_TIP_EXIT                     32830
+#define ID_32831                        32831
+#define ID_HIDEMAIN                     32832
 
 // Next default values for new objects
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        187
-#define _APS_NEXT_COMMAND_VALUE         32827
+#define _APS_NEXT_RESOURCE_VALUE        188
+#define _APS_NEXT_COMMAND_VALUE         32833
 #define _APS_NEXT_CONTROL_VALUE         1209
 #define _APS_NEXT_SYMED_VALUE           117
 #endif

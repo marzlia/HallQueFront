@@ -17,6 +17,7 @@ using namespace std;
 #define  DOINITThROUGHSCREEN 9579
 #define  BUTTONNUM 200
 
+
 class CHallQueFrontView : public CView
 {
 protected: // 仅从序列化创建
@@ -167,6 +168,7 @@ public:
 	CShowPageDlg* m_pShowPageDlg;
 	void ShowPage(int nPageID);
 	afx_msg void OnLeadinwav();
+	afx_msg void OnHidemain();
 };
 
 #ifndef _DEBUG  // HallQueFrontView.cpp 中的调试版本
