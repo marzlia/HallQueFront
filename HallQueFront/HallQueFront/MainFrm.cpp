@@ -207,8 +207,8 @@ void CMainFrame::FullScreen()
 
 	m_FullScreenRect.left = windowRect.left - ClientRect.left;
 	m_FullScreenRect.top = windowRect.top - ClientRect.top;
-	m_FullScreenRect.right = windowRect.right - ClientRect.right + nFullWidth;
-	m_FullScreenRect.bottom = windowRect.bottom - ClientRect.bottom + nFullHeight;
+	m_FullScreenRect.right = nFullWidth;//windowRect.right - ClientRect.right + nFullWidth;
+	m_FullScreenRect.bottom = nFullHeight;//windowRect.bottom - ClientRect.bottom + nFullHeight;
 	m_bFullScreen = TRUE;
 /*
 	WINDOWPLACEMENT wndpl;
@@ -330,21 +330,23 @@ void CMainFrame::OnShowWindow(BOOL bShow, UINT nStatus)
 {
 	CFrameWnd::OnShowWindow(bShow, nStatus);
 	// TODO: 在此处添加消息处理程序代码
-	ShowWindow(SW_MAXIMIZE);
+	if(!m_bFullScreen)
+		ShowWindow(SW_MAXIMIZE);
 	FullScreen();
 
 	//移动工具栏到中间
 	CRect ToolBarRect;
 	m_wndToolBar.GetWindowRect(&ToolBarRect);
-	CRect windowRect;
-	GetWindowRect(&windowRect);
+	m_wndToolBarRect = ToolBarRect;
+// 	CRect windowRect;
+// 	GetWindowRect(&windowRect);
 
 	CRect destRect;
-	destRect.left = windowRect.Width()/2 - ToolBarRect.Width()/2;
-	destRect.right = windowRect.Width()/2 + ToolBarRect.Width()/2;
+	destRect.left = m_windowRect.Width()/2 - ToolBarRect.Width()/2;
+	destRect.right = m_windowRect.Width()/2 + ToolBarRect.Width()/2;
 
 
-	destRect.top = 0;//ToolBarRect.top;
+	destRect.top = ToolBarRect.top;//ToolBarRect.top;
 	destRect.bottom = ToolBarRect.bottom;//ToolBarRect.bottom;
 	m_wndToolBar.MoveWindow(destRect);
 	///////////////////////////////////////
@@ -468,8 +470,8 @@ LRESULT CMainFrame::OnTrayIcon(WPARAM wParam, LPARAM lParam)
 	case WM_LBUTTONUP:
 	case WM_LBUTTONDBLCLK:
 		{
-			ShowWindow(SW_NORMAL);
-			FullScreen();
+			ShowWindow(SW_SHOW);
+			UpdateWindow();
 		}
 		break;
 	case WM_RBUTTONUP:
@@ -490,8 +492,8 @@ LRESULT CMainFrame::OnTrayIcon(WPARAM wParam, LPARAM lParam)
 void CMainFrame::OnTipShow()
 {
 	// TODO: 在此添加命令处理程序代码
-	ShowWindow(SW_NORMAL);
-	FullScreen();
+	ShowWindow(SW_SHOW);
+	UpdateWindow();
 }
 
 void CMainFrame::OnTipExit()

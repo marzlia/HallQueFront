@@ -64,8 +64,8 @@ public:
 	afx_msg void OnIconHor();
 	afx_msg void OnIconVer();
 	/////////////////////////////////////////
-//	CRect m_wndToolBarRect;
-
+private:
+	CRect m_wndToolBarRect;
 	//硬件呼叫器，在硬件呼叫器中实现了评价
 	//因为当有呼叫信息产生时，会相应的去调用评价
 	//让其处理数据所以这样处理
