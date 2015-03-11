@@ -96,14 +96,14 @@ int CProducePacket::JudgeSendPacket(const std::string strPacket)
 		if(firstIndex==strPacket.npos)return -27;
 		lastIndex = strPacket.find("</wndID>");
 		if(lastIndex==strPacket.npos)return -27;
-		std::string wndID = strPacket.substr(firstIndex+9,lastIndex-firstIndex-9);
+		std::string wndID = strPacket.substr(firstIndex+7,lastIndex-firstIndex-7);
 		if(wndID.empty())return -27;
 		//////////////////////////////
 		firstIndex = strPacket.find("<wndName>");
 		if(firstIndex==strPacket.npos)return -27;
 		lastIndex = strPacket.find("</wndName>");
 		if(lastIndex==strPacket.npos)return -27;
-		std::string wndName = strPacket.substr(firstIndex+11,lastIndex-firstIndex-11);
+		std::string wndName = strPacket.substr(firstIndex+9,lastIndex-firstIndex-9);
 		if(wndName.empty())return -27;
 		//////////////////////////////
 		firstIndex = strPacket.find("<orgID>");
@@ -339,7 +339,7 @@ std::string CProducePacket::ProduceSendRet(int errCode,const std::string strPack
 			std::auto_ptr<sql::ResultSet> res(NULL);
 			if(m_mySql.IsConnect())
 			{
-				CString sql = _T("select orID,orOrganId,orName,orParentName,orParent from organ where orParent='0'");
+				CString sql = _T("select orID,orOrganId,orName,orParentName,orParent from organ");
 				res =m_mySql.ExecuteQuery(sql);
 			}
 			CString retPacket = _T("<?xml version=\"1.0\" encoding=\"UTF-8\"?><dataPacket version=\"1.0\"><headCode>orgInfo</headCode>");
@@ -367,6 +367,7 @@ std::string CProducePacket::ProduceSendRet(int errCode,const std::string strPack
 					retPacket+=_T("<end>");
 				}
 			}
+			retPacket+=_T("</dataPacket>");
 			////////////////////////////
 			std::string strRetPacket;
 			CStringA a_retPacket(retPacket.GetBuffer(0));
@@ -382,6 +383,7 @@ std::string CProducePacket::ProduceSendRet(int errCode,const std::string strPack
 		{
 			CString packet = _T("<?xml version=\"1.0\" encoding=\"UTF-8\"?><dataPacket version=\"1.0\"><headCode>queInfo</headCode>");
 			packet.AppendFormat(_T("<retCode>%d</retCode>"),errCode);
+			packet += _T("</dataPacket>");
 			int len = CCommonConvert::CStringToChar(packet,NULL);
 			char* strPacket = new char[len+1];
 			memset(strPacket,0,len+1);
@@ -396,6 +398,7 @@ std::string CProducePacket::ProduceSendRet(int errCode,const std::string strPack
 		{
 			CString packet = _T("<?xml version=\"1.0\" encoding=\"UTF-8\"?><dataPacket version=\"1.0\"><headCode>wndInfo</headCode>");
 			packet.AppendFormat(_T("<retCode>%d</retCode>"),errCode);
+			packet += _T("</dataPacket>");
 			int len = CCommonConvert::CStringToChar(packet,NULL);
 			char* strPacket = new char[len+1];
 			memset(strPacket,0,len+1);
@@ -410,6 +413,7 @@ std::string CProducePacket::ProduceSendRet(int errCode,const std::string strPack
 		{
 			CString packet = _T("<?xml version=\"1.0\" encoding=\"UTF-8\"?><dataPacket version=\"1.0\"><headCode>staffInfo</headCode>");
 			packet.AppendFormat(_T("<retCode>%d</retCode>"),errCode);
+			packet += _T("</dataPacket>");
 			int len = CCommonConvert::CStringToChar(packet,NULL);
 			char* strPacket = new char[len+1];
 			memset(strPacket,0,len+1);
@@ -450,6 +454,7 @@ std::string CProducePacket::ProduceSendRet(int errCode,const std::string strPack
 					retPacket+=_T("<end>");
 				}
 			}
+			retPacket += _T("</dataPacket>");
 			////////////////////////////
 			std::string strRetPacket;
 			CStringA a_retPacket(retPacket.GetBuffer(0));
@@ -493,6 +498,7 @@ std::string CProducePacket::ProduceSendRet(int errCode,const std::string strPack
 					retPacket+=_T("<end>");
 				}
 			}
+			retPacket += _T("</dataPacket>");
 			////////////////////////////
 			std::string strRetPacket;
 			CStringA a_retPacket(retPacket.GetBuffer(0));
@@ -536,6 +542,7 @@ std::string CProducePacket::ProduceSendRet(int errCode,const std::string strPack
 					retPacket+=_T("<end>");
 				}
 			}
+			retPacket += _T("</dataPacket>");
 			////////////////////////////
 			std::string strRetPacket;
 			CStringA a_retPacket(retPacket.GetBuffer(0));
@@ -551,6 +558,7 @@ std::string CProducePacket::ProduceSendRet(int errCode,const std::string strPack
 		{
 			CString packet = _T("<?xml version=\"1.0\" encoding=\"UTF-8\"?><dataPacket version=\"1.0\"><headCode>sendOrg</headCode>");
 			packet.AppendFormat(_T("<retCode>%d</retCode>"),errCode);
+			packet += _T("</dataPacket>");
 			int len = CCommonConvert::CStringToChar(packet,NULL);
 			char* strPacket = new char[len+1];
 			memset(strPacket,0,len+1);
@@ -564,6 +572,7 @@ std::string CProducePacket::ProduceSendRet(int errCode,const std::string strPack
 		{
 			CString packet = _T("<?xml version=\"1.0\" encoding=\"UTF-8\"?><dataPacket version=\"1.0\"><headCode>hallQue</headCode>");
 			packet.AppendFormat(_T("<retCode>%d</retCode>"),errCode);
+			packet += _T("</dataPacket>");
 			int len = CCommonConvert::CStringToChar(packet,NULL);
 			char* strPacket = new char[len+1];
 			memset(strPacket,0,len+1);

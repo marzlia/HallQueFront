@@ -20,6 +20,7 @@ BOOL SLZStaffQueryView::LoadStaffs()
 	CFileException e;
 	if (file.Open(exePath,CFile::modeRead,&e))
 	{
+		Clear();
 		SLZStaff* pStaff=NULL;
 		CArchive ar(&file,CArchive::load);
 		if (file.GetLength())

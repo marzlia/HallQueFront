@@ -50,11 +50,13 @@ void CComplSocketClient::StopClient()
 
 BOOL CComplSocketClient::SendData(const CString& msg,std::string& recvMsg,int& actRecvSize)
 {
+
 	if(msg.IsEmpty())
 	{
 		return FALSE;
 	}
 	BOOL flag = SendData(m_romotePort,m_romoteIP,msg,recvMsg,actRecvSize);
+
 	if(!flag)
 	{
 		//缓存机制
@@ -65,6 +67,7 @@ BOOL CComplSocketClient::SendData(const CString& msg,std::string& recvMsg,int& a
 		//重发机制
 		ReSendMsg();
 	}
+
 	return flag;
 }
 
@@ -108,7 +111,10 @@ BOOL CComplSocketClient::SendData(USHORT port,CString IP,const std::string& msg,
 	////////////////////////////////////////////
 	ServerAddr.sin_addr.S_un.S_addr = inet_addr(buf);
 	delete []buf;
-
+#ifdef _DEBUG
+	CComputeFuncationTime connectTime;
+	connectTime.SetStartTime(clock());
+#endif
 	if(SOCKET_ERROR==connect(m_sClient,(SOCKADDR*)&ServerAddr,
 		sizeof(ServerAddr)))
 	{
@@ -118,31 +124,88 @@ BOOL CComplSocketClient::SendData(USHORT port,CString IP,const std::string& msg,
 		closesocket(m_sClient);
 		return FALSE;
 	}
+#ifdef _DEBUG
+	connectTime.SetFinshTime(clock());
+	double connDur = connectTime.GetDuration();
+	CString strConDur;
+	strConDur.Format(_T("conntime:%f"),connDur);
+	MyWriteConsole(strConDur);
+#endif
+	//发送
+#ifdef _DEBUG
+	CComputeFuncationTime sendTime;
+	sendTime.SetStartTime(clock());
+#endif
 	setsockopt(m_sClient,SOL_SOCKET,SO_SNDTIMEO,(char *)&m_nTimeOut,sizeof(UINT));
-	if(SOCKET_ERROR == send(m_sClient,msg.c_str(),size,0))
+// 	if(SOCKET_ERROR == send(m_sClient,msg.c_str(),size,0))
+// 	{
+// #ifdef _DEBUG
+// 		MyWriteConsole(_T("send failed"));
+// #endif
+// 		closesocket(m_sClient);
+// 		return FALSE;
+// 	}
+	int actSendSize = 0;
+	while(true)
 	{
+		int tempSize = send(m_sClient,msg.c_str(),size,0);
+		if(tempSize == SOCKET_ERROR)
+		{
 #ifdef _DEBUG
 		MyWriteConsole(_T("send failed"));
 #endif
-		closesocket(m_sClient);
-		return FALSE;
+			closesocket(m_sClient);
+			return FALSE;
+		}
+		else
+		{
+			actSendSize += tempSize;
+			if(actSendSize == size)break;
+		}
 	}
-	char recvBuf[MAXRECVBUF]={0};
+#ifdef _DEBUG
+	sendTime.SetFinshTime(clock());
+	double durSendTime = sendTime.GetDuration();
+	CString strSendTime;
+	strSendTime.Format(_T("sendTime:%f"),durSendTime);
+	MyWriteConsole(strSendTime);
+#endif
+#ifdef _DEBUG
+	CComputeFuncationTime recvTime;
+	recvTime.SetStartTime(clock());
+#endif
+	//接收
+	char recvBuf[MAXRECVBUF+1]={0};
 	setsockopt(m_sClient,SOL_SOCKET,SO_RCVTIMEO,(char *)&m_nTimeOut,sizeof(UINT));
 	while(true)
 	{
+ 		memset(recvBuf,0,MAXRECVBUF+1);
 		actRecvSize = recv(m_sClient,recvBuf,MAXRECVBUF,0);
+		std::string recvTemp(recvBuf);
+#ifdef _DEBUG
+		CString tremp(recvBuf);
+		MyWriteConsole(tremp);
+#endif
+		if(recvTemp.find("</dataPacket>") != recvTemp.npos)//找结尾
+		{
+			recvMsg += recvTemp;
+			break;
+		}
 		if(actRecvSize==SOCKET_ERROR || actRecvSize==0)
 		{
 			break; 	
 		}
 		else
 		{
-			std::string recvTemp(recvBuf);
 			recvMsg += recvTemp;
 		}
 	}
 #ifdef _DEBUG
+	recvTime.SetFinshTime(clock());
+	double durRecvTime = recvTime.GetDuration();
+	CString strRecvTime;
+	strRecvTime.Format(_T("recvTime:%f"),durRecvTime);
+	MyWriteConsole(strRecvTime);
 	MyWriteConsole(_T("send ok"));
 #endif
 	closesocket(m_sClient);

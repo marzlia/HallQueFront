@@ -4,6 +4,7 @@
 #include "..\HallQueFront\DoFile.h"
 #include "HallQueFrontServer.h"
 #include "../HallQueFront/WriteLogError.h"
+#include "../HallQueFront/ComputeFuncationTime.h"
 
 CSelectSocketServer* pServer;
 extern void MyWriteConsole(CString str);
@@ -167,10 +168,10 @@ DWORD WINAPI CSelectSocketServer::WorkerThread(LPVOID lpParam)
 	fd_set fdread;
 	int ret;
 	struct timeval tv = {1, 0};
-	char szMessage[MAX_BUFFER]={0};
+	char szMessage[MAX_BUFFER+1]={0};
 	while(TRUE)
 	{
-		memset(szMessage,0,MAX_BUFFER);
+		memset(szMessage,0,MAX_BUFFER+1);
 		FD_ZERO(&fdread);//初始化
 		if(pThis->m_iTotalConn==0)
 		{
@@ -197,6 +198,10 @@ DWORD WINAPI CSelectSocketServer::WorkerThread(LPVOID lpParam)
 				否则，返回假（0）*/
 				if(FD_ISSET(pThis->m_CliSocketArr[i],&fdread))//检测
 				{
+#ifdef _DEBUG
+					CComputeFuncationTime time;
+					time.SetStartTime(clock());
+#endif
 					//接收
 					ret = recv(pThis->m_CliSocketArr[i], szMessage, MAX_BUFFER, 0);
 					if (ret == 0 || (ret == SOCKET_ERROR))
@@ -213,32 +218,40 @@ DWORD WINAPI CSelectSocketServer::WorkerThread(LPVOID lpParam)
 #endif
 						std::string recvPacket(szMessage);
 						std::string retPacket = pThis->DealMsg(recvPacket);
+#ifdef _DEBUG
+						CString wRetPacket(retPacket.c_str());
+						MyWriteConsole(wRetPacket);
+#endif
 						int size = retPacket.size();
 						int nTimeOut=1000;
+						int actSendSize = 0;
 						setsockopt(pThis->m_CliSocketArr[i],SOL_SOCKET,SO_RCVTIMEO,(char *)&nTimeOut,sizeof(UINT));
-						if(send(pThis->m_CliSocketArr[i], retPacket.c_str(), size, 0)!=SOCKET_ERROR)
+						while(true)
 						{
-#ifdef _DEBUG
-							CString wRetPacket(retPacket.c_str());
-							CString showMsg;
-							showMsg.Format(_T("retMsg:%s"),wRetPacket);
-							MyWriteConsole(showMsg);
-#endif
-// 							CWriteLogError log;
-// 							CString str;
-// 							str.Format(_T("send succ client num:%d"),i);
-// 							log.WriteErrLog(str);
-							pThis->DeleteClient(i);
-						}
-						else
-						{
-							pThis->DeleteClient(i);
-							CWriteLogError log;
-							CString str;
-							str.Format(_T("send errcode:%d client num:%d"),WSAGetLastError(),i);
-							log.WriteErrLog(str);
+							int tempSize = send(pThis->m_CliSocketArr[i], retPacket.c_str(), size, 0);
+							if(tempSize == SOCKET_ERROR)
+							{
+								pThis->DeleteClient(i);
+								CWriteLogError log;
+								CString str;
+								str.Format(_T("send errcode:%d client num:%d"),WSAGetLastError(),i);
+								log.WriteErrLog(str);
+								break;
+							}
+							else
+							{
+								actSendSize += tempSize;
+								if(actSendSize == size)break;
+							}
 						}
 					}
+#ifdef _DEBUG
+					time.SetFinshTime(clock());
+					double dura = time.GetDuration();
+					CString strDuration;
+					strDuration.Format(_T("dealtime:%f"),dura);
+					MyWriteConsole(strDuration);
+#endif
 				}
 				else
 				{

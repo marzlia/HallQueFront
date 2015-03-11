@@ -87,6 +87,7 @@ BOOL SLZWindowQueryView::LoadWindows()
 	CFileException e;
 	if (file.Open(exePath,CFile::modeRead,&e))
 	{
+		Clear();//Çå¿Õ
 		SLZWindow* pWindow = NULL;
 		CArchive ar(&file,CArchive::load);
 		if (file.GetLength())
