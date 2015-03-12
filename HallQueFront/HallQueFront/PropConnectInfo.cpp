@@ -123,9 +123,13 @@ BOOL CPropConnectInfo::OnInitDialog()
 	list<CommDaoOrg>::const_iterator itera = theApp.m_list_comOrg.begin();
 	for(itera;itera!=theApp.m_list_comOrg.end();itera++)
 	{
-		CString curOrgName(itera->curOrgName.c_str());
-		int index = m_combox_parentOrg.AddString(curOrgName);
-		m_map_commDaoOrg[index] = *itera;
+		CString wOrgID(itera->curOrgID.c_str());
+		if(wOrgID != theApp.m_logicVariables.strOrganID)//添加到combox中
+		{
+			CString curOrgName(itera->curOrgName.c_str());
+			int index = m_combox_parentOrg.AddString(curOrgName);
+			m_map_commDaoOrg[index] = *itera;
+		}
 	}
 	int count = m_combox_parentOrg.GetCount();
 	for(int i=0;i<count;i++)
@@ -585,9 +589,13 @@ void CPropConnectInfo::OnBnClickedBnFlushorg()
 	list<CommDaoOrg>::const_iterator itera = theApp.m_list_comOrg.begin();
 	for(itera;itera!=theApp.m_list_comOrg.end();itera++)
 	{
-		CString curOrgName(itera->curOrgName.c_str());
-		m_map_commDaoOrg[m_combox_parentOrg.AddString(curOrgName)]
-		= *itera;
+		CString wOrgID(itera->curOrgID.c_str());
+		if(wOrgID != theApp.m_logicVariables.strOrganID)//添加到combox中
+		{
+			CString curOrgName(itera->curOrgName.c_str());
+			m_map_commDaoOrg[m_combox_parentOrg.AddString(curOrgName)]
+			= *itera;
+		}
 	}
 	SetCursor(LoadCursor(NULL,IDC_ARROW));
 }

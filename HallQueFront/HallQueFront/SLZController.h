@@ -148,4 +148,6 @@ private:
 	CMutex m_fileWriteInlineFile;
 public:
 	CString GetStaffNameByID(const CString& staffID);
+	CString GetWindowNameByID(UINT nWindowID);
+	CString GetWindowCallNameByID(UINT nWindowID);
 };

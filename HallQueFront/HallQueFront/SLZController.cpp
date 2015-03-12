@@ -1332,6 +1332,8 @@ BOOL SLZController::ReadCommDaoWndInfo()
 void SLZController::AnaOrgPacket(const std::string strPacket)
 {
 	theApp.m_list_comOrg.clear();
+	CommDaoOrg emptyOrg;
+	theApp.m_list_comOrg.push_back(emptyOrg);
 	/////////////////////////////////
 	std::string temp = strPacket;
 	std::string::size_type flag = temp.find("<end>");
@@ -1356,6 +1358,8 @@ void SLZController::AnaOrgPacket(const std::string strPacket)
 		lastIndex = orgInfo.find("</curOrgName>");
 		if(firstIndex==orgInfo.npos||lastIndex==orgInfo.npos)break;
 		org.curOrgName = orgInfo.substr(firstIndex+12,lastIndex-firstIndex-12);
+//		CString wCurOrgID(org.curOrgID.c_str());
+//		if(wCurOrgID != theApp.m_logicVariables.strOrganID)
 		theApp.m_list_comOrg.push_back(org);
 		/////////////////////////////////////////////////////////////
 		temp = temp.substr(flag+5);
@@ -1475,7 +1479,7 @@ BOOL SLZController::SendQueData()
 		for(int i=0;i<count;i++)
 		{
 			CString localBussName = m_map_que[i].GetBussName();
-			CString localManNum = m_map_que[i].GetQueManNum();
+			CString localManNum = m_map_que[i].GetQueID();//队列唯一编号
 			if(theApp.m_list_comQue.size()>0)
 			{
 				BOOL flag = FALSE;
@@ -1526,7 +1530,7 @@ BOOL SLZController::SendWndData()
 		map<UINT,SLZWindow>::const_iterator itera = m_windowTable.m_mapIdWindow.begin();
 		for(itera;itera!=m_windowTable.m_mapIdWindow.end();itera++)
 		{
-			CString localShowID;localShowID.Format(_T("%d"),itera->second.GetShowWndId());
+			CString localShowID;localShowID.Format(_T("%d"),itera->second.GetWindowId());//窗口唯一编号
 			CString localWndName=itera->second.GetWindowName(); 
 			if(theApp.m_list_comWnd.size()>0)
 			{
@@ -1631,7 +1635,7 @@ BOOL SLZController::SendOrgData()
 		CString localParOrgID = theApp.m_logicVariables.strParOrgID;
 		CString localParOrgName = theApp.m_logicVariables.strParOrgName;
 		if(localOrgID.IsEmpty()||localOrgName.IsEmpty())return FALSE;
-		if(!JudgeParOrgIsAt())return FALSE;
+		if(JudgeParOrgIsAt())return FALSE;
 		if(theApp.m_list_comOrg.size()>0)
 		{
 			BOOL flag = FALSE;
@@ -1671,7 +1675,7 @@ BOOL SLZController::SendDelQue()
 			CString comQueNum(itera->queID.c_str());
 			for(int i=0;i<m_map_que.GetCount();i++)
 			{
-				if(m_map_que[i].GetQueManNum()==comQueNum)
+				if(m_map_que[i].GetQueID()==comQueNum)
 				{
 					flag = TRUE;
 					break;
@@ -1735,7 +1739,7 @@ BOOL SLZController::SendDelWnd()
 			for(localItera;localItera!=m_windowTable.m_mapIdWindow.end();localItera++)
 			{
 				CString wLocalShowID;
-				wLocalShowID.Format(_T("%d"),localItera->second.GetShowWndId());
+				wLocalShowID.Format(_T("%d"),localItera->second.GetWindowId());
 				if(wWndID == wLocalShowID)
 				{
 					flag = TRUE;
@@ -1760,6 +1764,7 @@ BOOL SLZController::SendDelWnd()
 
 BOOL SLZController::JudgeParOrgIsAt()
 {
+	CString localOrgID = theApp.m_logicVariables.strOrganID;
 	CString localParOrgID = theApp.m_logicVariables.strParOrgID;
 	//	CString localParOrgName = theApp.m_logicVariables.strParOrgName;
 	if(theApp.m_list_comOrg.size()>0)
@@ -1768,7 +1773,13 @@ BOOL SLZController::JudgeParOrgIsAt()
 		for(daoItear;daoItear!=theApp.m_list_comOrg.end();daoItear++)
 		{
 			CString orgID(daoItear->curOrgID.c_str());
-			if(localParOrgID==orgID)
+			CString parOrgID(daoItear->parOrgID.c_str());
+			if(localOrgID == localParOrgID)
+				//不能以自己为自己的父级机构//且本地机构不能和父级机构ID相同
+			{
+				return TRUE;
+			}
+			if(localOrgID == orgID && localParOrgID == parOrgID)
 			{
 				return TRUE;
 			}
@@ -1818,4 +1829,18 @@ CString SLZController::GetStaffNameByID(const CString& staffID)
 	SLZStaff* pStaff = m_staffTable.QueryStaffById(staffID);
 	if(!pStaff)return _T("");
 	return pStaff->GetStaffName();
+}
+
+CString SLZController::GetWindowNameByID(UINT nWindowID)
+{
+	SLZWindow slzWindow;
+	m_windowTable.QueryWindowById(nWindowID,slzWindow);
+	return slzWindow.GetWindowName();
+}
+
+CString SLZController::GetWindowCallNameByID(UINT nWindowID)
+{
+	SLZWindow slzWindow;
+	m_windowTable.QueryWindowById(nWindowID,slzWindow);
+	return slzWindow.GetWindowCallName();
 }

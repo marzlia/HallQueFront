@@ -144,7 +144,8 @@ void CHallQueFrontView::OnDraw(CDC* pDC)
 	/////调正显示等待，缺纸窗口位置
  	CRect rect;
  	GetClientRect(rect);
- 	m_pWaringDlg->MoveWindow(rect.left+rect.Width()/2-m_rWaringRect.Width()/2,rect.top+rect.Height()/2-m_rWaringRect.Height()/2,m_rWaringRect.Width(),m_rWaringRect.Height(),FALSE);
+	if(m_pWaringDlg && m_pWaringDlg->m_hWnd)
+ 		m_pWaringDlg->MoveWindow(rect.left+rect.Width()/2-m_rWaringRect.Width()/2,rect.top+rect.Height()/2-m_rWaringRect.Height()/2,m_rWaringRect.Width(),m_rWaringRect.Height(),FALSE);
 	MyDraw(pDC);
 	////////////////////////////////
 	CHallQueFrontDoc* pDoc = GetDocument();

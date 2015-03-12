@@ -176,9 +176,9 @@ BOOL CFinshQueData::SendMsgToPhone(const SLZData& data)
 	{
 		CJudgeShortMsg* pMsg = *itera;
 		CString strShortMsg = pMsg->GetShortMsg();
-		UINT winddowID = data.GetWindowShowId();
-		CString strWindowID;
-		strWindowID.Format(_T("%d号窗口"),winddowID);
+		UINT winddowID = data.GetWindowId();
+		CString strWindowID = theApp.m_Controller.GetWindowNameByID(winddowID);
+//		strWindowID.Format(_T("%d号窗口"),winddowID);
 		strShortMsg.Replace(_T("[窗口号]"),strWindowID);
 		CString staffName = theApp.m_Controller.GetStaffNameByID(data.GetStaffId());
 		strShortMsg.Replace(_T("[员工姓名]"),staffName);

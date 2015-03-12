@@ -112,10 +112,19 @@ void CCallThread::DoEvaMsg(const MSG& msg)
 			data.SetWindowShowId(Window.GetShowWndId());
 			CString staffID = m_map_login[Window.GetWindowId()];
 			data.SetStaffId(staffID);
-			data.SetBussinessType(_T("1"));
+			CString bussinessType;
+			CMap<int,int,CQueueInfo,CQueueInfo&>::CPair* pCurEva;
+			int count = m_map_que.GetCount();
+			for(int i=0;i<count;i++)
+			{
+				pCurEva = m_map_que.PLookup(i);
+				bussinessType = pCurEva->value.GetQueID();
+				break;
+			}
+			data.SetBussinessType(bussinessType);
 			data.SetOrganId(theApp.m_logicVariables.strOrganID);
 			data.SetOrganName(theApp.m_logicVariables.strOrganNmae);
-			data.SetQueSerialID(_T("1"));
+//			data.SetQueSerialID(_T("1"));
 			data.SetQueueNumber(_T("0"));
 			data.SetCallTime(curTime);
 			data.SetTakingNumTime(curTime);

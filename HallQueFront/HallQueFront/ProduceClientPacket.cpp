@@ -131,7 +131,10 @@ CString CProduceClientPacket::ProduceSearchStaffInfo(const CString& orgID)
 CString CProduceClientPacket::ProduceOrgPacket(const CString& curOrgID,const CString& curOrgName,const CString& parOrgID,const CString& parOrgName)
 {
 	CString packet = _T("<?xml version=\"1.0\" encoding=\"UTF-8\"?><dataPacket version=\"1.0\"><headCode>sendOrg</headCode>");
-	packet.AppendFormat(_T("<parOrgID>%s</parOrgID>"),parOrgID);
+	if(!parOrgID.IsEmpty())
+		packet.AppendFormat(_T("<parOrgID>%s</parOrgID>"),parOrgID);//父级结构
+	else 
+		packet += _T("<parOrgID>0</parOrgID>");//顶级机构
 	packet.AppendFormat(_T("<curOrgID>%s</curOrgID>"),curOrgID);
 	packet.AppendFormat(_T("<parOrgName>%s</parOrgName>"),parOrgName);
 	packet.AppendFormat(_T("<curOrgName>%s</curOrgName>"),curOrgName);

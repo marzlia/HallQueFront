@@ -22,14 +22,14 @@ CString CProducePacket::ProduceSendPacket(const SLZData& data,int leftNum,SendDa
 	packet.AppendFormat(_T("<orgID>%s</orgID>"),data.GetOrganId());
 	packet.AppendFormat(_T("<cardType>%d</cardType>"),cardType);
 	packet.AppendFormat(_T("<cardNum>%s</cardNum>"),cardNum);
-	packet.AppendFormat(_T("<queID>%s</queID>"),data.GetQueSerialID());
+	packet.AppendFormat(_T("<queID>%s</queID>"),data.GetBussinessType());
 	packet.AppendFormat(_T("<queNum>%s</queNum>"),data.GetQueueNumber());
 	CString wStrtakeNumTime = ExChangeTime(data.GetTakingNumTime());
 	packet.AppendFormat(_T("<enterTime>%s</enterTime>"),wStrtakeNumTime);
 	CString wStrCallTime = ExChangeTime(data.GetCallTime());
 	packet.AppendFormat(_T("<callTime>%s</callTime>"),wStrCallTime);
 	packet.AppendFormat(_T("<workerID>%s</workerID>"),data.GetStaffId());
-	packet.AppendFormat(_T("<windowNum>%d</windowNum>"),data.GetWindowShowId());
+	packet.AppendFormat(_T("<windowNum>%d</windowNum>"),data.GetWindowId());
 	CString wStrFinishTime = ExChangeTime(data.GetFinishTime());
 	packet.AppendFormat(_T("<scoreTime>%s</scoreTime>"),wStrFinishTime);
 	packet.AppendFormat(_T("<scoreLev>%d</scoreLev>"),data.GetEvaluateLevel());

@@ -250,8 +250,8 @@ int CProducePacket::JudgeSendPacket(const std::string strPacket)
 		if(firstIndex == strPacket.npos)return -32;
 		lastIndex = strPacket.find("</parOrgName>");
 		if(lastIndex==strPacket.npos)return -32;
-		std::string strParOrgName = strPacket.substr(firstIndex+12,lastIndex-firstIndex-12);
-		if(strParOrgName.empty())return -32;
+// 		std::string strParOrgName = strPacket.substr(firstIndex+12,lastIndex-firstIndex-12);
+// 		if(strParOrgName.empty())return -32;
 		firstIndex = strPacket.find("<curOrgName>");
 		if(firstIndex==strPacket.npos)return -32;
 		lastIndex = strPacket.find("</curOrgName>");
