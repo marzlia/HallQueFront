@@ -85,7 +85,7 @@ SLZController::~SLZController(void)
 	}
 	if(m_pCalledQueData)
 	{
-		
+		/*
 		map<UINT, SLZWindow>::iterator iter=m_windowTable.m_mapIdWindow.begin();
 		for (iter;iter!=m_windowTable.m_mapIdWindow.end();iter++)
 		{
@@ -100,7 +100,7 @@ SLZController::~SLZController(void)
 				m_pCalledQueData->DeleteCalledQueData(data);
 			}
 		}
-		
+		*/
 		delete m_pCalledQueData;
 		m_pCalledQueData = NULL;
 	}
