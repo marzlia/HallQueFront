@@ -12,7 +12,7 @@
 #include "CommonStrMethod.h"
 #include "LicenseMaker.h"
 
-#pragma comment(lib, "QueSystemLicense.lib")
+#pragma comment(lib, "LbLicense.lib")
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
