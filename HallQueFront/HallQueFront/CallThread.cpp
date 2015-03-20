@@ -113,14 +113,29 @@ void CCallThread::DoEvaMsg(const MSG& msg)
 			CString staffID = m_map_login[Window.GetWindowId()];
 			data.SetStaffId(staffID);
 			CString bussinessType;
-			CMap<int,int,CQueueInfo,CQueueInfo&>::CPair* pCurEva;
-			int count = m_map_que.GetCount();
-			for(int i=0;i<count;i++)
+			/*
+			处理业务ID
+			*/
+			SLZWindow window;
+			m_rInlineQueData.m_rWindowTable.QueryWindowById(data.GetWindowId(),window);
+			CStringArray arrayQueID;
+			window.GetArrayQueId(arrayQueID);
+			if(!arrayQueID.IsEmpty())
 			{
-				pCurEva = m_map_que.PLookup(i);
-				bussinessType = pCurEva->value.GetQueID();
-				break;
+				bussinessType = arrayQueID[0];
 			}
+			else
+			{
+				CMap<int,int,CQueueInfo,CQueueInfo&>::CPair* pCurEva;
+				int count = m_map_que.GetCount();
+				for(int i=0;i<count;i++)
+				{
+					pCurEva = m_map_que.PLookup(i);
+					bussinessType = pCurEva->value.GetQueID();
+					break;
+				}
+			}
+			////////////////////////////////
 			data.SetBussinessType(bussinessType);
 			data.SetOrganId(theApp.m_logicVariables.strOrganID);
 			data.SetOrganName(theApp.m_logicVariables.strOrganNmae);
