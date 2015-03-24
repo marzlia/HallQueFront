@@ -12,6 +12,7 @@
 #include "WaitQueData.h"
 #include "QueueInfo.h"
 #include "ShortMsgModem.h"
+#include "ConfigCardDef.h"
 
 ////////////////处理呼叫命令类
 using namespace std;
@@ -73,4 +74,9 @@ private:
 	LogicVariables& m_logicVariables;//系统逻辑变量
 	MSG m_msg;//消息队列
 	CShortMsgModem* m_pShortMsg;
+private:
+	CARDCONNECTINFO m_cardConnectInfo;//卡连接远程服务器判断信息
+	BOOL ReadCardConnectInfo();//读取卡连接信息
+public:
+	BOOL ReFlushCardConnectInfo();//刷新卡连接信息
 };

@@ -269,6 +269,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\¸£½¨\DoWebService.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\DrawStars.cpp"
 				>
 			</File>
@@ -687,6 +691,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\¸£½¨\DoWebService.h"
+				>
+			</File>
+			<File
 				RelativePath=".\DrawStars.h"
 				>
 			</File>
@@ -700,6 +708,10 @@
 			</File>
 			<File
 				RelativePath=".\FinshQueData.h"
+				>
+			</File>
+			<File
+				RelativePath=".\¸£½¨\Fuzhou.h"
 				>
 			</File>
 			<File

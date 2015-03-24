@@ -44,6 +44,8 @@ SLZData::SLZData(const SLZData& obj)
 	m_iQueNum = obj.m_iQueNum;
 	m_strPhoneNum = obj.m_strPhoneNum;
 	m_strMsg = obj.m_strMsg;
+	m_leftNum = obj.m_leftNum;
+	m_custLev = obj.m_custLev;
 }
 
 SLZData& SLZData::operator=(const SLZData& obj)
@@ -72,6 +74,8 @@ SLZData& SLZData::operator=(const SLZData& obj)
 	m_iQueNum = obj.m_iQueNum;
 	m_strPhoneNum = obj.m_strPhoneNum;
 	m_strMsg = obj.m_strMsg;
+	m_leftNum = obj.m_leftNum;
+	m_custLev = obj.m_custLev;
 	return *this;
 }
 

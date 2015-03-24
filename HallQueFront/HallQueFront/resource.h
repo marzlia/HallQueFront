@@ -340,6 +340,7 @@
 #define IDC_BTN_CLRBK                   1190
 #define IDC_BN_SAVECON                  1190
 #define IDC_CANCELAUTOLOGIN             1190
+#define IDC_CUST_PRODUCT                1190
 #define IDC_STA_BTNBK                   1191
 #define IDC_CHECK4                      1192
 #define IDC_COMBO3                      1194

@@ -4,6 +4,7 @@
 #include "SLZData.h"
 #include <string>
 #include "JudyeShortMsg.h"
+#include "ConfigCardDef.h"
 using namespace std;
 
 class CFinshQueData
@@ -28,4 +29,9 @@ private:
 	BOOL SendMsgToPhone(const SLZData& data);
 public:
 	BOOL ReFlushListShortMsg();//接口刷新出现差评发送短信的队列
+private:
+	CARDCONNECTINFO m_cardConnectInfo;//卡连接远程服务器判断信息
+	BOOL ReadCardConnectInfo();//读取卡连接信息
+public:
+	BOOL ReFlushCardConnectInfo();//刷新卡连接信息
 };

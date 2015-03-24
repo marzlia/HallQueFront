@@ -1,6 +1,6 @@
 #ifndef _HALLQUEFRONT_DATADEF_H
 #define _HALLQUEFRONT_DATADEF_H
-
+#include "福建\Fuzhou.h"
 
 #define EVA_MSG WM_USER+1019
 #define CALL_MSG WM_USER+1117
@@ -82,6 +82,7 @@ public:
 	CString strCustName;//用户姓名，用于刷身份证
 	CString strAttchQueID;//属于那个队列的队列ID
 	int nAttchPageID;//链接哪个界面
+	CustLev custLev;//客户级别(福州对接)
 }CARDINFO,*PCARDINFO;
 
 typedef struct _tagLogicVariables//系统综合逻辑变量

@@ -398,7 +398,11 @@ void SLZPrinter::SetPrintStyle(CDC* pDC,const WINDOWCTRINFO& info,const SLZData&
 			content = data.GetCustName();
 			break;//客户姓名
 		case 	enumPrintClientLevel: //客户星级
-			DrawStarsForClientLev(pDC,7,rect,data.GetCustomerLevel());
+//			DrawStarsForClientLev(pDC,7,rect,data.GetCustomerLevel());
+			DrawStarsForCustLev(pDC,rect,data);
+			break;
+		case enumPrintCustProduct://客户所持有产品
+			DrawCircleForCustProduct(pDC,rect,data,15);
 			break;
 		}
 		if(!content.IsEmpty())
@@ -563,4 +567,125 @@ int SLZPrinter::FlushCStringData(CDC* pDC,const CString& content,const CRect& re
 	pDC->SelectObject(def_font);
 	font.DeleteObject();
 	return col;
+}
+
+void SLZPrinter::DrawStarsForCustLev(CDC* pDC,const CRect& rect,const SLZData& data)
+{
+	CString content;
+	CustLev custLev = data.GetFuZhouCustLev();
+	for(int i=0;i<custLev.custLev;i++)
+	{
+		content+=_T("※");
+	}
+	CRect textRect = rect;
+	::DrawText(pDC->GetSafeHdc(),content,-1,&textRect,DT_LEFT|DT_WORDBREAK|DT_EDITCONTROL);
+}
+
+void SLZPrinter::DrawCircleForCustProduct(CDC* pDC,const CRect& rect,const SLZData& data,int num)
+{
+	CustLev custLev = data.GetFuZhouCustLev();
+	int len = ( m_printRect.Width() - rect.Height()*num ) / 2;
+	CPoint startPoint;
+	startPoint.x = rect.left + len;
+	startPoint.y = rect.top;
+	int raudis = rect.Height();
+	CRect circleRect(startPoint.x,startPoint.y,startPoint.x+raudis,startPoint.y+raudis);
+	for(int i=0;i<num;i++)
+	{
+		BOOL isSolid = FALSE; BOOL isTwo = FALSE;
+		CRect circleRectValue;
+		circleRectValue.top = circleRect.top;
+		circleRectValue.bottom = circleRect.bottom;
+		circleRectValue.left = circleRect.left + i*raudis;
+		circleRectValue.right = circleRect.right + i*raudis;
+		if(i<=4){
+			switch(custLev.proForCust[i]){
+				case 0:
+					isSolid = FALSE;
+					isTwo = FALSE;
+					break;
+				case 1:
+					isTwo = TRUE;
+					isSolid = FALSE;
+					break;
+				case 2:
+					isSolid = TRUE;
+					isTwo = FALSE;
+					break;
+				case 3:
+					isSolid = TRUE;
+					isTwo = FALSE;
+					break;
+				default:
+					break;
+			}
+		}
+		else if(i == 10){
+			switch(custLev.proForCust[i]){
+				case 0:
+					isSolid = FALSE;
+					isTwo = FALSE;
+					break;
+				case 1:
+					isSolid = FALSE;
+					isTwo = TRUE;
+					break;
+				case 3:
+					isSolid = TRUE;
+					isTwo = FALSE;
+					break;
+				default:
+					break;
+			}
+		}
+		else{
+			switch(custLev.proForCust[i]){
+				case 0:
+					isSolid = FALSE;
+					isTwo = FALSE;
+					break;
+				case 4:
+					isTwo = TRUE;
+					isSolid = FALSE;
+					break;
+				default:
+					break;
+			}
+		}
+		//画圆
+		DrawCircles(pDC,circleRectValue,isSolid,isTwo);
+	}
+}
+
+void SLZPrinter::DrawCircles(CDC* pDC,const CRect& circleRect,BOOL isSoild/* =FALSE */,BOOL isTwo/* =FALSE */)
+{
+	CPen pen;
+	pen.CreatePen(PS_SOLID, 1, RGB(0,0,0));
+	CPen* pOldPen = pDC->SelectObject(&pen);
+	if(isSoild)
+	{
+		HBRUSH hBrush = (HBRUSH)GetStockObject(BLACK_BRUSH);
+		HBRUSH hOldBrush = (HBRUSH)SelectObject(pDC->GetSafeHdc(),hBrush);
+		DeleteObject(hBrush);
+		pDC->Ellipse(circleRect);
+		SelectObject(pDC->GetSafeHdc(),hOldBrush);
+	}
+	else if(isTwo && !isSoild)
+	{
+		HBRUSH hBrush = (HBRUSH)GetStockObject(NULL_BRUSH);
+		HBRUSH hOldBursh = (HBRUSH)SelectObject(pDC->GetSafeHdc(),hBrush);
+		DeleteObject(hBrush);
+		pDC->Ellipse(circleRect);
+		CRect secoendRect = circleRect;
+		secoendRect.left += 2;secoendRect.right -= 2;
+		secoendRect.top += 2; secoendRect.bottom -= 2;
+		pDC->Ellipse(secoendRect);
+		SelectObject(pDC->GetSafeHdc(),hOldBursh);
+	}
+	else if(!isSoild && !isTwo)
+	{
+		pDC->Ellipse(circleRect);
+	}
+	pen.DeleteObject();
+	pDC->SelectObject(pOldPen);
 }

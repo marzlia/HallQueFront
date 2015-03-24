@@ -5,6 +5,7 @@
 #include "DoFile.h"
 #include "HallQueFront.h"
 #include "TCPConnect.h"
+#include "福建\DoWebService.h"
 
 extern  void MyWriteConsole(CString str); 
 
@@ -264,6 +265,19 @@ DWORD WINAPI SLZCardReader::ReadCard(LPVOID pParam)
  						cardinfo.strAttchQueID = queID;
  						cardinfo.iCustLevel = nLev;
  					}*/
+					//这里对接
+					CDoWebService doWebService;
+					CustLev LevValue;
+					int nCustLev = pCard->GetCustLev(cardinfo.strCardNumber,&LevValue);
+					if(nCustLev != -1 && LevValue.isSucced){
+						cardinfo.custLev = LevValue;
+						cardinfo.strAttchQueID = pCard->JudgeCardAttchQue(nCustLev);
+						cardinfo.nAttchPageID = pCard->JudgeCardAttchPageID(nCustLev);
+					}
+					else{//以本地判断
+						cardinfo.strAttchQueID = pCard->JudgeCardAttchQue(cardinfo.strCardNumber);
+						cardinfo.nAttchPageID = pCard->JudgeCardAttchPageID(cardinfo.strCardNumber);
+					}
 				}
 				//判断是否超出工作时间
 				if(!theApp.m_Controller.JudgeWorkTimeOut(cardinfo.strAttchQueID)&&!cardinfo.strAttchQueID.IsEmpty())
@@ -281,13 +295,11 @@ DWORD WINAPI SLZCardReader::ReadCard(LPVOID pParam)
 	return 0;
 }
 
-int SLZCardReader::GetCustLev(const CString& strCardNum)
+int SLZCardReader::GetCustLev(const CString& strCardNum,CustLev* pCustLev)
 {
-	CString strPort;
-	strPort.Format(_T("%d"),m_cardConnectInfo.ServerPort);
-	CTCPConnect connect;
-	int recvValue = connect.GetCustLevel(strCardNum,m_cardConnectInfo.ServerIP,
-		strPort,m_cardConnectInfo.OverTime);
+	CDoWebService doWebService;
+	int recvValue = doWebService.GetCardLevelFromServer(m_cardConnectInfo.ServerIP,strCardNum,m_cardConnectInfo.ServerPort,
+		m_cardConnectInfo.OverTime,pCustLev);
 	return recvValue;
 }
 

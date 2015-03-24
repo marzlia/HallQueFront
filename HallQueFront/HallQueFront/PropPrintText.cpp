@@ -188,6 +188,9 @@ void CPropPrintText::InitFont()
 			case enumPrintClientLevel:
 				m_ed_prText.SetWindowText(CS_printClientLevel);
 				break;
+			case enumPrintCustProduct:
+				m_ed_prText.SetWindowText(CS_printCustProduct);
+				break;
 			}
 		}
 	}

@@ -82,6 +82,7 @@ BOOL CInlineQueData::GetInlineQueData(const UINT iWinId,
 	rdata.SetStaffId(staffID);//设置员工ID,哪个员工呼叫
 	rdata.SetWindowId(iWinId);//设置哪个窗口呼叫
 	rdata.SetWindowShowId(Window.GetShowWndId());//设置窗口编号
+	rdata.SetWndLefNum(GetCandoQueCount(iWinId));
 	m_mtInlineQue.Unlock();
 	return bFind;
 }

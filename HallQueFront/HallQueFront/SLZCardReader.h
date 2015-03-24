@@ -48,7 +48,7 @@ private:
 	CARDCONNECTINFO m_cardConnectInfo;//卡连接远程服务器判断信息
 	CArray<CSwingCard*,CSwingCard*> m_list_swingCard;//刷卡的链表
 	void ClearCardLevInfo();//清空卡等级数组数组
-	int GetCustLev(const CString& strCardNum);//获取客户等级用于对接情况
+	int GetCustLev(const CString& strCardNum,CustLev* pCustLev);//获取客户等级用于对接情况
 	CString JudgeCardAttchQue(const int level);//判断卡对接，传入等级对应一个队列，返回队列，用于对接的情况
 	int JudgeCardAttchPageID(int level);//判断卡对接,传入等级返回界面ID，用于对接情况
 public:

@@ -58,4 +58,10 @@ private:
 	CRect m_printRect;
 	BOOL LoadPrintRectFormFile();
 	int FlushCStringData(CDC* pDC,const CString& content,const CRect& rect,const WINDOWCTRINFO& info);
+private:
+	////下面两个用于福州对接
+	void DrawStarsForCustLev(CDC* pDC,const CRect& rect,const SLZData& data);
+	void DrawCircleForCustProduct(CDC* pDC,const CRect& rect,const SLZData& data,int num);
+private:
+	void DrawCircles(CDC* pDC,const CRect& circleRect,BOOL isSoild=FALSE,BOOL isTwo=FALSE);
 };

@@ -227,6 +227,14 @@ public:
 	////设置完成评价
 	void SetIsFinshEva(const BOOL isFinsh){m_bIsFinshEva = isFinsh;}
 	BOOL GetIsFinshEva(){return m_bIsFinshEva;}
+	
+	
+	/////设置呼叫窗口可处理的所有队列的排队人数
+	void SetWndLefNum(int leftNum){m_leftNum = leftNum;}
+	int GetWndLefNum()const {return m_leftNum;}
+	////////福州返回信息
+	void SetFuZhouCustLev(CustLev custLev){m_custLev = custLev;}
+	CustLev GetFuZhouCustLev()const {return m_custLev;}
 
 	virtual void Serialize( CArchive& ar );//支持序列化
 	DECLARE_SERIAL(SLZData)
@@ -258,13 +266,7 @@ private:
 private:
 	int GetSrand(const int &max);
 	CString GetOnlyId();//取号唯一ID
-//public:
-//	void SetDataEmpty()
-//	{
-//		m_strSerialId=_T("");m_strOrganId=_T("");m_strBType=_T("");
-//		m_strBussName=_T("");m_strQueueNum=_T("");m_CardType=cardNotDefine;
-//		m_strCardNum=_T("");m_CustName=_T("");m_iCusLevel=RegularMember;
-//		m_timeTakingNum=0;m_strStaffId=_T("");m_strWindowId=_T("");
-//		m_timeCall=0;m_timeFinish=0;m_EvaLevel=evaNone;
-//	}
+
+	int m_leftNum;//当呼叫此条信息后，设置呼叫窗口可处理的所有队列的排队人数
+	CustLev m_custLev;//福州返回的客户等级信息
 };
