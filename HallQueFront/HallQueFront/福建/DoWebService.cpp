@@ -596,8 +596,10 @@ int CDoWebService::SendDealBusMsg(const CString& host,const SLZData& data,USHORT
 		MyWriteConsole(strErrCode);
 #endif
 	}
+	
 	char recvBuf[MAXRECVBUF+1]={0};
 	setsockopt(cliSock,SOL_SOCKET,SO_RCVTIMEO,(char *)&m_nTimeOut,sizeof(UINT));
+	
 	int actRecvSize = recv(cliSock,recvBuf,MAXRECVBUF,0);
 	if(actRecvSize == 0 || actRecvSize == SOCKET_ERROR)
 	{
@@ -622,6 +624,7 @@ int CDoWebService::SendDealBusMsg(const CString& host,const SLZData& data,USHORT
 		std::string strTemp(recvBuf);
 		strRecvBuf += strTemp;
 	}
+	
 	strRecvBuf = CCommonConvert::UTF8_To_string(strRecvBuf);
 	nResult = AnaBusErrcode(strRecvBuf);
 	return nResult;
