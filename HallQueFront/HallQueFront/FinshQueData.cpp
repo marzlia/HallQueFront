@@ -101,7 +101,6 @@ BOOL CFinshQueData::GetFinshedData()
 		doWebservice.SendDealBusMsg(m_cardConnectInfo.ServerIP,data,m_cardConnectInfo.ServerPort,
 			m_cardConnectInfo.OverTime,data.GetWndLefNum(),TRUE);
 	}
-	m_listFinshQue.pop_front();
 	return flag;
 }
 
