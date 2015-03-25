@@ -75,7 +75,7 @@ std::string CDoWebService::ProduceSendCardMsg(const CString& cardNo,const CStrin
 	CTime currTime = CTime::GetCurrentTime();
 	CString strTime;
 	strTime.Format(_T("%d-%d-%d%%20%d:%d:%d"),currTime.GetYear(),currTime.GetMonth(),currTime.GetDay(),
-		currTime.GetDay(),currTime.GetMinute(),currTime.GetSecond());
+		currTime.GetHour(),currTime.GetMinute(),currTime.GetSecond());
 	packet.AppendFormat(_T("&transTime=%s"),strTime);
 	packet+=_T("&queueLeft=0");
 	packet+=_T("&queueCode=001");
@@ -336,7 +336,7 @@ std::string CDoWebService::ProduceDealBusMsg(const SLZData& dealData,int leftNum
 	CTime currTime = dealData.GetTakingNumTime();
 	CString strTime;
 	strTime.Format(_T("%d-%d-%d%%20%d:%d:%d"),currTime.GetYear(),currTime.GetMonth(),currTime.GetDay(),
-		currTime.GetDay(),currTime.GetMinute(),currTime.GetSecond());
+		currTime.GetHour(),currTime.GetMinute(),currTime.GetSecond());
 	if(isEnd){
 		packet.AppendFormat(_T("&transTime=%s"),strTime);
 	}else{
