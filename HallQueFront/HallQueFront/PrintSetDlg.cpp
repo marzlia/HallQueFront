@@ -59,6 +59,7 @@ BEGIN_MESSAGE_MAP(CPrintSetDlg, CDialog)
 	ON_WM_KEYDOWN()
 	ON_BN_CLICKED(IDC_BN_OK, &CPrintSetDlg::OnBnClickedBnOk)
 	ON_BN_CLICKED(IDC_BN_CANCEL, &CPrintSetDlg::OnBnClickedBnCancel)
+	ON_BN_CLICKED(IDC_CUST_PRODUCT, &CPrintSetDlg::OnBnClickedCustProduct)
 END_MESSAGE_MAP()
 
 void CPrintSetDlg::OnBnClickedAddText()
@@ -556,4 +557,20 @@ void CPrintSetDlg::OnBnClickedBnCancel()
 {
 	// TODO: 在此添加控件通知处理程序代码
 	return CDialog::OnCancel();
+}
+
+void CPrintSetDlg::OnBnClickedCustProduct()
+{
+	// TODO: 在此添加控件通知处理程序代码
+	m_bIsAddPicture = FALSE;
+	m_bIsAddText = TRUE;
+	m_bIsForEdit = FALSE;
+	m_bIsShowTime = FALSE;
+	m_bIsForPrintObject = TRUE;
+	m_printObject = enumPrintCustProduct;
+	CPropPrintSet printSet(_T("打印"),this);
+	if(IDOK == printSet.DoModal())
+	{
+		//		SetModified();
+	}
 }

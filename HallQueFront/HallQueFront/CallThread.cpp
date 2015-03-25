@@ -7,6 +7,7 @@
 #include "SLZEvaData.h"
 #include "SLZCWndScreen.h"
 #include "ComputeFuncationTime.h"
+#include "福建\DoWebService.h"
 
 
 extern void MyWriteConsole(CString str);
@@ -344,6 +345,13 @@ void CCallThread::OnCall(CallerCmd& callerCmd)
  			m_pShortMsg->ClearSendBox();
  			m_pShortMsg->SendMsg(data.GetPhoneNum(),data.GetSendMsg());
  		}
+		//用于福州发送到银行CRM服务端
+		if(m_cardConnectInfo.IsConnect)
+		{
+			CDoWebService doWebservice;
+			doWebservice.SendDealBusMsg(m_cardConnectInfo.ServerIP,data,m_cardConnectInfo.ServerPort,
+				m_cardConnectInfo.OverTime,data.GetWndLefNum());
+		}
 	}
 	///重新写file，保存没处理（呼叫）的数据
 	theApp.m_Controller.WriteInlineDataToFile();
@@ -760,4 +768,31 @@ BOOL CCallThread::ShowCallerWaitNum(const CString& queID)
 		}
 	}
 	return TRUE;
+}
+
+BOOL CCallThread::ReadCardConnectInfo()
+{
+	CString path;
+	CDoFile doFile;
+	path = doFile.GetExeFullFilePath();
+	path += _T("\\CardConfigInfo\\CardConnectInfo.dat");
+	memset(&m_cardConnectInfo,0,sizeof(m_cardConnectInfo));
+	CFile file;
+	CFileException e;
+	if (file.Open(path,CFile::modeRead,&e))
+	{
+		file.Read(&m_cardConnectInfo,sizeof(CARDCONNECTINFO));
+		file.Close();
+		return TRUE;
+	}
+	else
+	{
+		return FALSE;
+	}
+	return TRUE;
+}
+
+BOOL CCallThread::ReFlushCardConnectInfo()
+{
+	return ReadCardConnectInfo();
 }

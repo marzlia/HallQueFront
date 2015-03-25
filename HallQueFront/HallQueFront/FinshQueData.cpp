@@ -6,6 +6,7 @@
 #include "ProducePacket.h"
 #include "ShortMsgModem.h"
 #include "DoFile.h"
+#include "福建\DoWebService.h"
 
 CFinshQueData::CFinshQueData(void) : m_pDoFinshedDataThread(NULL)
 {
@@ -93,6 +94,14 @@ BOOL CFinshQueData::GetFinshedData()
 			SendMsgToPhone(data);
 		}	
 	}
+	////////////用于福州发送到银行CRM系统//////////
+	if(m_cardConnectInfo.IsConnect)
+	{
+		CDoWebService doWebservice;
+		doWebservice.SendDealBusMsg(m_cardConnectInfo.ServerIP,data,m_cardConnectInfo.ServerPort,
+			m_cardConnectInfo.OverTime,data.GetWndLefNum(),TRUE);
+	}
+	m_listFinshQue.pop_front();
 	return flag;
 }
 
@@ -188,4 +197,31 @@ BOOL CFinshQueData::SendMsgToPhone(const SLZData& data)
 		flag = pMsgModem->SendMsg(pMsg->GetPhoneNum(),strShortMsg);
 	}
 	return flag;
+}
+
+BOOL CFinshQueData::ReadCardConnectInfo()
+{
+	CString path;
+	CDoFile doFile;
+	path = doFile.GetExeFullFilePath();
+	path += _T("\\CardConfigInfo\\CardConnectInfo.dat");
+	memset(&m_cardConnectInfo,0,sizeof(m_cardConnectInfo));
+	CFile file;
+	CFileException e;
+	if (file.Open(path,CFile::modeRead,&e))
+	{
+		file.Read(&m_cardConnectInfo,sizeof(CARDCONNECTINFO));
+		file.Close();
+		return TRUE;
+	}
+	else
+	{
+		return FALSE;
+	}
+	return TRUE;
+}
+
+BOOL CFinshQueData::ReFlushCardConnectInfo()
+{
+	return ReadCardConnectInfo();
 }

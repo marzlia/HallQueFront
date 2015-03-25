@@ -141,8 +141,7 @@ BOOL SLZController::Start()
 	m_pInlineQueData = new CInlineQueData(m_windowTable);
 	m_pCalledQueData = new CCalledQueData(m_windowTable);
 	m_pFinshQueData = new CFinshQueData;
-	ReFlushSwingCardTable();
-	m_cardread.Run();
+	
 	/////////////////////////发送本地信息到服务端数据库
 	if(flag1&&flag2&&flag3&&flag4)
 	{
@@ -244,7 +243,10 @@ BOOL SLZController::Start()
 	m_pEvaThread = new CEvaThread(m_EvaCmdData,m_pCallThread);
 	m_pEvaThread->Start();
 
-	
+	///初始化刷卡一系列信息
+	ReFlushSwingCardTable();
+	//开启刷卡线程
+	m_cardread.Run();
 	return TRUE;
 }
 
@@ -329,6 +331,9 @@ UINT SLZController::TakingNumThreadProc(LPVOID pParam)
 				///设置机构代码和名称
 				data.SetOrganId(theApp.m_logicVariables.strOrganID);
 				data.SetOrganName(theApp.m_logicVariables.strOrganNmae);
+				////如果卡对接，把客户信息赋值给中间变量data
+				data.SetFuZhouCustLev(cardInfo.custLev);
+
 				if (!pControl->InsertListData(data))
 				{
 					pControl->m_list_Data.AddTail(data);
@@ -684,6 +689,8 @@ BOOL SLZController::ReFlushSwingCardTable()
 	m_cardread.ReFlushCardConnectInfo();//刷新卡连接信息
 	m_cardread.ReFlushCardConfigInof();//刷新卡识别信息
 	m_cardread.ReFlushCardLevelInfo();//刷新卡的对接等级，对应队列信息
+	m_pCallThread->ReFlushCardConnectInfo();//呼叫类刷新卡对接信息，用于对接情形向服务器发送数据
+	m_pFinshQueData->ReFlushCardConnectInfo();//完成队列刷新卡对接信息，用于对接情形向服务器发送数据
 	return TRUE;
 }
 
