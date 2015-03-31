@@ -6,7 +6,7 @@
 #include "HallQueFront.h"
 #include "TCPConnect.h"
 #include "¸£½¨\DoWebService.h"
-
+#include "WriteLogError.h"
 extern  void MyWriteConsole(CString str); 
 
 SLZCardReader::SLZCardReader(void) : m_hReadTread(NULL),
@@ -269,6 +269,12 @@ DWORD WINAPI SLZCardReader::ReadCard(LPVOID pParam)
 					CDoWebService doWebService;
 					CustLev LevValue;
 					int nCustLev = pCard->GetCustLev(cardinfo.strCardNumber,&LevValue);
+					CWriteLogError writeLogErr;
+					if (LevValue.isSucced)
+					{
+						writeLogErr.WriteErrLog(_T("³É¹¦"));
+					}
+					else writeLogErr.WriteErrLog(_T("Ê§°Ü"));
 					if(nCustLev != -1 && LevValue.isSucced){
 						cardinfo.custLev = LevValue;
 						cardinfo.strAttchQueID = pCard->JudgeCardAttchQue(nCustLev);

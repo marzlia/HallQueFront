@@ -35,7 +35,7 @@ private:
 	void AssicToHex(char *param);
 	void StrToHexes(char *pc,int nsize,char *puc);
 	int InitScreen(char *buf,const int address);
-	BOOL IsResaved(const char* buf);//判断发送给屏的数据是否接收到
+	BOOL IsResaved(const char* buf);//判断发送给屏的数据是否接收g
 	CList<WNDSCREENMSG,WNDSCREENMSG&> m_listScreenMsg;//缓冲区
 	HANDLE m_hDoWndScreenMsgThread;//处理屏数据线程
 	static DWORD WINAPI DoWndScreenMsgThread(LPVOID pParm);//处理屏数据线程
