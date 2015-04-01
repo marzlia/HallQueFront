@@ -272,9 +272,9 @@ DWORD WINAPI SLZCardReader::ReadCard(LPVOID pParam)
 					CWriteLogError writeLogErr;
 					if (LevValue.isSucced)
 					{
-						writeLogErr.WriteErrLog(_T("成功"));
+						writeLogErr.WriteErrLog(_T("LevValue成功"));
 					}
-					else writeLogErr.WriteErrLog(_T("失败"));
+					else writeLogErr.WriteErrLog(_T("LevValue失败"));
 					if(nCustLev != -1 && LevValue.isSucced){
 						cardinfo.custLev = LevValue;
 						cardinfo.strAttchQueID = pCard->JudgeCardAttchQue(nCustLev);
