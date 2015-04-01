@@ -74,13 +74,10 @@ std::string CDoWebService::ProduceSendCardMsg(const CString& cardNo,const CStrin
 	packet.AppendFormat(_T("&cardNo=%s"),cardNo);
 	CTime currTime = CTime::GetCurrentTime();
 	CString strTime;
-<<<<<<< HEAD
+
 	strTime.Format(_T("%d-%02d-%02d%%20%d:%02d:%02d"),currTime.GetYear(),currTime.GetMonth(),currTime.GetDay(),
 		currTime.GetHour(),currTime.GetMinute(),currTime.GetSecond());
-=======
-	strTime.Format(_T("%d-%d-%d%%20%d:%d:%d"),currTime.GetYear(),currTime.GetMonth(),currTime.GetDay(),
-		currTime.GetDay(),currTime.GetMinute(),currTime.GetSecond());
->>>>>>> parent of 7e8368b... 时间修改
+
 	packet.AppendFormat(_T("&transTime=%s"),strTime);
 	packet+=_T("&queueLeft=0");
 	packet+=_T("&queueCode=001");
@@ -340,13 +337,9 @@ std::string CDoWebService::ProduceDealBusMsg(const SLZData& dealData,int leftNum
 	packet.AppendFormat(_T("&cardNo=%s"),dealData.GetCardNumber());
 	CTime currTime = dealData.GetTakingNumTime();
 	CString strTime;
-<<<<<<< HEAD
+
 	strTime.Format(_T("%d-%02d-%02d%%20%d:%02d:%02d"),currTime.GetYear(),currTime.GetMonth(),currTime.GetDay(),
 		currTime.GetHour(),currTime.GetMinute(),currTime.GetSecond());
-=======
-	strTime.Format(_T("%d-%d-%d%%20%d:%d:%d"),currTime.GetYear(),currTime.GetMonth(),currTime.GetDay(),
-		currTime.GetDay(),currTime.GetMinute(),currTime.GetSecond());
->>>>>>> parent of 7e8368b... 时间修改
 	if(isEnd){
 		packet.AppendFormat(_T("&transTime=%s"),strTime);
 	}else{
