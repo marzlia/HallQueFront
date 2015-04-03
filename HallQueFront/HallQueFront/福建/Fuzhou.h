@@ -4,6 +4,18 @@
 using namespace std;
 typedef struct recvCustLev
 {
+public:
+	recvCustLev() : isSucced(FALSE)
+		,highestCardLev(0)
+		,cardLev(0)
+		,custLev(0)
+		,custLevAll(0)
+		,creditCardLev(0)
+	{
+		memset(proForCust,0,15 * sizeof(int));
+	}
+	~recvCustLev(){}
+public:
 	BOOL isSucced;//是否成功
 	int highestCardLev;//最高卡级别
 	int cardLev;//刷卡级别
