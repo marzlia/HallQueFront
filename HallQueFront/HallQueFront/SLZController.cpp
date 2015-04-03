@@ -437,12 +437,10 @@ UINT SLZController::TakingViewThreadProc(LPVOID pParam)
 							pControl->m_pInlineQueData->Add(data);
 							//////////////////保存信息到本地文件
 							pControl->WriteInlineDataToFile();
-							EnumPrintStaus status = pControl->m_print.CheckPrinterStatus();
 							CurNum=pControl->m_pInlineQueData->GetBussCount(queserial_id);
-
 							///处理打印
+							EnumPrintStaus status = pControl->m_print.CheckPrinterStatus();
 							pControl->DoPrintStatus(status,data,CurNum);
-
 							///界面显示等待人数
 							theApp.m_pView->ShowWaitNum(data.GetBussinessType(),CurNum);
 							///呼叫器更新等待人数

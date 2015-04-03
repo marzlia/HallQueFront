@@ -258,15 +258,6 @@ DWORD WINAPI SLZCardReader::ReadCard(LPVOID pParam)
 				else
 				{
 					//这里对接
- 					/*int nLev = pCard->GetCustLev(cardinfo.strCardNumber);
- 					if(nLev!=-1)
- 					{
- 						CString queID = pCard->JudgeCardAttchQue(nLev);
- 						cardinfo.strAttchQueID = queID;
- 						cardinfo.iCustLevel = nLev;
- 					}*/
-					//这里对接
-					CDoWebService doWebService;
 					CustLev LevValue;
 					int nCustLev = pCard->GetCustLev(cardinfo.strCardNumber,&LevValue);
 					if(nCustLev != -1 && LevValue.isSucced){

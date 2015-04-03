@@ -526,8 +526,42 @@ int CDoWebService::GetCardLevelFromServer(const CString& host,const CString& car
 		MyWriteConsole(strErrCode);
 #endif
 	}
+
+	std::string strRecvBuf;
 	char recvBuf[MAXRECVBUF+1]={0};
 	setsockopt(cliSock,SOL_SOCKET,SO_RCVTIMEO,(char *)&m_nTimeOut,sizeof(UINT));
+	while(1)
+	{
+		memset(recvBuf,0,MAXRECVBUF+1);
+		int actRecvSize = recv(cliSock,recvBuf,MAXRECVBUF,0);
+		if(actRecvSize == SOCKET_ERROR || actRecvSize == 0)
+		{
+#ifdef _DEBUG
+			DWORD errCode = GetLastError();
+			CString str = _T("recv error:");
+			str.AppendFormat(_T("%d"),errCode);
+			MyWriteConsole(str);
+#endif
+			CWriteLogError log;
+			CString strErrCode;
+			strErrCode.Format(_T("recv error:%d"),WSAGetLastError());
+			log.WriteErrLog(strErrCode);
+			closesocket(cliSock);
+//			pCustLev->isSucced = FALSE;
+			break;
+		}
+		else
+		{
+			std::string strTemp(recvBuf);
+			strRecvBuf += strTemp;
+			int pos = strRecvBuf.find("&lt;/dataPacket&gt;");
+			if(pos != strRecvBuf.npos)
+			{
+				break;
+			}
+		}
+	}
+	/*
 	int actRecvSize = recv(cliSock,recvBuf,MAXRECVBUF,0);
 	if(actRecvSize==SOCKET_ERROR)
 	{
@@ -556,6 +590,8 @@ int CDoWebService::GetCardLevelFromServer(const CString& host,const CString& car
 			strRecvBuf += strTemp;
 		}
 	}
+	*/
+	closesocket(cliSock);
 	strRecvBuf = CCommonConvert::UTF8_To_string(strRecvBuf);
 //	strRecvBuf = "&lt;?xml version=\"1.0\" encoding=\"UTF-8\"?&gt;&lt;dataPacket version=\"1.0\"&gt;&lt;retCode&gt;0000&lt;/retCode&gt;&lt;highestCardLevel&gt;03&lt;/highestCardLevel&gt;&lt;cardLevel&gt;02&lt;/cardLevel&gt;&lt;custLevel&gt;08&lt;/custLevel&gt;&lt;custLevelAll&gt;08&lt;/custLevelAll&gt;&lt;highestCRCDLevel&gt;50&lt;/highestCRCDLevel&gt;&lt;aubm&gt;1000&lt;/aubm&gt;&lt;aubmMavg&gt;1200&lt;/aubmMavg&gt;&lt;aubmQavg&gt;15000&lt;/aubmQavg&gt;&lt;aubmYavg&gt;2500000&lt;/aubmYavg&gt;&lt;proForCust&gt;1#2#0#1#3#1#2#1#2#2#3#1#2#0#1#0&lt;/proForCust&gt;&lt;reserve1&gt;&lt;/reserve1&gt;&lt;reserve2&gt;&lt;/reserve2&gt;&lt;reserve3&gt;&lt;/reserve3&gt;&lt;reserve4&gt;&lt;/reserve4&gt;&lt;reserve5&gt;&lt;/reserve5&gt;&lt;/dataPacket&gt;";
 	nCardLev = AnaCustLevel(strRecvBuf,pCustLev);
@@ -596,10 +632,41 @@ int CDoWebService::SendDealBusMsg(const CString& host,const SLZData& data,USHORT
 		MyWriteConsole(strErrCode);
 #endif
 	}
-	
+	/*
 	char recvBuf[MAXRECVBUF+1]={0};
 	setsockopt(cliSock,SOL_SOCKET,SO_RCVTIMEO,(char *)&m_nTimeOut,sizeof(UINT));
-	
+	std::string strRecvBuf;
+	while(1)
+	{
+		memset(recvBuf,0,MAXRECVBUF+1);
+		int actRecvSize = recv(cliSock,recvBuf,MAXRECVBUF,0);
+		if(actRecvSize == 0 || actRecvSize == SOCKET_ERROR)
+		{
+#ifdef _DEBUG
+			DWORD errCode = GetLastError();
+			CString str = _T("recv error:");
+			str.AppendFormat(_T("%d"),errCode);
+			MyWriteConsole(str);
+#endif
+			CWriteLogError log;
+			CString strErrCode;
+			strErrCode.Format(_T("recv error:%d"),WSAGetLastError());
+			log.WriteErrLog(strErrCode);
+			closesocket(cliSock);
+			return nResult;
+		}
+		else
+		{
+			std::string strTemp(recvBuf);
+			strRecvBuf += strTemp;
+			int npos = strRecvBuf.find("&lt;/dataPacket&gt;");
+			if(npos != strRecvBuf.npos)
+			{
+				break;
+			}
+		}
+	}
+	/*
 	int actRecvSize = recv(cliSock,recvBuf,MAXRECVBUF,0);
 	if(actRecvSize == 0 || actRecvSize == SOCKET_ERROR)
 	{
@@ -624,9 +691,11 @@ int CDoWebService::SendDealBusMsg(const CString& host,const SLZData& data,USHORT
 		std::string strTemp(recvBuf);
 		strRecvBuf += strTemp;
 	}
+	*/
+	closesocket(cliSock);
 	
-	strRecvBuf = CCommonConvert::UTF8_To_string(strRecvBuf);
-	nResult = AnaBusErrcode(strRecvBuf);
+//	strRecvBuf = CCommonConvert::UTF8_To_string(strRecvBuf);
+//	nResult = AnaBusErrcode(strRecvBuf);
 	return nResult;
 }
 

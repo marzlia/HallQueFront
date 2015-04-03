@@ -89,6 +89,7 @@ public:
 	afx_msg void OnTipShow();
 	afx_msg void OnTipExit();
 	void SetFullScreen(BOOL bFullScreen){m_bFullScreen = bFullScreen;}
+	virtual BOOL DestroyWindow();
 };
 
 
