@@ -43,7 +43,7 @@ typedef enum _tagStaticTextAlign
 	enumRight  = 2
 }StaticTextAlign;
 
-#define  textNum 2048 //最大处理文字限制
+#define  textNum 20480 //最大处理文字限制
 #define  addNum 256   //连接处理队列的限制
 
 //时间格式
