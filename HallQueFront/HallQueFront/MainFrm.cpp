@@ -501,8 +501,14 @@ void CMainFrame::OnTipExit()
 	// TODO: 在此添加命令处理程序代码
 	if(IDOK==MessageBox(_T("确定退出吗?"),_T("警告"),MB_OKCANCEL | MB_ICONINFORMATION))
 	{
-		RemoveTrayIcon();
 		DestroyWindow();
 	}
 }
 
+
+BOOL CMainFrame::DestroyWindow()
+{
+	// TODO: 在此添加专用代码和/或调用基类
+	RemoveTrayIcon();
+	return CFrameWnd::DestroyWindow();
+}
