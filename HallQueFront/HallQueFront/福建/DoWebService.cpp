@@ -337,11 +337,7 @@ std::string CDoWebService::ProduceDealBusMsg(const SLZData& dealData,int leftNum
 	CString strTime;
 	strTime.Format(_T("%d-%d-%d%%20%d:%d:%d"),currTime.GetYear(),currTime.GetMonth(),currTime.GetDay(),
 		currTime.GetHour(),currTime.GetMinute(),currTime.GetSecond());
-	if(isEnd){
-		packet.AppendFormat(_T("&transTime=%s"),strTime);
-	}else{
-		packet+=_T("&transTime=9999-99-99 99:99:99");
-	}
+	packet.AppendFormat(_T("&transTime=%s"),strTime);
 	packet.AppendFormat(_T("&queueLeft=%d"),leftNum);
 	packet.AppendFormat(_T("&queueCode=%s"),dealData.GetQueueNumber());
 	CTime callTime = dealData.GetCallTime();
@@ -351,7 +347,20 @@ std::string CDoWebService::ProduceDealBusMsg(const SLZData& dealData,int leftNum
 	packet.AppendFormat(_T("&processBeginTime=%s"),strCallTime);
 	packet.AppendFormat(_T("&handTellerNo=%d"),dealData.GetWindowShowId());
 	packet.AppendFormat(_T("&tellerNo=%s"),dealData.GetStaffId());
-//	CString packet=_T("GET /jaxwsserver/services/hello/sayhello?num1=1&num2=2");
+
+	if(isEnd)//处理结束,完成处理
+	{
+		CTime finshTime = dealData.GetFinishTime();
+		CString strFinshTime;
+		strFinshTime.Format(_T("%d-%d-%d%%20%d:%d:%d"),finshTime.GetYear(),finshTime.GetMonth(),finshTime.GetDay(),
+			finshTime.GetHour(),finshTime.GetMinute(),finshTime.GetSecond());
+		packet.AppendFormat(_T("&processEndTime=%s"),strFinshTime);
+	}
+	else//开始处理
+	{
+		packet += _T("&processEndTime=9999-99-99 99:99:99");
+	}
+
 	packet.AppendFormat(_T(" HTTP/1.0\r\nHost:%s:%d\r\n\r\n"),host,port);
 //	packet+=_T(" HTTP/1.1\r\n\r\n");
 	/////////////////////////
@@ -362,6 +371,36 @@ std::string CDoWebService::ProduceDealBusMsg(const SLZData& dealData,int leftNum
 	std::string stdStrPacket(strPacket);
 	delete [] strPacket;
 	return stdStrPacket;
+
+	/*
+	CCommonConvert convert;
+	//http://192.168.1.100:8080/jaxwsserver/services/T000101/getData?transCode=T000101&orgCode=001&machineCode=79787145456&typeFlag=02&cardNo=123456&transTime=2014-10-08%202010:10:10&queueLeft=10&queueCode=45465
+
+	CString packet = _T("GET /bmc/services/T000103/getData?transCode=T000103");
+	//	CString packet = _T("GET /jaxwsserver/services/T000103/getData?transCode=T000103");
+	packet.AppendFormat(_T("&orgCode=%s"),theApp.m_logicVariables.strOrganID);//机构号
+	packet.AppendFormat(_T("&machineCode=%s"),theApp.m_logicVariables.strOrganNmae);//设备号
+	packet+=_T("&typeFlag=02");
+	packet.AppendFormat(_T("&cardNo=%s"),cardNo);
+	CTime currTime = CTime::GetCurrentTime();
+	CString strTime;
+	strTime.Format(_T("%d-%d-%d%%20%d:%d:%d"),currTime.GetYear(),currTime.GetMonth(),currTime.GetDay(),
+	currTime.GetHour(),currTime.GetMinute(),currTime.GetSecond());
+	packet.AppendFormat(_T("&transTime=%s"),strTime);
+	packet+=_T("&queueLeft=0");
+	packet+=_T("&queueCode=001");
+	packet.AppendFormat(_T(" HTTP/1.0\r\nHost:%s:%d\r\n\r\n"),host,port);
+	//	packet.AppendFormat(_T(" HTTP/1.1\nHost:%s:%d\r\n"),host,port);
+	//	packet+=_T(" HTTP/1.1\r\n\r\n");
+	/////////////////////////
+	int length = convert.CStringToChar(packet,NULL);
+	char* strPacket = new char[length+1];
+	memset(strPacket,0,length+1);
+	convert.CStringToChar(packet,strPacket);
+	std::string stdStrPacket(strPacket);
+	delete [] strPacket;
+	return stdStrPacket;
+	*/
 }
 
 int CDoWebService::AnaBusErrcode(const std::string& recvMsg)
@@ -606,7 +645,7 @@ int CDoWebService::SendDealBusMsg(const CString& host,const SLZData& data,USHORT
 	{
 		return nResult;
 	}
-	if(data.GetCardNumber().IsEmpty()){return nResult;}
+//	if(data.GetCardNumber().IsEmpty()){return nResult;}
 	std::string sendBuf = ProduceDealBusMsg(data,leftNum,host,port,isEnd);
 	sendBuf=CCommonConvert::string_To_UTF8(sendBuf);
 	setsockopt(cliSock,SOL_SOCKET,SO_SNDTIMEO,(char *)&m_nTimeOut,sizeof(UINT));
