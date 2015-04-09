@@ -257,7 +257,7 @@ DWORD WINAPI SLZCardReader::ReadCard(LPVOID pParam)
 				}
 				else
 				{
-					//这里对接
+					//这里对接,返回的是卡等级
 					CustLev LevValue;
 					int nCustLev = pCard->GetCustLev(cardinfo.strCardNumber,&LevValue);
 					CWriteLogError writeLogErr;
@@ -267,9 +267,10 @@ DWORD WINAPI SLZCardReader::ReadCard(LPVOID pParam)
 					}
 					else writeLogErr.WriteErrLog(_T("LevValue失败"));
 					if(nCustLev != -1 && LevValue.isSucced){
+						//以客户等级去判断
 						cardinfo.custLev = LevValue;
-						cardinfo.strAttchQueID = pCard->JudgeCardAttchQue(nCustLev);
-						cardinfo.nAttchPageID = pCard->JudgeCardAttchPageID(nCustLev);
+						cardinfo.strAttchQueID = pCard->JudgeCardAttchQue(LevValue.custLev);
+						cardinfo.nAttchPageID = pCard->JudgeCardAttchPageID(LevValue.custLev);
 					}
 					else{//以本地判断
 						cardinfo.strAttchQueID = pCard->JudgeCardAttchQue(cardinfo.strCardNumber);
