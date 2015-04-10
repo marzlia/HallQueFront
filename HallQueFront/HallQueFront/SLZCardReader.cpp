@@ -6,7 +6,7 @@
 #include "HallQueFront.h"
 #include "TCPConnect.h"
 #include "福建\DoWebService.h"
-
+#include "WriteLogError.h"
 extern  void MyWriteConsole(CString str); 
 
 SLZCardReader::SLZCardReader(void) : m_hReadTread(NULL),
@@ -260,6 +260,12 @@ DWORD WINAPI SLZCardReader::ReadCard(LPVOID pParam)
 					//这里对接,返回的是卡等级
 					CustLev LevValue;
 					int nCustLev = pCard->GetCustLev(cardinfo.strCardNumber,&LevValue);
+					CWriteLogError writeLogErr;
+					if (LevValue.isSucced)
+					{
+						writeLogErr.WriteErrLog(_T("LevValue成功"));
+					}
+					else writeLogErr.WriteErrLog(_T("LevValue失败"));
 					if(nCustLev != -1 && LevValue.isSucced){
 						//以客户等级去判断
 						cardinfo.custLev = LevValue;

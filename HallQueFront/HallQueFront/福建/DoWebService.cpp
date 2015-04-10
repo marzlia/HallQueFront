@@ -74,8 +74,10 @@ std::string CDoWebService::ProduceSendCardMsg(const CString& cardNo,const CStrin
 	packet.AppendFormat(_T("&cardNo=%s"),cardNo);
 	CTime currTime = CTime::GetCurrentTime();
 	CString strTime;
-	strTime.Format(_T("%d-%d-%d%%20%d:%d:%d"),currTime.GetYear(),currTime.GetMonth(),currTime.GetDay(),
+
+	strTime.Format(_T("%d-%02d-%02d%%20%d:%02d:%02d"),currTime.GetYear(),currTime.GetMonth(),currTime.GetDay(),
 		currTime.GetHour(),currTime.GetMinute(),currTime.GetSecond());
+
 	packet.AppendFormat(_T("&transTime=%s"),strTime);
 	packet+=_T("&queueLeft=0");
 	packet+=_T("&queueCode=001");
@@ -335,14 +337,15 @@ std::string CDoWebService::ProduceDealBusMsg(const SLZData& dealData,int leftNum
 	packet.AppendFormat(_T("&cardNo=%s"),dealData.GetCardNumber());
 	CTime currTime = dealData.GetTakingNumTime();
 	CString strTime;
-	strTime.Format(_T("%d-%d-%d%%20%d:%d:%d"),currTime.GetYear(),currTime.GetMonth(),currTime.GetDay(),
+	strTime.Format(_T("%d-%0d-%0d%%20%d:%0d:%0d"),currTime.GetYear(),currTime.GetMonth(),currTime.GetDay(),
 		currTime.GetHour(),currTime.GetMinute(),currTime.GetSecond());
 	packet.AppendFormat(_T("&transTime=%s"),strTime);
+
 	packet.AppendFormat(_T("&queueLeft=%d"),leftNum);
 	packet.AppendFormat(_T("&queueCode=%s"),dealData.GetQueueNumber());
 	CTime callTime = dealData.GetCallTime();
 	CString strCallTime;
-	strCallTime.Format(_T("%d-%d-%d%%20%d:%d:%d"),callTime.GetYear(),callTime.GetMonth(),callTime.GetDay(),
+	strCallTime.Format(_T("%d-%02d-%02d%%20%d:%02d:%02d"),callTime.GetYear(),callTime.GetMonth(),callTime.GetDay(),
 		callTime.GetHour(),callTime.GetMinute(),callTime.GetSecond());
 	packet.AppendFormat(_T("&processBeginTime=%s"),strCallTime);
 	packet.AppendFormat(_T("&handTellerNo=%d"),dealData.GetWindowShowId());
@@ -352,7 +355,7 @@ std::string CDoWebService::ProduceDealBusMsg(const SLZData& dealData,int leftNum
 	{
 		CTime finshTime = dealData.GetFinishTime();
 		CString strFinshTime;
-		strFinshTime.Format(_T("%d-%d-%d%%20%d:%d:%d"),finshTime.GetYear(),finshTime.GetMonth(),finshTime.GetDay(),
+		strFinshTime.Format(_T("%d-%0d-%0d%%20%d:%0d:%0d"),finshTime.GetYear(),finshTime.GetMonth(),finshTime.GetDay(),
 			finshTime.GetHour(),finshTime.GetMinute(),finshTime.GetSecond());
 		packet.AppendFormat(_T("&processEndTime=%s"),strFinshTime);
 	}
