@@ -1848,14 +1848,14 @@ void SLZController::TakeViewNum(const CString& queserial_id)
 				WriteInlineDataToFile();//保存信息到本地文件
 
 				//inlineNum = m_pInlineQueData->GetBussCount(queserial_id);//排队队列人数
-				if(!isClientData)
-					DoPrint(data,inlineNum);//打印
+				
+				DoPrint(data,inlineNum);//打印
 				
 				theApp.m_pView->ShowWaitNum(data.GetBussinessType(),inlineNum);///界面显示等待人数
 				
 				m_pCallThread->ShowCallerWaitNum(data.GetBussinessType());///呼叫器更新等待人数
-				if(!isClientData)
-					ReturnMainFrame(data);//流程结束
+				
+				ReturnMainFrame(data);//流程结束
 				break;
 			}
 		}
@@ -1923,6 +1923,7 @@ unsigned int SLZController::GetQueNum(const CString& queserial_id,UINT* pInlineN
 		sendMsg,sendMsg.size(),recvMsg,actRecvSize) && actRecvSize)
 		{
 			CDealInterMsg::AnaRetInterMsg(recvMsg,pData,pInlineNum);
+			pData->SetBussinessType(queserial_id);
 		}
 		else
 		{
