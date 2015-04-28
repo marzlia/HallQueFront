@@ -27,7 +27,13 @@ void CDealInterMsg::ProduceRetInterMsg(const SLZData* pData, UINT inlineNum,stri
 	msg.AppendFormat(_T("<cardNum>%s</cardNum>"),pData->GetCardNumber());
 	msg.AppendFormat(_T("<custName>%s</custName>"),pData->GetCustName());
 	msg.AppendFormat(_T("<custLevel>%d</custLevel>"),pData->GetCustomerLevel());
-	msg.AppendFormat(_T("<takeNumTime>%s</takeNumTime>"),pData->GetTakingNumTime());
+	
+	CTime takeNumTime = pData->GetTakingNumTime();
+	CString strTime;
+	strTime.Format(_T("%d-%d-%d %d:%d:%d"),takeNumTime.GetYear(),takeNumTime.GetMonth(),takeNumTime.GetDay(),
+		takeNumTime.GetHour(),takeNumTime.GetMinute(),takeNumTime.GetSecond());
+
+	msg.AppendFormat(_T("<takeNumTime>%s</takeNumTime>"),strTime);
 	msg.AppendFormat(_T("<staffId>%s</staffId>"),pData->GetStaffId());
 	msg.AppendFormat(_T("<phoneNum>%s</phoneNum>"),pData->GetPhoneNum());
 	msg.AppendFormat(_T("<sendMsg>%s</sendMsg>"),pData->GetSendMsg());
