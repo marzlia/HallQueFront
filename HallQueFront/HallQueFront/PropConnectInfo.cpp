@@ -54,6 +54,9 @@ void CPropConnectInfo::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX, IDC_RADIO_TYPE2, m_Sel_CallType2);
 	DDX_Control(pDX, IDC_CHECK4, m_check_changePage);
 	DDX_Control(pDX, IDC_COM_PARENTORG, m_combox_parentOrg);
+	DDX_Control(pDX, IDC_ED_INTERIP, m_ed_interIP);
+//	DDX_Control(pDX, IDC_ED_INTERPORT, m_ed_interPort);
+	DDX_Control(pDX, IDC_CHECK_INTER, m_check_inter);
 }
 
 
@@ -71,6 +74,7 @@ ON_BN_CLICKED(IDC_BN_FLUSHORG, &CPropConnectInfo::OnBnClickedBnFlushorg)
 ON_BN_CLICKED(IDC_BN_SAVECON, &CPropConnectInfo::OnBnClickedBnSavecon)
 ON_BN_CLICKED(IDC_BUTTON_MSGSET, &CPropConnectInfo::OnBnClickedButtonMsgset)
 ON_CBN_SELCHANGE(IDC_COMBO_MSG, &CPropConnectInfo::OnCbnSelchangeComboMsg)
+ON_BN_CLICKED(IDC_BN_TESTINTERNET, &CPropConnectInfo::OnBnClickedBnTestinternet)
 END_MESSAGE_MAP()
 
 
@@ -277,6 +281,15 @@ BOOL CPropConnectInfo::OnInitDialog()
 			ASSERT(pButton);
 			pButton->SetCheck(BST_UNCHECKED);
 		}
+		if(m_logicVariables.IsOpenInterNum)
+		{
+			m_check_inter.SetCheck(BST_CHECKED);
+		}
+		else
+		{
+			m_check_inter.SetCheck(BST_UNCHECKED);
+		}
+		m_ed_interIP.SetWindowText(m_logicVariables.strInterIP);
 		m_ed_organID.SetWindowText(m_logicVariables.strOrganID);
 		m_ed_organName.SetWindowText(m_logicVariables.strOrganNmae);
 	}
@@ -501,16 +514,29 @@ BOOL CPropConnectInfo::WriteSysLogicVaribiles()
 	{
 		m_logicVariables.IsAutoChangePage = FALSE;
 	}
+	if(BST_CHECKED == m_check_inter.GetCheck())
+	{
+		m_logicVariables.IsOpenInterNum = TRUE;
+	}
+	else
+	{
+		m_logicVariables.IsOpenInterNum = FALSE;
+	}
 	CString wstrOrganID;
 	m_ed_organID.GetWindowText(wstrOrganID);
 	CString wstrOrganName;
 	m_ed_organName.GetWindowText(wstrOrganName);
-	wcscpy_s(m_logicVariables.strOrganID,addNum,
+	wcscpy_s(m_logicVariables.strOrganID,MYBUFLEN,
 		wstrOrganID.GetBuffer(0));
 	wstrOrganID.ReleaseBuffer(0);
-	wcscpy_s(m_logicVariables.strOrganNmae,addNum,
+	wcscpy_s(m_logicVariables.strOrganNmae,MYBUFLEN,
 		wstrOrganName.GetBuffer(0));
 	wstrOrganName.ReleaseBuffer(0);
+	CString wstrInterIP;
+	m_ed_interIP.GetWindowText(wstrInterIP);
+	wcscpy_s(m_logicVariables.strInterIP,MYBUFLEN,
+		wstrInterIP.GetBuffer(0));
+	wstrInterIP.ReleaseBuffer(0);
 
 	int nSpeed = m_slider_speed.GetPos();
 	m_logicVariables.playSpeed = nSpeed;
@@ -529,9 +555,9 @@ BOOL CPropConnectInfo::WriteSysLogicVaribiles()
 	{
 		CString parOrgName(m_map_commDaoOrg[index].curOrgName.c_str());
 		CString parOrgID(m_map_commDaoOrg[index].curOrgID.c_str());
-		wcscpy_s(m_logicVariables.strParOrgID,addNum,parOrgID.GetBuffer(0));
+		wcscpy_s(m_logicVariables.strParOrgID,MYBUFLEN,parOrgID.GetBuffer(0));
 		parOrgID.ReleaseBuffer();
-		wcscpy_s(m_logicVariables.strParOrgName,addNum,parOrgName.GetBuffer(0));
+		wcscpy_s(m_logicVariables.strParOrgName,MYBUFLEN,parOrgName.GetBuffer(0));
 		parOrgID.ReleaseBuffer();
 	}
 	/////////////////////////////////
@@ -660,4 +686,9 @@ void CPropConnectInfo::OnCbnSelchangeComboMsg()
 		}
 	}
 	else m_pComInit->SetMsgComm(L"0");
+}
+
+void CPropConnectInfo::OnBnClickedBnTestinternet()
+{
+	// TODO: 在此添加控件通知处理程序代码
 }

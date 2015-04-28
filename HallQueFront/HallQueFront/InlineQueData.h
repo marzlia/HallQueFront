@@ -17,12 +17,16 @@ public:
 	void AddHeadData(const SLZData& data);
 	UINT GetCount();//获取总人数
 	UINT GetBussCount(const CString& strBussId);//获取对应队列的排队人数
-	BOOL GetInlineQueData(SLZData& rdata);//获取第一个数据
+//	BOOL GetInlineQueData(SLZData& rdata);//获取第一个数据
 	void RemoveAllData();
 	int GetMaxQueNum(const CString queID);
 	UINT GetCandoQueCount(UINT iWinID);//获取窗口能够处理的队列排队人数总和
 	BOOL AlterData(const CString QueNum,const CString strPhoneNum,const CString strMsg);
 	BOOL GetInlineQueData(int i,SLZData& data);
+//	BOOL GetLastInlineQueWaitNum(const CString& strBussid,UINT* pWaitNum);
+//	BOOL GetLastInlineQueWaitNumSub(const CString& strBussid,UINT* pWaitNum);
+	void GetAllBussCount(const CString& strBussid,UINT* pWaitNum);
+	BOOL DeleteInlineClientData(const CString& queID,const CString& organId,SLZData* pData);//删除队列中的一个客户机数据
 private:
 	CList<SLZData> m_lstInlineQue;//排队队列
 	CMutex m_mtInlineQue;

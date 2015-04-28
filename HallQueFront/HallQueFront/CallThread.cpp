@@ -7,6 +7,8 @@
 #include "SLZEvaData.h"
 #include "SLZCWndScreen.h"
 #include "ComputeFuncationTime.h"
+#include "ComplSocketClient.h"
+#include "DealInterMsg.h"
 
 
 extern void MyWriteConsole(CString str);
@@ -319,13 +321,33 @@ void CCallThread::OnCall(CallerCmd& callerCmd)
 	else
 	{
 		///得到排队队列的下一个数据
-		if(m_rInlineQueData.GetInlineQueData(callerCmd.GetWindowId(),data))
+		if(!theApp.IsLocal())//客户机
 		{
-			m_rCalledQueData.Add(data);//添加到正在呼叫队列
+			/////如果是客户机呼叫则需要向服务端发送一条请求删除队列中的一条客户机数据
+			CComplSocketClient client;
+			CString queManNum;
+			theApp.m_Controller.GetManQueNumByQueSerialID(data.GetBussinessType(),queManNum);
+			string sendMsg,recvMsg;
+			int actRecvSize = 0;
+			CDealInterMsg::ProduceSendCallMsg(queManNum,sendMsg,theApp.m_logicVariables.strOrganID);
+			if(client.SendData(INTERPORT,theApp.m_logicVariables.strInterIP,
+				sendMsg,sendMsg.size(),recvMsg,actRecvSize) && actRecvSize)
+			{
+				BOOL isSucced;
+				CDealInterMsg::AnaRetCallMsg(recvMsg,&isSucced,&data);
+			}
+		}
+		else
+		{
+			if(m_rInlineQueData.GetInlineQueData(callerCmd.GetWindowId(),data))
+			{
+				m_rCalledQueData.Add(data);//添加到正在呼叫队列
+			}
 		}
 	}
 	if(!data.GetBussinessType().IsEmpty())
 	{
+		
 		//返回，写剩余人数
 //		CString carriedData = data.GetQueueNumber() + _T(" ") + GetQueInlineCount(data.GetBussinessType());
 		CString carriedData = data.GetQueueNumber() + _T(" ") + GetCandoQueInlineCount(callerCmd.GetWindowId());
@@ -333,7 +355,8 @@ void CCallThread::OnCall(CallerCmd& callerCmd)
 		//界面剩余人数更新
 		if(theApp.m_pView)
 		{
-			theApp.m_pView->ShowWaitNum(data.GetBussinessType(),m_rInlineQueData.GetBussCount(data.GetBussinessType()));
+			//theApp.m_pView->ShowWaitNum(data.GetBussinessType(),m_rInlineQueData.GetBussCount(data.GetBussinessType()));
+			ShowViewWaitNum(data.GetBussinessType());
 		}
 		//playsound,显示
 		theApp.m_Controller.m_pPlaySound->DataPlay(data);
@@ -382,7 +405,8 @@ void CCallThread::OnDiscard(CallerCmd& callerCmd)
 		//界面剩余人数更新
 		if(theApp.m_pView)
 		{
-			theApp.m_pView->ShowWaitNum(data.GetBussinessType(),m_rInlineQueData.GetBussCount(data.GetBussinessType()));
+//			theApp.m_pView->ShowWaitNum(data.GetBussinessType(),m_rInlineQueData.GetBussCount(data.GetBussinessType()));
+			ShowViewWaitNum(data.GetBussinessType());
 		}
 		//playsound,display
 //		theApp.m_Controller.m_pPlaySound->DataPlay(data);
@@ -406,10 +430,10 @@ void CCallThread::OnWait(CallerCmd& callerCmd)
 		CString carriedData = data.GetQueueNumber() + _T(" ") + GetCandoQueInlineCount(callerCmd.GetWindowId());
 		callerCmd.SetCarriedData(carriedData);
 		//界面剩余人数更新
-		if(theApp.m_pView)
-		{
-			theApp.m_pView->ShowWaitNum(data.GetBussinessType(),m_rInlineQueData.GetBussCount(data.GetBussinessType()));
-		}
+// 		if(theApp.m_pView)
+// 		{
+// 			theApp.m_pView->ShowWaitNum(data.GetBussinessType(),m_rInlineQueData.GetBussCount(data.GetBussinessType()));
+// 		}
 		//playsound,display
 		theApp.m_Controller.m_pPlaySound->DataPlay(data,TRUE);
 	}
@@ -761,3 +785,47 @@ BOOL CCallThread::ShowCallerWaitNum(const CString& queID)
 	}
 	return TRUE;
 }
+
+BOOL CCallThread::ShowViewWaitNum(const CString& queserial_id)
+{
+	if(theApp.m_logicVariables.IsOpenInterNum)
+	{
+		if(theApp.m_logicVariables.strInterIP[0] == '\0')//主机
+		{
+			goto Normal;		
+		}
+		else//客户机
+		{
+			CComplSocketClient client;
+			CString queManNum;
+			theApp.m_Controller.GetManQueNumByQueSerialID(queserial_id,queManNum);
+			string sendMsg,recvMsg;
+			int actRecvSize = 0;
+			CDealInterMsg::ProduceSendInNumMsg(queManNum,sendMsg);
+			if(client.SendData(INTERPORT,theApp.m_logicVariables.strInterIP,
+				sendMsg,sendMsg.size(),recvMsg,actRecvSize) && actRecvSize)
+			{
+				//CDealInterMsg::AnaRetInterMsg(recvMsg,&iQueNum,pInlineNum);
+				UINT waitNum = 0;
+				CDealInterMsg::AnaRetInNumMsg(recvMsg,&waitNum);
+
+				theApp.m_pView->ShowWaitNum(queserial_id,waitNum);
+				return TRUE;
+			}
+			else
+			{
+				goto Normal;
+			}
+		}
+	}
+	else
+	{
+Normal:
+		UINT nWaitNum = 0;
+		m_rInlineQueData.GetAllBussCount(queserial_id,&nWaitNum);//获取当前队列人数
+		theApp.m_pView->ShowWaitNum(queserial_id,nWaitNum);//m_rInlineQueData.GetBussCount(queserial_id));
+		return TRUE;
+	}
+	return FALSE;
+}
+

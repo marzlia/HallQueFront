@@ -218,6 +218,7 @@
 #define IDC_BTN_WAITSOUND               1108
 #define IDC_BTN_MOVEUP                  1108
 #define IDC_BUTTON_DEL                  1108
+#define IDC_BN_TESTINTERNET             1108
 #define IDC_BUTTON6                     1109
 #define IDC_BTN_WAITSHOW                1109
 #define IDC_EDIT_CALLID2                1110
@@ -355,6 +356,10 @@
 #define IDC_EDIT_MSG                    1203
 #define IDC_COMBO1                      1206
 #define IDC_EDIT_PHONENUM               1208
+#define IDC_ED_INTERIP                  1209
+#define IDC_ED_INTERPORT                1210
+#define IDC_CHECK5                      1212
+#define IDC_CHECK_INTER                 1212
 #define ID_32771                        32771
 #define ID_32772                        32772
 #define ID_32773                        32773
@@ -424,7 +429,7 @@
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        188
 #define _APS_NEXT_COMMAND_VALUE         32833
-#define _APS_NEXT_CONTROL_VALUE         1209
+#define _APS_NEXT_CONTROL_VALUE         1213
 #define _APS_NEXT_SYMED_VALUE           117
 #endif
 #endif

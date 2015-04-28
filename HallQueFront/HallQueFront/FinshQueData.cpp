@@ -76,7 +76,8 @@ BOOL CFinshQueData::GetFinshedData()
 	{
 		CComplSocketClient client;
 		CProducePacket packet;
- 		int leftNum = theApp.m_Controller.m_pInlineQueData->GetBussCount(data.GetBussinessType());
+ 		UINT leftNum = 0;
+		theApp.m_Controller.m_pInlineQueData->GetAllBussCount(data.GetBussinessType(),&leftNum);
  		CString sendPacket = packet.ProduceSendPacket(data,leftNum,evateNumData);
  		std::string recvMsg;
  		int actRecvSize = 0;

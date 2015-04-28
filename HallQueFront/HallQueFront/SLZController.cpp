@@ -14,6 +14,9 @@
 #include "ProduceClientPacket.h"
 #include "ComplSocketClient.h"
 #include "ShortMsgSetDlg.h"
+#include "InterNumSocketServer.h"
+#include "ComplSocketClient.h"
+#include "DealInterMsg.h"
 
 extern  void MyWriteConsole(CString str); 
 
@@ -31,6 +34,7 @@ SLZController::SLZController(void)
 , m_pPlaySound(NULL)
 , m_pAlarmToCaller(NULL)
 , m_pFinshQueData(NULL)
+, m_pInterNumServer(NULL)
 {
 	m_print.Start();
 	m_infofile_path = m_convert.GetExeFullFilePath();
@@ -119,6 +123,11 @@ SLZController::~SLZController(void)
 	/////////////////这里没有好的处理方式析构inline有待处理
    ////////////////原因是因为线程之间的联合访问m_pInlineData出现访问控制问题。
 	//////待讨论解决，但对程序没有影响，因为程序在退出时析构。
+	if(m_pInterNumServer)
+	{
+		delete m_pInterNumServer;
+		m_pInterNumServer = NULL;
+	}
 }
 
 BOOL SLZController::Start()
@@ -244,7 +253,35 @@ BOOL SLZController::Start()
 	m_pEvaThread = new CEvaThread(m_EvaCmdData,m_pCallThread);
 	m_pEvaThread->Start();
 
-	
+	//初始化联机取号服务器
+	InitInterNumServer();
+
+	return TRUE;
+}
+
+BOOL SLZController::InitInterNumServer()
+{
+	if(theApp.m_logicVariables.IsOpenInterNum)
+	{
+		if(theApp.m_logicVariables.strInterIP[0] == '\0')
+		{
+			if(!m_pInterNumServer)
+			{
+				m_pInterNumServer = new CInterNumSocketServer(m_pInlineQueData);
+				return m_pInterNumServer->InitServer();
+			}
+			else 
+				return TRUE;
+		}
+	}
+	else
+	{
+		if(m_pInterNumServer)
+		{
+			delete m_pInterNumServer;
+			m_pInterNumServer = NULL;
+		}
+	}
 	return TRUE;
 }
 
@@ -296,16 +333,8 @@ UINT SLZController::TakingNumThreadProc(LPVOID pParam)
 				////排队人数
 				unsigned int CurNum=0;
 				UINT iQueNum;
-				UINT beginnum = pControl->GetQueBeginNum(cardInfo.strAttchQueID);
-				pControl->map_QueNum.Lookup(cardInfo.strAttchQueID,CurNum);
-				if (beginnum!=0&&CurNum==0)
-				{
-					iQueNum = CurNum+beginnum;
-				}
-				else
-				{
-					iQueNum = CurNum+1;
-				}
+				BOOL isClientData = FALSE;
+				iQueNum = pControl->GetQueNum(cardInfo.strAttchQueID,&CurNum,&isClientData,&data);
 				////排队号码
 				CString QueCount;
 				CString StrQueNum;
@@ -320,6 +349,7 @@ UINT SLZController::TakingNumThreadProc(LPVOID pParam)
 				data.SetBussinessType(cardInfo.strAttchQueID);//属于哪个队列
 				data.SetCustomerLevel(cardInfo.iCustLevel);//客户级别
 				data.SetCustName(cardInfo.strCustName);//客户姓名
+				
 				CString bussName = pControl->GetQueNameFromID(cardInfo.strAttchQueID);
 				if(!bussName.IsEmpty()) data.SetBussName(bussName);//队列名称
 			///卡号
@@ -340,9 +370,10 @@ UINT SLZController::TakingNumThreadProc(LPVOID pParam)
 				/////////////////////////保存信息到本地文件
 				pControl->WriteInlineDataToFile();
 				///打印
-				CurNum=pControl->m_pInlineQueData->GetBussCount(cardInfo.strAttchQueID);
-				EnumPrintStaus status = pControl->m_print.CheckPrinterStatus();
-				pControl->DoPrintStatus(status,data,CurNum);
+				//CurNum=pControl->m_pInlineQueData->GetBussCount(cardInfo.strAttchQueID);
+				//EnumPrintStaus status = pControl->m_print.CheckPrinterStatus();
+				//pControl->DoPrintStatus(status,data,CurNum);
+				pControl->DoPrint(data,CurNum);
 				///界面显示等待人数
 				theApp.m_pView->ShowWaitNum(data.GetBussinessType(),CurNum);
 				///呼叫器更新等待人数
@@ -361,110 +392,21 @@ UINT SLZController::TakingViewThreadProc(LPVOID pParam)
 	{
 		if(theApp.m_pView)
 		{
-		if(theApp.m_pView->HasData())
-		{
-			CString queserial_id=theApp.m_pView->GetData();
-			if (queserial_id == L"短信提示")
+			if(theApp.m_pView->HasData())
 			{
-				CShortMsgSetDlg MsgDlg(NULL,*pControl->m_pInlineQueData);
-				if(MsgDlg.DoModal()==IDOK)
+				CString queserial_id=theApp.m_pView->GetData();
+				if (!pControl->ShortMsgNum(queserial_id))//短信
 				{
-					Sleep(100);
-					ShowVariables variables;
-					memset(&variables,0,sizeof(variables));
-					variables.bSendMsg = TRUE;
-					SendMessage(theApp.m_pView->m_hWnd,WM_SHOWMSG,(WPARAM)&variables,0);
-				}
-			}
-			else
-			{
-			if(pControl->VerifyCountLimit(queserial_id))
-			{
-				for (int i=0;i<pControl->m_map_que.GetCount();i++)
-				{
-					pControl->m_map_que.Lookup(i,pControl->m_queinfo);
-					if (queserial_id==pControl->m_queinfo.GetQueID())
+					if(pControl->VerifyCountLimit(queserial_id))//上下午、全天人数限制
 					{
-						SLZData data;
-						if (pControl->DataNumOut(queserial_id))
-						{
-							AfxMessageBox(_T("取号失败，已取到最大号码！"));
-						}
-						else
-						{
-							//设置排队号码
-							unsigned int CurNum=0;
-							UINT iQueNum;
-							pControl->map_QueNum.Lookup(queserial_id,CurNum);
-							UINT beginnum = pControl->GetQueBeginNum(queserial_id);
-							if (beginnum!=0&&CurNum==0)
-							{
-								iQueNum = CurNum+beginnum;
-							}
-							else
-							{
-								iQueNum = CurNum+1;
-							}
-							CString QueCount;
-							CString StrQueNum;
-							StrQueNum.Format(_T("%03d"),iQueNum);
-							StrQueNum=pControl->m_queinfo.GetFrontID()+StrQueNum;
-							data.SetQueueNumber(StrQueNum);
-							pControl->map_QueNum.SetAt(queserial_id,iQueNum);
-							data.SetIntQueNum(iQueNum);
-							CTime GetTime;
-							GetTime=GetTime.GetCurrentTime();
-							CString QueName;
-							QueName=pControl->m_queinfo.GetBussName();
-							data.SetBussName(QueName);
-							data.SetTakingNumTime(GetTime);
-							data.SetBussinessType(queserial_id);
-							/////设置机构代码和名称
-							data.SetOrganId(theApp.m_logicVariables.strOrganID);
-							data.SetOrganName(theApp.m_logicVariables.strOrganNmae);
-							data.SetQueSerialID(pControl->m_queinfo.GetQueManNum());//队列编号
-							if (!pControl->InsertListData(data))
-							{
-								pControl->m_list_Data.AddTail(data);
-							}
-							pControl->WriteListQueIntoFile();
-							////////////////////
-							pControl->m_pInlineQueData->Add(data);
-							//////////////////保存信息到本地文件
-							pControl->WriteInlineDataToFile();
-							EnumPrintStaus status = pControl->m_print.CheckPrinterStatus();
-							CurNum=pControl->m_pInlineQueData->GetBussCount(queserial_id);
-
-							///处理打印
-							pControl->DoPrintStatus(status,data,CurNum);
-
-							///界面显示等待人数
-							theApp.m_pView->ShowWaitNum(data.GetBussinessType(),CurNum);
-							///呼叫器更新等待人数
-							pControl->m_pCallThread->ShowCallerWaitNum(data.GetBussinessType());
-							//流程结束后是否返回主界面
-							if(theApp.m_pView->m_pTrackCtrl->GetSerialID()!=0 && theApp.m_logicVariables.IsAutoChangePage)
-							{
-//								Sleep(1000);
-//								theApp.m_pView->ShowPage(0);//返回主界面
-								UINT nPageID = 0;
-								SendMessage(theApp.m_pView->m_hWnd,WM_SHOWPAGE,(WPARAM)nPageID,NULL);
-							}
-							break;
-						}
+						pControl->TakeViewNum(queserial_id);
 					}
+					else 
+						AfxMessageBox(_T("已超过人数限制"));
 				}
 			}
-			else AfxMessageBox(_T("已超过人数限制"));
-			}
-
 		}
-		else Sleep(10);
-		}
-		else
-		{
-			Sleep(10);
-		}
+		Sleep(10);
 	}
 	return 0;
 }
@@ -484,13 +426,13 @@ BOOL SLZController::DataNumOut(CString QueId)
 		return FALSE;
 	}
 	else if ((curmaxnum+1)<=endnum)
-		{
-			return FALSE;
-		}
-		else 
-		{
-			return TRUE;
-		}
+	{
+		return FALSE;
+	}
+	else 
+	{
+		return TRUE;
+	}
 }
 
 BOOL SLZController::ReadQueInfoFromFile()
@@ -675,7 +617,11 @@ BOOL SLZController::ReFlushSysLogicVarlibles()
 			SendWndData();
 		}
 	}
+	
 	SetCursor(LoadCursor(NULL,IDC_ARROW));
+
+	flag = InitInterNumServer();//初始化联机取号服务器
+
 	return flag;
 }
 
@@ -964,7 +910,8 @@ void SLZController::InitShowInlineQueNum()
 	for(int i=0;i<count;i++)
 	{
 		CString queID = m_map_que[i].GetQueID();
-		UINT inlineNum = m_pInlineQueData->GetBussCount(queID);
+		UINT inlineNum = 0;
+		m_pInlineQueData->GetAllBussCount(queID,&inlineNum);
 		if(theApp.m_pView)
 			theApp.m_pView->ShowWaitNum(queID,inlineNum);
 	}
@@ -1843,4 +1790,235 @@ CString SLZController::GetWindowCallNameByID(UINT nWindowID)
 	SLZWindow slzWindow;
 	m_windowTable.QueryWindowById(nWindowID,slzWindow);
 	return slzWindow.GetWindowCallName();
+}
+
+BOOL SLZController::ShortMsgNum(const CString& queserial_id)
+{
+	if (queserial_id == L"短信提示")
+	{
+		CShortMsgSetDlg MsgDlg(NULL,*m_pInlineQueData);
+		if(MsgDlg.DoModal()==IDOK)
+		{
+			Sleep(100);
+			ShowVariables variables;
+			memset(&variables,0,sizeof(variables));
+			variables.bSendMsg = TRUE;
+			SendMessage(theApp.m_pView->m_hWnd,WM_SHOWMSG,(WPARAM)&variables,0);
+		}
+		return TRUE;
+	}
+	return FALSE;
+}
+
+void SLZController::TakeViewNum(const CString& queserial_id)
+{
+	for (int i=0;i<m_map_que.GetCount();i++)
+	{
+		if(!m_map_que.Lookup(i,m_queinfo))return;
+		if (queserial_id == m_queinfo.GetQueID())
+		{
+			SLZData data;
+			if (DataNumOut(queserial_id))
+			{
+				AfxMessageBox(_T("取号失败，已取到最大号码！"));
+			}
+			else
+			{
+				
+				/////////////////////////
+				UINT inlineNum = 0;
+				//获取当前排队号码
+				BOOL isClientData = FALSE;//是否为客户机产生的数据
+				unsigned int iQueNum = GetQueNum(queserial_id,&inlineNum,&isClientData,&data);
+				
+				if(!isClientData)
+					TakeNumSetData(data,iQueNum);//生成数据
+				
+				map_QueNum.SetAt(queserial_id,iQueNum);//更新map中队列的当前排队号
+
+				if (!InsertListData(data))////写入当前排队号码到list保存
+				{
+					m_list_Data.AddTail(data);
+				}
+				WriteListQueIntoFile();///并将List写入文件，系统重启时需要读取
+
+				
+				m_pInlineQueData->Add(data);//加入到排队队列即等候队列
+				
+				WriteInlineDataToFile();//保存信息到本地文件
+
+				//inlineNum = m_pInlineQueData->GetBussCount(queserial_id);//排队队列人数
+				if(!isClientData)
+					DoPrint(data,inlineNum);//打印
+				
+				theApp.m_pView->ShowWaitNum(data.GetBussinessType(),inlineNum);///界面显示等待人数
+				
+				m_pCallThread->ShowCallerWaitNum(data.GetBussinessType());///呼叫器更新等待人数
+				if(!isClientData)
+					ReturnMainFrame(data);//流程结束
+				break;
+			}
+		}
+	}
+}
+
+
+void SLZController::TakeNumSetData(SLZData& data,int nQueNum)
+{
+	CString StrQueNum;//排队号码str
+	StrQueNum.Format(_T("%03d"),nQueNum);
+	StrQueNum=m_queinfo.GetFrontID()+StrQueNum;//加前缀
+	///////////////////////////////////////////
+	data.SetQueueNumber(StrQueNum);//设置data排队号码
+
+	data.SetIntQueNum(nQueNum);
+
+	CString QueName = m_queinfo.GetBussName();//设置队列名称
+	data.SetBussName(QueName);
+
+	CTime GetTime;//设置取号时间
+	GetTime=GetTime.GetCurrentTime();
+	data.SetTakingNumTime(GetTime);
+
+
+	data.SetBussinessType(m_queinfo.GetQueID());//设置业务类型ID即队列ID
+
+	/////设置机构代码和名称
+	data.SetOrganId(theApp.m_logicVariables.strOrganID);
+	data.SetOrganName(theApp.m_logicVariables.strOrganNmae);
+	data.SetQueSerialID(m_queinfo.GetQueManNum());//队列编号
+
+}
+
+void SLZController::ReturnMainFrame(const SLZData& data)
+{
+	if(theApp.m_pView->m_pTrackCtrl->GetSerialID()!=0 && theApp.m_logicVariables.IsAutoChangePage)//流程结束后是否返回主界面
+	{
+		UINT nPageID = 0;
+		SendMessage(theApp.m_pView->m_hWnd,WM_SHOWPAGE,(WPARAM)nPageID,NULL);
+	}
+}
+
+void SLZController::DoPrint(const SLZData& data,UINT inLineNum)
+{
+	EnumPrintStaus status = m_print.CheckPrinterStatus();//获取打印机状态
+	DoPrintStatus(status,data,inLineNum);///处理打印
+}
+
+unsigned int SLZController::GetQueNum(const CString& queserial_id,UINT* pInlineNum,BOOL* pIsClientData,SLZData* pData)
+{
+	unsigned int iQueNum = 0;
+	
+	if(!theApp.IsLocal())
+	{
+		*pIsClientData = TRUE;//客户机产生的数据
+
+		CComplSocketClient client;
+		CString queManNum;
+		GetManQueNumByQueSerialID(queserial_id,queManNum);
+		string sendMsg,recvMsg;
+		int actRecvSize = 0;
+		CDealInterMsg::ProduceSendInterMsg(queManNum,sendMsg);
+		if(client.SendData(INTERPORT,theApp.m_logicVariables.strInterIP,
+		sendMsg,sendMsg.size(),recvMsg,actRecvSize) && actRecvSize)
+		{
+			CDealInterMsg::AnaRetInterMsg(recvMsg,pData,pInlineNum);
+		}
+		else
+		{
+			goto Normal;
+		}
+	}
+	else
+	{
+Normal:
+		*pIsClientData = FALSE;
+
+		unsigned int CurNum=0;
+		map_QueNum.Lookup(queserial_id,CurNum);//获取当前队列当前排队号码
+		
+		UINT beginnum = GetQueBeginNum(queserial_id);//获取开始号码
+		if (beginnum!=0 && CurNum==0)
+			iQueNum = CurNum + beginnum;
+		else
+			iQueNum = CurNum + 1;
+
+		m_pInlineQueData->GetAllBussCount(queserial_id,pInlineNum);//获取当前队列人数
+		*pInlineNum += 1;//队列人数加1
+	}
+
+	return iQueNum;
+}
+
+BOOL SLZController::GetManQueNumByQueSerialID(const CString& queserial_id,CString& manQueNum)
+{
+	int count = m_map_que.GetCount();
+	CQueueInfo queInfo;
+	for(int i=0;i<count;i++)
+	{
+		if(m_map_que.Lookup(i,queInfo))
+		{
+			if(queInfo.GetQueID() == queserial_id)
+			{
+				manQueNum = queInfo.GetQueManNum();
+				return TRUE;
+			}
+		}
+	}
+	return FALSE;
+}
+
+BOOL SLZController::GetQueSerialIDByManQueNum(CString& queserial_id,const CString& manQueNum)
+{
+	int count = m_map_que.GetCount();
+	CQueueInfo queInfo;
+	for(int i=0;i<count;i++)
+	{
+		if(m_map_que.Lookup(i,queInfo))
+		{
+			if(queInfo.GetQueManNum() == manQueNum)
+			{
+				queserial_id = queInfo.GetQueID();
+				return TRUE;
+			}
+		}
+	}
+	return FALSE;
+}
+
+BOOL SLZController::ModifyQueNum(const CString& queserial_id,UINT* pQueNum)
+{
+	BOOL flag = FALSE;
+	m_mtModifyQueLock.Lock();
+	if(map_QueNum.Lookup(queserial_id,*pQueNum))
+	{
+		flag = TRUE;
+		*pQueNum += 1;
+		map_QueNum.SetAt(queserial_id,*pQueNum);
+	}
+	else
+	{
+		map_QueNum[queserial_id] = ++*pQueNum;
+	}
+	m_mtModifyQueLock.Unlock();
+	return flag;
+}
+
+BOOL SLZController::GetQueueInfoBySerialID(const CString& queserial_id,CQueueInfo& queInfo)
+{
+	BOOL flag = FALSE;
+	CQueueInfo info;
+	for(int i=0;i<m_map_que.GetCount();i++)
+	{
+		if(m_map_que.Lookup(i,info))
+		{
+			if(queInfo.GetQueID() == queserial_id)
+			{
+				queInfo = info;
+				flag = TRUE;
+				break;
+			}
+		}
+	}
+	return flag;
 }

@@ -55,10 +55,35 @@ BOOL CInlineQueData::GetInlineQueData(const UINT iWinId,
 			{
 				if(arrStrQueId[i].Compare(data.GetBussinessType()) == 0)
 				{
-					rdata = data;
-					m_lstInlineQue.RemoveAt(posLast);
-					bFind = TRUE;
-					break;
+					if(!data.GetIsLocalData())//客户机产生的数据
+					{
+						if( theApp.IsLocal())//主机
+						{
+							continue;
+						}
+						else //客户机
+						{
+							bFind = TRUE;
+							rdata = data;
+							m_lstInlineQue.RemoveAt(posLast);
+							break;
+						}
+					}
+					else//本机数据
+					{
+						if( theApp.IsLocal() )//主机
+						{
+							bFind = TRUE;
+							rdata = data;
+							m_lstInlineQue.RemoveAt(posLast);
+							break;
+						}
+						else//客户机
+						{
+							continue;
+						}
+						
+					}
 				}
 			}
 			else//设置了指定窗口优先呼叫
@@ -117,6 +142,12 @@ UINT CInlineQueData::GetBussCount(const CString& strBussId)
 		CString queID = data.GetBussinessType();
 		if(queID == strBussId)
 		{
+			//只返回本机的人数
+// 			if(data.GetIsClientData() && theApp.m_logicVariables.IsOpenInterNum)
+// 			{
+// 				if(theApp.m_logicVariables.strInterIP[0] == '\0')//主机
+// 					continue;
+// 			}
 			iCount++;
 		}
 	}
@@ -126,19 +157,40 @@ UINT CInlineQueData::GetBussCount(const CString& strBussId)
 
 // CInlineQueData 成员函数
 
-BOOL CInlineQueData::GetInlineQueData(SLZData& rdata)
-{
-	m_mtInlineQue.Lock();
-	if(!m_lstInlineQue.GetCount())
-	{
-		m_mtInlineQue.Unlock();
-		return FALSE;
-	}
-	rdata = m_lstInlineQue.GetHead();
-	m_lstInlineQue.RemoveHead();
-	m_mtInlineQue.Unlock();
-	return TRUE;
-}
+// BOOL CInlineQueData::GetInlineQueData(SLZData& rdata)
+// {
+// 	m_mtInlineQue.Lock();
+// 	if(!m_lstInlineQue.GetCount())
+// 	{
+// 		m_mtInlineQue.Unlock();
+// 		return FALSE;
+// 	}
+// 	if(theApp.m_logicVariables.IsOpenInterNum && 
+// 		theApp.m_logicVariables.strInterIP[0] == '\0')//主机
+// 	{
+// 		do
+// 		{
+// 			rdata = m_lstInlineQue.GetHead();
+// 			m_lstInlineQue.RemoveHead();
+// 		}while(rdata.GetIsClientData());
+// 	}
+// 	else if(theApp.m_logicVariables.IsOpenInterNum && 
+// 		theApp.m_logicVariables.strInterIP[0] != '\0')//客户机
+// 	{
+// 		do
+// 		{
+// 			rdata = m_lstInlineQue.GetHead();
+// 			m_lstInlineQue.RemoveHead();
+// 		}while(!rdata.GetIsClientData());
+// 	}
+// 	else
+// 	{
+// 		rdata = m_lstInlineQue.GetHead();
+// 		m_lstInlineQue.RemoveHead();
+// 	}
+// 	m_mtInlineQue.Unlock();
+// 	return TRUE;
+// }
 
 void CInlineQueData::RemoveAllData()
 {
@@ -150,34 +202,34 @@ void CInlineQueData::RemoveAllData()
 int CInlineQueData::GetMaxQueNum(const CString queID)
 {
 	m_mtInlineQue.Lock();
-	CString maxNum;
+	int maxNum = 0;
 	POSITION pos = m_lstInlineQue.GetHeadPosition();
 	while(pos)
 	{
 		SLZData data = m_lstInlineQue.GetNext(pos);
 		if(data.GetBussinessType() == queID)
 		{
-			CString queNum = data.GetQueueNumber();
+			int queNum = data.GetIntQueNum();
 			maxNum = maxNum > queNum ? maxNum : queNum;
 		}
 	}
-	CString num;
-	if(!maxNum.IsEmpty())
-	{
-		for(int i=0;i<maxNum.GetLength();i++)
-		{
-			WCHAR w = maxNum.GetAt(i);
-			if(w>'0'&&w<'9')
-			{
-				num+=w;
-			}
-		}
-	}
+// 	CString num;
+// 	if(!maxNum.IsEmpty())
+// 	{
+// 		for(int i=0;i<maxNum.GetLength();i++)
+// 		{
+// 			WCHAR w = maxNum.GetAt(i);
+// 			if(w>'0'&&w<'9')
+// 			{
+// 				num+=w;
+// 			}
+// 		}
+// 	}
 	m_mtInlineQue.Unlock();
-	int iNum = 0;
-	CCommonConvert convert;
-	convert.CStringToint(iNum,num);
-	return iNum;
+// 	int iNum = 0;
+// 	CCommonConvert convert;
+// 	convert.CStringToint(iNum,num);
+	return maxNum;
 }
 
 UINT CInlineQueData::GetCandoQueCount(UINT iWinID)
@@ -235,4 +287,90 @@ BOOL CInlineQueData::GetInlineQueData(int i,SLZData& data)
 	}
 	m_mtInlineQue.Unlock();
 	return FALSE;
+}
+
+// BOOL CInlineQueData::GetLastInlineQueWaitNum(const CString& strBussid,UINT* pWaitNum)
+// {
+// 	BOOL flag = FALSE;
+// 	m_mtInlineQue.Lock();
+// 	POSITION pos = m_lstInlineQue.GetTailPosition();
+// 	for(;pos;)
+// 	{
+// 		SLZData data = m_lstInlineQue.GetPrev(pos);
+// 		if(data.GetBussinessType() == strBussid)
+// 		{
+// 			*pWaitNum = data.GetCurrWaitNum();
+// 			flag = TRUE;
+// 			break;
+// 		}
+// 	}
+// 	m_mtInlineQue.Unlock();
+// 	return flag;
+// }
+
+// BOOL CInlineQueData::GetLastInlineQueWaitNumSub(const CString& strBussid,UINT* pWaitNum)
+// {
+// 	BOOL flag = FALSE;
+// 	m_mtInlineQue.Lock();
+// 	POSITION pos = m_lstInlineQue.GetTailPosition();
+// 	POSITION pospre;
+// 	for(;pos;)
+// 	{
+// 		pospre = pos;
+// 		SLZData data = m_lstInlineQue.GetPrev(pos);
+// 		if(data.GetBussinessType() == strBussid)
+// 		{
+// 			*pWaitNum = data.GetCurrWaitNum();
+// 			*pWaitNum--;
+// 			data.SetCurrWaitNum(*pWaitNum);
+// 			m_lstInlineQue.SetAt(pospre,data);
+// 			flag = TRUE;
+// 			break;
+// 		}
+// 	}
+// 	m_mtInlineQue.Unlock();
+// 	return flag;
+// }
+
+void CInlineQueData::GetAllBussCount(const CString& strBussid,UINT* pWaitNum)
+{
+	m_mtInlineQue.Lock();
+	UINT iCount = 0;
+	POSITION pos = m_lstInlineQue.GetHeadPosition();
+	SLZData data;
+	for(; pos; )
+	{
+		data = m_lstInlineQue.GetNext(pos);
+		CString queID = data.GetBussinessType();
+		if(queID == strBussid)
+		{
+			//返回队列总人数
+			iCount++;
+		}
+	}
+	m_mtInlineQue.Unlock();
+	*pWaitNum = iCount;
+}
+
+BOOL CInlineQueData::DeleteInlineClientData(const CString& queID,const CString& organId,SLZData* pData)
+{
+	m_mtInlineQue.Lock();
+	BOOL flag = FALSE;
+	POSITION pos = m_lstInlineQue.GetHeadPosition();
+	POSITION poslast;
+	SLZData data;
+	for(; pos; )
+	{
+		poslast = pos;
+		data = m_lstInlineQue.GetNext(pos);
+		if(queID == data.GetBussinessType() && data.GetOrganId() == organId)
+		{
+			flag = TRUE;
+			m_lstInlineQue.RemoveAt(poslast);
+			*pData = data;
+			break;
+		}
+	}
+	m_mtInlineQue.Unlock();
+	return flag;
 }

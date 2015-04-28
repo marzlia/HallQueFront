@@ -257,6 +257,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\DealInterMsg.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\DiscardQueData.cpp"
 				>
 			</File>
@@ -302,6 +306,10 @@
 			</File>
 			<File
 				RelativePath=".\InlineQueData.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\InterNumSocketServer.cpp"
 				>
 			</File>
 			<File
@@ -675,6 +683,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\DealInterMsg.h"
+				>
+			</File>
+			<File
 				RelativePath=".\DiscardQueData.h"
 				>
 			</File>
@@ -724,6 +736,10 @@
 			</File>
 			<File
 				RelativePath=".\InlineQueData.h"
+				>
+			</File>
+			<File
+				RelativePath=".\InterNumSocketServer.h"
 				>
 			</File>
 			<File

@@ -49,6 +49,7 @@ CQueueInfo::CQueueInfo(const CQueueInfo& obj)
 	m_tQueWorkStart=obj.m_tQueWorkStart;
 	m_tQueWorkEnd=obj.m_tQueWorkEnd;
 	m_queManNum = obj.m_queManNum;
+	
 }
 
 CQueueInfo& CQueueInfo::operator=(CQueueInfo& obj)
@@ -67,6 +68,7 @@ CQueueInfo& CQueueInfo::operator=(CQueueInfo& obj)
 	m_tQueWorkStart=obj.m_tQueWorkStart;
 	m_tQueWorkEnd=obj.m_tQueWorkEnd;
 	m_queManNum = obj.m_queManNum;
+	
 	return *this;
 }
 

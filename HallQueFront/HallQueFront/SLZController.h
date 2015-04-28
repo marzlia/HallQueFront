@@ -27,6 +27,8 @@
 #define WM_SHOWPAGE WM_USER+3097
 using namespace std;
 
+class CInterNumSocketServer; 
+
 class SLZController//处理整个数组逻辑类           
 {
 public:
@@ -110,13 +112,12 @@ private:
 	CString m_InlineDataPath;//排队数据文件路径
 
 	int GetMaxQueNum(const CString QueID);//获取最大的排队号码
-	CMap<CString,LPCTSTR,UINT,UINT&> map_QueNum;//
+	
 	CString m_MapQuePath;
 	BOOL ReadListQueFromFile();
-	BOOL WriteListQueIntoFile();
 
-	CList<SLZData,SLZData&> m_list_Data;
-	BOOL InsertListData(SLZData data);
+	
+	
 	BOOL JudgeTodayOrNot(SLZData data);
 public:
 	SoundPlay* m_pPlaySound;//播放声音的对象
@@ -150,4 +151,30 @@ public:
 	CString GetStaffNameByID(const CString& staffID);
 	CString GetWindowNameByID(UINT nWindowID);
 	CString GetWindowCallNameByID(UINT nWindowID);
+
+private:
+	BOOL ShortMsgNum(const CString& queserial_id);//短信取号操作
+	void TakeViewNum(const CString& queserial_id);//取号操作
+	unsigned int GetQueNum(const CString& queserial_id,UINT* pInlineNum,BOOL* pIsClientData,SLZData* pData);//设置取号时的排队号码
+
+private:
+	CInterNumSocketServer* m_pInterNumServer;
+	BOOL InitInterNumServer();
+	
+	CMutex m_mtModifyQueLock;
+public:
+	CMap<CString,LPCTSTR,UINT,UINT&> map_QueNum;//存储各个队列当前取号最大值
+	BOOL GetQueSerialIDByManQueNum(CString& queserial_id,const CString& manQueNum);
+	BOOL ModifyQueNum(const CString& queserial_id,UINT* pQueNum);//修改排队号码最大值
+
+	BOOL GetManQueNumByQueSerialID(const CString& queserial_id,CString& manQueNum);
+	BOOL GetQueueInfoBySerialID(const CString& queserial_id,CQueueInfo& queInfo);
+private:
+	void DoPrint(const SLZData& data,UINT inLineNum);
+	void ReturnMainFrame(const SLZData& data);
+	void TakeNumSetData(SLZData& data,int nQueNum);
+public:
+	CList<SLZData,SLZData&> m_list_Data;
+	BOOL InsertListData(SLZData data);
+	BOOL WriteListQueIntoFile();
 };
