@@ -374,3 +374,24 @@ BOOL CInlineQueData::DeleteInlineClientData(const CString& queID,const CString& 
 	m_mtInlineQue.Unlock();
 	return flag;
 }
+
+BOOL CInlineQueData::GetWindowCanDoQue(UINT nWindowID,CString& queerial_id)
+{
+	if(m_lstInlineQue.GetCount() < 1)
+	{
+		return FALSE;
+	}
+	CStringArray arrStrQueId;//可处理队列以及优先级
+	SLZWindow Window;
+	BOOL flag = m_rWindowTable.QueryWindowById(nWindowID,Window);
+	if(!flag)return FALSE;
+	Window.GetArrayQueId(arrStrQueId);//获取可处理队列及优先级
+	CString staffID = theApp.m_Controller.m_mapLoginList[Window.GetWindowId()];//获取登录STAFFID
+	if(staffID.IsEmpty())return FALSE;
+	if(arrStrQueId.GetCount() < 1)
+	{
+		return FALSE;
+	}
+	queerial_id = arrStrQueId[0];
+	return TRUE;
+}
