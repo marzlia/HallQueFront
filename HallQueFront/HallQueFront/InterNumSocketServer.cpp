@@ -307,7 +307,7 @@ void CInterNumSocketServer::DealMsg(const string& recvPacket,string& retPacket)
 		///////////////////////////////////////////
 		data.SetQueueNumber(StrQueNum);//设置data排队号码
 		CTime GetTime;//设置取号时间
-		GetTime=GetTime.GetCurrentTime();
+		GetTime=CTime::GetCurrentTime();
 		data.SetTakingNumTime(GetTime);
 		data.SetOrganId(organId);
 		data.SetOrganName(organName);

@@ -17,7 +17,7 @@ void CDealInterMsg::ProduceRetInterMsg(const SLZData* pData, UINT inlineNum,stri
 	CString msg = _T("<?xml version=\"1.0\" encoding=\"UTF-8\"?><dataPacket version=\"1.0\">");
 	msg.Append(_T("<headCode>retInterMsg</headCode>"));
 	//数据基本信息
-	msg.AppendFormat(_T("<serialId>%d</serialId>"),pData->GetSerialId());
+	msg.AppendFormat(_T("<serialId>%s</serialId>"),pData->GetSerialId());
 	msg.AppendFormat(_T("<bussName>%s</bussName>"),pData->GetBussName());
 	msg.AppendFormat(_T("<queId>%s</queId>"),pData->GetBussinessType());
 	msg.AppendFormat(_T("<queManNum>%s</queManNum>"),pData->GetQueSerialID());
@@ -320,7 +320,7 @@ void CDealInterMsg::ProduceRetCallMsg(BOOL isSucced,string& retMsg,const SLZData
 	CString msg = _T("<?xml version=\"1.0\" encoding=\"UTF-8\"?><dataPacket version=\"1.0\">");
 	msg.Append(_T("<headCode>retCallMsg</headCode>"));
 
-	msg.AppendFormat(_T("<serialId>%d</serialId>"),pData->GetSerialId());
+	msg.AppendFormat(_T("<serialId>%s</serialId>"),pData->GetSerialId());
 	msg.AppendFormat(_T("<bussName>%s</bussName>"),pData->GetBussName());
 	msg.AppendFormat(_T("<queId>%s</queId>"),pData->GetBussinessType());
 	msg.AppendFormat(_T("<queManNum>%s</queManNum>"),pData->GetQueSerialID());

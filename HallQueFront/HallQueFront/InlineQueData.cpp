@@ -377,10 +377,10 @@ BOOL CInlineQueData::DeleteInlineClientData(const CString& queID,const CString& 
 
 BOOL CInlineQueData::GetWindowCanDoQue(UINT nWindowID,CString& queerial_id,CString& callStaffID)
 {
-	if(m_lstInlineQue.GetCount() < 1)
-	{
-		return FALSE;
-	}
+// 	if(m_lstInlineQue.GetCount() < 1)
+// 	{
+// 		return FALSE;
+// 	}
 	CStringArray arrStrQueId;//可处理队列以及优先级
 	SLZWindow Window;
 	BOOL flag = m_rWindowTable.QueryWindowById(nWindowID,Window);
