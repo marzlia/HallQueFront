@@ -375,7 +375,7 @@ BOOL CInlineQueData::DeleteInlineClientData(const CString& queID,const CString& 
 	return flag;
 }
 
-BOOL CInlineQueData::GetWindowCanDoQue(UINT nWindowID,CString& queerial_id)
+BOOL CInlineQueData::GetWindowCanDoQue(UINT nWindowID,CString& queerial_id,CString& callStaffID)
 {
 	if(m_lstInlineQue.GetCount() < 1)
 	{
@@ -393,5 +393,6 @@ BOOL CInlineQueData::GetWindowCanDoQue(UINT nWindowID,CString& queerial_id)
 		return FALSE;
 	}
 	queerial_id = arrStrQueId[0];
+	callStaffID = staffID;
 	return TRUE;
 }

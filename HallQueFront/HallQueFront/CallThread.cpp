@@ -325,8 +325,8 @@ void CCallThread::OnCall(CallerCmd& callerCmd)
 		{
 			/////如果是客户机呼叫则需要向服务端发送一条请求删除队列中的一条客户机数据
 			CComplSocketClient client;
-			CString queSerialID;
-			m_rInlineQueData.GetWindowCanDoQue(callerCmd.GetWindowId(),queSerialID);
+			CString queSerialID,callStaffID;
+			m_rInlineQueData.GetWindowCanDoQue(callerCmd.GetWindowId(),queSerialID,callStaffID);
 			CString queManNum;
 			theApp.m_Controller.GetManQueNumByQueSerialID(queSerialID,queManNum);
 			string sendMsg,recvMsg;
@@ -337,6 +337,12 @@ void CCallThread::OnCall(CallerCmd& callerCmd)
 			{
 				BOOL isSucced;
 				CDealInterMsg::AnaRetCallMsg(recvMsg,&isSucced,&data);
+				if(isSucced)
+				{
+					data.SetCallTime(CTime::GetCurrentTime());
+					data.SetStaffId(callStaffID);
+					data.SetWindowId(callerCmd.GetWindowId());
+				}
 			}
 		}
 		else
