@@ -342,6 +342,7 @@ void CCallThread::OnCall(CallerCmd& callerCmd)
 					data.SetCallTime(CTime::GetCurrentTime());
 					data.SetStaffId(callStaffID);
 					data.SetWindowId(callerCmd.GetWindowId());
+					data.SetBussinessType(queSerialID);
 				}
 			}
 		}
