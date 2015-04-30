@@ -349,7 +349,7 @@ void CCallThread::OnCall(CallerCmd& callerCmd)
 					data.SetStaffId(callStaffID);
 					data.SetWindowId(callerCmd.GetWindowId());
 					CString queSerialID;
-					theApp.m_Controller.GetManQueNumByQueSerialID(queSerialID,data.GetQueSerialID());
+					theApp.m_Controller.GetQueSerialIDByManQueNum(queSerialID,data.GetQueSerialID());
 					data.SetBussinessType(queSerialID);
 				}
 				else
