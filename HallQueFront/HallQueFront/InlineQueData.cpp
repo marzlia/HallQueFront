@@ -352,7 +352,7 @@ void CInlineQueData::GetAllBussCount(const CString& strBussid,UINT* pWaitNum)
 	*pWaitNum = iCount;
 }
 
-BOOL CInlineQueData::DeleteInlineClientData(const CString& queID,const CString& organId,SLZData* pData)
+BOOL CInlineQueData::DeleteInlineClientData(const CStringArray& queIDArray,const CString& organId,SLZData* pData)
 {
 	m_mtInlineQue.Lock();
 	BOOL flag = FALSE;
@@ -363,11 +363,21 @@ BOOL CInlineQueData::DeleteInlineClientData(const CString& queID,const CString& 
 	{
 		poslast = pos;
 		data = m_lstInlineQue.GetNext(pos);
-		if(queID == data.GetBussinessType() && data.GetOrganId() == organId)
+		if(data.GetOrganId() == organId)
 		{
-			flag = TRUE;
-			m_lstInlineQue.RemoveAt(poslast);
-			*pData = data;
+			for(int i=0;i<queIDArray.GetCount();i++)
+			{
+				if(data.GetBussinessType() == queIDArray.GetAt(i))
+				{
+					flag = TRUE;
+					m_lstInlineQue.RemoveAt(poslast);
+					*pData = data;
+					break;
+				}
+			}
+		}
+		if(flag)
+		{
 			break;
 		}
 	}
@@ -375,7 +385,7 @@ BOOL CInlineQueData::DeleteInlineClientData(const CString& queID,const CString& 
 	return flag;
 }
 
-BOOL CInlineQueData::GetWindowCanDoQue(UINT nWindowID,CString& queerial_id,CString& callStaffID)
+BOOL CInlineQueData::GetWindowCanDoQue(UINT nWindowID,CStringArray& queerial_id_array,CString& callStaffID)
 {
 // 	if(m_lstInlineQue.GetCount() < 1)
 // 	{
@@ -392,7 +402,7 @@ BOOL CInlineQueData::GetWindowCanDoQue(UINT nWindowID,CString& queerial_id,CStri
 	{
 		return FALSE;
 	}
-	queerial_id = arrStrQueId[0];
+	queerial_id_array.Copy(arrStrQueId);
 	callStaffID = staffID;
 	return TRUE;
 }

@@ -325,13 +325,19 @@ void CCallThread::OnCall(CallerCmd& callerCmd)
 		{
 			/////如果是客户机呼叫则需要向服务端发送一条请求删除队列中的一条客户机数据
 			CComplSocketClient client;
-			CString queSerialID,callStaffID;
-			m_rInlineQueData.GetWindowCanDoQue(callerCmd.GetWindowId(),queSerialID,callStaffID);
-			CString queManNum;
-			theApp.m_Controller.GetManQueNumByQueSerialID(queSerialID,queManNum);
+			CStringArray queSerialIDArray,queManNumArray;
+			CString callStaffID,queManNum;
+			m_rInlineQueData.GetWindowCanDoQue(callerCmd.GetWindowId(),queSerialIDArray,callStaffID);
+			
+			for(int i=0;i<queSerialIDArray.GetCount();i++)
+			{
+				theApp.m_Controller.GetManQueNumByQueSerialID(queSerialIDArray.GetAt(i),queManNum);
+				queManNumArray.Add(queManNum);
+			}
+
 			string sendMsg,recvMsg;
 			int actRecvSize = 0;
-			CDealInterMsg::ProduceSendCallMsg(queManNum,sendMsg,theApp.m_logicVariables.strOrganID);
+			CDealInterMsg::ProduceSendCallMsg(queManNumArray,sendMsg,theApp.m_logicVariables.strOrganID);
 			if(client.SendData(INTERPORT,theApp.m_logicVariables.strInterIP,
 				sendMsg,sendMsg.size(),recvMsg,actRecvSize) && actRecvSize)
 			{
@@ -342,7 +348,13 @@ void CCallThread::OnCall(CallerCmd& callerCmd)
 					data.SetCallTime(CTime::GetCurrentTime());
 					data.SetStaffId(callStaffID);
 					data.SetWindowId(callerCmd.GetWindowId());
+					CString queSerialID;
+					theApp.m_Controller.GetManQueNumByQueSerialID(queSerialID,data.GetQueSerialID());
 					data.SetBussinessType(queSerialID);
+				}
+				else
+				{
+					return;
 				}
 			}
 		}
@@ -358,7 +370,6 @@ void CCallThread::OnCall(CallerCmd& callerCmd)
 	{
 		
 		//返回，写剩余人数
-//		CString carriedData = data.GetQueueNumber() + _T(" ") + GetQueInlineCount(data.GetBussinessType());
 		CString carriedData = data.GetQueueNumber() + _T(" ") + GetCandoQueInlineCount(callerCmd.GetWindowId());
 		callerCmd.SetCarriedData(carriedData);
 		//界面剩余人数更新

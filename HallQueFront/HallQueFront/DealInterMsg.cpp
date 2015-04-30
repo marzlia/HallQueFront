@@ -271,11 +271,21 @@ BOOL CDealInterMsg::AnaSendInterMsg(const string& retSendMsg,CString& queManNum,
 	return TRUE;
 }
 
-void CDealInterMsg::ProduceSendCallMsg(const CString& queManNum,string& retCallMsg,const CString& organId)
+void CDealInterMsg::ProduceSendCallMsg(const CStringArray& queManNumArray,string& retCallMsg,const CString& organId)
 {
 	CString msg = _T("<?xml version=\"1.0\" encoding=\"UTF-8\"?><dataPacket version=\"1.0\">");
 	msg.Append(_T("<headCode>sendCallMsg</headCode>"));
-	msg.AppendFormat(_T("<queManNum>%s</queManNum>"),queManNum);
+	msg.Append(_T("<queManNum>"));
+	int count = queManNumArray.GetCount();
+	for(int i=0;i<count;i++)
+	{
+		msg.AppendFormat(_T("%s"),queManNumArray.GetAt(i));
+		if(i != count - 1)
+		{
+			msg.Append(_T(","));
+		}
+	}
+	msg.Append(_T("</queManNum>"));
 	msg.AppendFormat(_T("<organId>%s</organId>"),organId);
 	msg.Append(_T("</dataPacket>"));
 
@@ -285,7 +295,7 @@ void CDealInterMsg::ProduceSendCallMsg(const CString& queManNum,string& retCallM
 	a_retPacket.ReleaseBuffer(0);
 }
 
-BOOL CDealInterMsg::AnaSendCallMsg(const string& retSendMsg,CString& queManNum,CString& organId)
+BOOL CDealInterMsg::AnaSendCallMsg(const string& retSendMsg,CStringArray& queManNumArray,CString& organId)
 {
 	string::size_type pos1 = retSendMsg.find("<headCode>");
 	string::size_type pos2 = retSendMsg.find("</headCode>");
@@ -301,8 +311,23 @@ BOOL CDealInterMsg::AnaSendCallMsg(const string& retSendMsg,CString& queManNum,C
 	if(pos1 == retSendMsg.npos || pos2 == retSendMsg.npos)
 		return FALSE;
 
-	string aQueManNum = retSendMsg.substr(pos1 + strlen("<queManNum>"),pos2 - pos1 - strlen("<queManNum>"));
-	queManNum = aQueManNum.c_str();
+	string aQueManNumArray = retSendMsg.substr(pos1 + strlen("<queManNum>"),pos2 - pos1 - strlen("<queManNum>"));
+	string::size_type posTemp = 0;
+	string::size_type posLast;
+	for(posTemp;posTemp != aQueManNumArray.npos;)
+	{
+		posLast = posTemp;
+		if(!posTemp)
+			posTemp = aQueManNumArray.find(",",posTemp);
+		else
+			posTemp = aQueManNumArray.find(",",posTemp + 1);
+		string aQueManNum = aQueManNumArray.substr(posLast,posTemp);
+		CString wQueManNum(aQueManNum.c_str());
+		queManNumArray.Add(wQueManNum);
+	}
+	string aQueManNum = aQueManNumArray.substr(posTemp,aQueManNumArray.npos);
+	CString wQueManNum(aQueManNum.c_str());
+	queManNumArray.Add(wQueManNum);
 
 	
 	pos1 = retSendMsg.find("<organId>");
@@ -548,7 +573,7 @@ void CDealInterMsg::StringToTime(const string& strTime,CTime& time)
 	string strYear = strTime.substr(0,pos1);
 	int nYear = atoi(const_cast<char*>(strYear.c_str()));
 	
-	pos2 = strTime.find("_",pos1 + 1);if(pos2 == strTime.npos)return;
+	pos2 = strTime.find("-",pos1+1);if(pos2 == strTime.npos)return;
 	string strMonth = strTime.substr(pos1+1,pos2 - pos1 -1);
 	int nMonth = atoi(const_cast<char*>(strMonth.c_str()));
 

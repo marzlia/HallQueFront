@@ -26,8 +26,8 @@ public:
 //	BOOL GetLastInlineQueWaitNum(const CString& strBussid,UINT* pWaitNum);
 //	BOOL GetLastInlineQueWaitNumSub(const CString& strBussid,UINT* pWaitNum);
 	void GetAllBussCount(const CString& strBussid,UINT* pWaitNum);
-	BOOL DeleteInlineClientData(const CString& queID,const CString& organId,SLZData* pData);//删除队列中的一个客户机数据
-	BOOL GetWindowCanDoQue(UINT nWindowID,CString& queerial_id,CString& callStaffID);//获取窗口能够处理的队列优先级最高的队列以及不使用优先级的队列
+	BOOL DeleteInlineClientData(const CStringArray& queIDArray,const CString& organId,SLZData* pData);//删除队列中的一个客户机数据
+	BOOL GetWindowCanDoQue(UINT nWindowID,CStringArray& queerial_id_array,CString& callStaffID);//获取窗口能够处理的队列优先级最高的队列以及不使用优先级的队列
 private:
 	CList<SLZData> m_lstInlineQue;//排队队列
 	CMutex m_mtInlineQue;

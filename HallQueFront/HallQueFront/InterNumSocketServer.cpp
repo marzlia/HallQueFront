@@ -334,13 +334,20 @@ void CInterNumSocketServer::DealMsg(const string& recvPacket,string& retPacket)
 	}
 	else if(headCode == "sendCallMsg")
 	{
-		CString queManNum,queserial_id,organId;
-		CDealInterMsg::AnaSendCallMsg(recvPacket,queManNum,organId);
-		theApp.m_Controller.GetQueSerialIDByManQueNum(queserial_id,queManNum);//得到queid
-
+		CStringArray queManNumArray,queserial_id_array;
+		CString organId,queserial_id;
+		CDealInterMsg::AnaSendCallMsg(recvPacket,queManNumArray,organId);
+		
+		for(int i=0;i<queManNumArray.GetCount();++i)
+		{
+			theApp.m_Controller.GetQueSerialIDByManQueNum(queserial_id,queManNumArray.GetAt(i));//得到queid
+			queserial_id_array.Add(queserial_id);
+		}
+		
 		//////
 		SLZData data;
-		BOOL isSucced = m_pInlineQueData->DeleteInlineClientData(queserial_id,organId,&data);
+		BOOL isSucced = m_pInlineQueData->DeleteInlineClientData(queserial_id_array,organId,&data);
+
 		CDealInterMsg::ProduceRetCallMsg(isSucced,retPacket,&data);
 		
 		UINT nWaitNum = 0;
@@ -348,6 +355,7 @@ void CInterNumSocketServer::DealMsg(const string& recvPacket,string& retPacket)
 		{
 			m_pInlineQueData->GetAllBussCount(queserial_id,&nWaitNum);
 		}
-		theApp.m_pView->ShowWaitNum(queserial_id,nWaitNum);///界面显示等待人数
+		if(isSucced)
+			theApp.m_pView->ShowWaitNum(queserial_id,nWaitNum);///界面显示等待人数
 	}
 }
