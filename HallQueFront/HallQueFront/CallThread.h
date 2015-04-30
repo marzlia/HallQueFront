@@ -59,7 +59,7 @@ private:
 	BOOL SetLoginStaffID(const UINT iWinID,const CString& staffID);//设置窗口登录员工ID
 	BOOL DelWindowLoginStaffID(const UINT iWinID);//把窗口登录员工ID删除
 	CString GetCandoQueInlineCount(UINT iWinID);//获取该窗口能够处理的队列排队人数
-	BOOL ShowViewWaitNum(const CString& queserial_id);//显示界面剩余人数
+	BOOL ShowViewWaitNum(const CString& queserial_id,const SLZData& data,CallerCmd& callerCmd);//显示界面剩余人数
 	
 private:
 	CInlineQueData& m_rInlineQueData;//排队队列

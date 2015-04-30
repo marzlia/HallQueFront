@@ -360,24 +360,22 @@ void CCallThread::OnCall(CallerCmd& callerCmd)
 		}
 		else
 		{
-			if(m_rInlineQueData.GetInlineQueData(callerCmd.GetWindowId(),data))
-			{
-				m_rCalledQueData.Add(data);//添加到正在呼叫队列
-			}
+//			if(m_rInlineQueData.GetInlineQueData(callerCmd.GetWindowId(),data))
+			m_rInlineQueData.GetInlineQueData(callerCmd.GetWindowId(),data);
+//			{
+				//添加到正在呼叫队列
+//			}
 		}
 	}
 	if(!data.GetBussinessType().IsEmpty())
 	{
+	
+		m_rCalledQueData.Add(data);//添加到正在呼叫队列
 		
-		//返回，写剩余人数
-		CString carriedData = data.GetQueueNumber() + _T(" ") + GetCandoQueInlineCount(callerCmd.GetWindowId());
-		callerCmd.SetCarriedData(carriedData);
 		//界面剩余人数更新
-		if(theApp.m_pView)
-		{
 			//theApp.m_pView->ShowWaitNum(data.GetBussinessType(),m_rInlineQueData.GetBussCount(data.GetBussinessType()));
-			ShowViewWaitNum(data.GetBussinessType());
-		}
+		ShowViewWaitNum(data.GetBussinessType(),data,callerCmd);
+		
 		//playsound,显示
 		theApp.m_Controller.m_pPlaySound->DataPlay(data);
 
@@ -426,7 +424,7 @@ void CCallThread::OnDiscard(CallerCmd& callerCmd)
 		if(theApp.m_pView)
 		{
 //			theApp.m_pView->ShowWaitNum(data.GetBussinessType(),m_rInlineQueData.GetBussCount(data.GetBussinessType()));
-			ShowViewWaitNum(data.GetBussinessType());
+			ShowViewWaitNum(data.GetBussinessType(),data,callerCmd);
 		}
 		//playsound,display
 //		theApp.m_Controller.m_pPlaySound->DataPlay(data);
@@ -806,7 +804,7 @@ BOOL CCallThread::ShowCallerWaitNum(const CString& queID)
 	return TRUE;
 }
 
-BOOL CCallThread::ShowViewWaitNum(const CString& queserial_id)
+BOOL CCallThread::ShowViewWaitNum(const CString& queserial_id,const SLZData& data,CallerCmd& callerCmd)
 {
 	if(theApp.m_logicVariables.IsOpenInterNum)
 	{
@@ -830,6 +828,12 @@ BOOL CCallThread::ShowViewWaitNum(const CString& queserial_id)
 				CDealInterMsg::AnaRetInNumMsg(recvMsg,&waitNum);
 
 				theApp.m_pView->ShowWaitNum(queserial_id,waitNum);
+
+				//返回，写剩余人数
+				CString wStrWaitNum;
+				wStrWaitNum.Format(_T("%d"),waitNum);
+				CString carriedData = data.GetQueueNumber() + _T(" ") + wStrWaitNum;
+				callerCmd.SetCarriedData(carriedData);
 				return TRUE;
 			}
 			else
@@ -844,6 +848,12 @@ Normal:
 		UINT nWaitNum = 0;
 		m_rInlineQueData.GetAllBussCount(queserial_id,&nWaitNum);//获取当前队列人数
 		theApp.m_pView->ShowWaitNum(queserial_id,nWaitNum);//m_rInlineQueData.GetBussCount(queserial_id));
+		
+		//返回，写剩余人数
+		CString wStrWaitNum;
+		wStrWaitNum.Format(_T("%d"),nWaitNum);
+		CString carriedData = data.GetQueueNumber() + _T(" ") + wStrWaitNum;
+		callerCmd.SetCarriedData(carriedData);
 		return TRUE;
 	}
 	return FALSE;
