@@ -317,17 +317,23 @@ BOOL CDealInterMsg::AnaSendCallMsg(const string& retSendMsg,CStringArray& queMan
 	for(posTemp;posTemp != aQueManNumArray.npos;)
 	{
 		posLast = posTemp;
+		string aQueManNum;
 		if(!posTemp)
+		{
 			posTemp = aQueManNumArray.find(",",posTemp);
+			aQueManNum = aQueManNumArray.substr(posLast,posTemp);
+		}
 		else
+		{
 			posTemp = aQueManNumArray.find(",",posTemp + 1);
-		string aQueManNum = aQueManNumArray.substr(posLast,posTemp);
+			aQueManNum = aQueManNumArray.substr(posLast + 1,posTemp);
+		}
 		CString wQueManNum(aQueManNum.c_str());
 		queManNumArray.Add(wQueManNum);
 	}
-	string aQueManNum = aQueManNumArray.substr(posTemp,aQueManNumArray.npos);
-	CString wQueManNum(aQueManNum.c_str());
-	queManNumArray.Add(wQueManNum);
+// 	string aQueManNum = aQueManNumArray.substr(posTemp,aQueManNumArray.npos);
+// 	CString wQueManNum(aQueManNum.c_str());
+// 	queManNumArray.Add(wQueManNum);
 
 	
 	pos1 = retSendMsg.find("<organId>");
@@ -417,7 +423,7 @@ BOOL CDealInterMsg::AnaRetCallMsg(const string& retMsg,BOOL* pIsSucced,SLZData* 
 	string queNum;
 	GetMsgData(retMsg,enumSlzDataqueNum,queNum);
 	CString wQueNum(queNum.c_str());
-	pData->SetQueSerialID(wQueNum);
+	pData->SetQueueNumber(wQueNum);
 
 
 	string intQueNum;
