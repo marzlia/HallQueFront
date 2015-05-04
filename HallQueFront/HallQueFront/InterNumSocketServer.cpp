@@ -236,7 +236,7 @@ void CInterNumSocketServer::DeleteClient(int i)
 	closesocket(m_CliSocketArr[i]);
 #ifdef _DEBUG
 	CString str;
-	str.Format(_T("%d client"),m_iTotalConn);
+	str.Format(_T("%d client closed"),m_iTotalConn);
 	MyWriteConsole(str);
 #endif
 	if(i == m_iTotalConn-1)//删除最后一个
@@ -353,9 +353,9 @@ void CInterNumSocketServer::DealMsg(const string& recvPacket,string& retPacket)
 		UINT nWaitNum = 0;
 		if(m_pInlineQueData)
 		{
-			m_pInlineQueData->GetAllBussCount(queserial_id,&nWaitNum);
+			m_pInlineQueData->GetAllBussCount(data.GetBussinessType(),&nWaitNum);
 		}
 		if(isSucced)
-			theApp.m_pView->ShowWaitNum(queserial_id,nWaitNum);///界面显示等待人数
+			theApp.m_pView->ShowWaitNum(data.GetBussinessType(),nWaitNum);///界面显示等待人数
 	}
 }

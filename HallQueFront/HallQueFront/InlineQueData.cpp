@@ -334,7 +334,7 @@ BOOL CInlineQueData::GetInlineQueData(int i,SLZData& data)
 
 void CInlineQueData::GetAllBussCount(const CString& strBussid,UINT* pWaitNum)
 {
-	m_mtInlineQue.Lock();
+//	m_mtInlineQue.Lock();
 	UINT iCount = 0;
 	POSITION pos = m_lstInlineQue.GetHeadPosition();
 	SLZData data;
@@ -342,13 +342,14 @@ void CInlineQueData::GetAllBussCount(const CString& strBussid,UINT* pWaitNum)
 	{
 		data = m_lstInlineQue.GetNext(pos);
 		CString queID = data.GetBussinessType();
+
 		if(queID == strBussid)
 		{
 			//返回队列总人数
 			iCount++;
 		}
 	}
-	m_mtInlineQue.Unlock();
+//	m_mtInlineQue.Unlock();
 	*pWaitNum = iCount;
 }
 
@@ -363,8 +364,8 @@ BOOL CInlineQueData::DeleteInlineClientData(const CStringArray& queIDArray,const
 	{
 		poslast = pos;
 		data = m_lstInlineQue.GetNext(pos);
-		if(data.GetOrganId() == organId)
-		{
+//		if(data.GetOrganId() == organId)
+//		{
 			for(int i=0;i<queIDArray.GetCount();i++)
 			{
 				if(data.GetBussinessType() == queIDArray.GetAt(i))
@@ -375,7 +376,7 @@ BOOL CInlineQueData::DeleteInlineClientData(const CStringArray& queIDArray,const
 					break;
 				}
 			}
-		}
+//		}
 		if(flag)
 		{
 			break;
