@@ -32,6 +32,7 @@ public:
 	BOOL OpenMsgQueue();
 	//取号时返回呼叫器等待人数变化
 	BOOL ShowCallerWaitNum(const CString& queID);
+	BOOL ShowCallerWaitNum(const CString& queID,int nWaitNum);
 private:
 	virtual void Run();
 	void DispatchCallerCmd(CallerCmd& callerCmd);

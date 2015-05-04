@@ -386,8 +386,9 @@ void CCallThread::OnCall(CallerCmd& callerCmd)
  			m_pShortMsg->SendMsg(data.GetPhoneNum(),data.GetSendMsg());
  		}
 	}
-	///重新写file，保存没处理（呼叫）的数据
-	theApp.m_Controller.WriteInlineDataToFile();
+	if(theApp.IsLocal())
+		///重新写file，保存没处理（呼叫）的数据
+		theApp.m_Controller.WriteInlineDataToFile();
 }
 
 void CCallThread::OnRecall(CallerCmd& callerCmd)
@@ -792,6 +793,37 @@ BOOL CCallThread::ShowCallerWaitNum(const CString& queID)
 				SLZData data;
 				m_rCalledQueData.GetCalledQueData(Window.GetWindowId(),data);
 				CString carriedData = data.GetQueueNumber() + _T(" ") + GetCandoQueInlineCount(Window.GetWindowId());
+				CallerCmd callerCmd;
+				callerCmd.SetCmdType(callerCmdShowNum);
+				callerCmd.SetWindowId(Window.GetWindowId());
+				callerCmd.SetCarriedData(carriedData);
+				ReturnToCaller(callerCmd);
+				break;
+			}
+		}
+	}
+	return TRUE;
+}
+
+BOOL CCallThread::ShowCallerWaitNum(const CString& queID,int nWaitNum)
+{
+	if(queID.IsEmpty())return FALSE;
+	std::map<UINT,SLZWindow>::const_iterator itera = m_rInlineQueData.m_rWindowTable.m_mapIdWindow.begin();
+	for(itera;itera!=m_rInlineQueData.m_rWindowTable.m_mapIdWindow.end();itera++)
+	{
+		SLZWindow Window = itera->second;
+		CStringArray ArrayQueID;
+		Window.GetArrayQueId(ArrayQueID);
+		for(int i=0;i<ArrayQueID.GetCount();i++)
+		{
+			CString wStrQueID = ArrayQueID.GetAt(i);
+			if(wStrQueID == queID)
+			{
+				SLZData data;
+				m_rCalledQueData.GetCalledQueData(Window.GetWindowId(),data);
+				CString wStrWaitNum;
+				wStrWaitNum.Format(_T("%d"),nWaitNum);
+				CString carriedData = data.GetQueueNumber() + _T(" ") + wStrWaitNum;
 				CallerCmd callerCmd;
 				callerCmd.SetCmdType(callerCmdShowNum);
 				callerCmd.SetWindowId(Window.GetWindowId());

@@ -914,6 +914,8 @@ void SLZController::InitShowInlineQueNum()
 		if(theApp.IsLocal())
 		{
 			m_pInlineQueData->GetAllBussCount(queID,&inlineNum);
+			if(theApp.m_pView)
+				theApp.m_pView->ShowWaitNum(queID,inlineNum);
 		}
 		else
 		{
@@ -927,14 +929,15 @@ void SLZController::InitShowInlineQueNum()
 				sendMsg,sendMsg.size(),recvMsg,actRecvSize) && actRecvSize)
 			{
 				//CDealInterMsg::AnaRetInterMsg(recvMsg,&iQueNum,pInlineNum);
-				UINT waitNum = 0;
-				CDealInterMsg::AnaRetInNumMsg(recvMsg,&waitNum);
+				CDealInterMsg::AnaRetInNumMsg(recvMsg,&inlineNum);
 
-				theApp.m_pView->ShowWaitNum(queID,waitNum);
+				theApp.m_pView->ShowWaitNum(queID,inlineNum);
+			}
+			else
+			{
+				theApp.m_pView->ShowWaitNum(queID,inlineNum);
 			}
 		}
-		if(theApp.m_pView)
-			theApp.m_pView->ShowWaitNum(queID,inlineNum);
 	}
 	////////////////////////
 }
@@ -1892,8 +1895,11 @@ void SLZController::TakeViewNum(const CString& queserial_id)
 				DoPrint(data,inlineNum);//打印
 				
 				theApp.m_pView->ShowWaitNum(data.GetBussinessType(),inlineNum);///界面显示等待人数
-				
-				m_pCallThread->ShowCallerWaitNum(data.GetBussinessType());///呼叫器更新等待人数
+
+				if(theApp.IsLocal())
+					m_pCallThread->ShowCallerWaitNum(data.GetBussinessType());///呼叫器更新等待人数
+				else
+					m_pCallThread->ShowCallerWaitNum(data.GetBussinessType(),inlineNum);
 				
 				ReturnMainFrame(data);//流程结束
 				break;
