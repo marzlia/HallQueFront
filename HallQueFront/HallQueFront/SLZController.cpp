@@ -1048,7 +1048,7 @@ UINT SLZController::CountToCallerAlarm(LPVOID pParam)
 			}
 		}
 		pThis->m_mtAlarm.Unlock();
-		Sleep(200);
+		Sleep(800);
 	}
 }
 
