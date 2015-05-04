@@ -911,7 +911,28 @@ void SLZController::InitShowInlineQueNum()
 	{
 		CString queID = m_map_que[i].GetQueID();
 		UINT inlineNum = 0;
-		m_pInlineQueData->GetAllBussCount(queID,&inlineNum);
+		if(theApp.IsLocal())
+		{
+			m_pInlineQueData->GetAllBussCount(queID,&inlineNum);
+		}
+		else
+		{
+			CComplSocketClient client;
+			CString queManNum;
+			theApp.m_Controller.GetManQueNumByQueSerialID(queID,queManNum);
+			string sendMsg,recvMsg;
+			int actRecvSize = 0;
+			CDealInterMsg::ProduceSendInNumMsg(queManNum,sendMsg);
+			if(client.SendData(INTERPORT,theApp.m_logicVariables.strInterIP,
+				sendMsg,sendMsg.size(),recvMsg,actRecvSize) && actRecvSize)
+			{
+				//CDealInterMsg::AnaRetInterMsg(recvMsg,&iQueNum,pInlineNum);
+				UINT waitNum = 0;
+				CDealInterMsg::AnaRetInNumMsg(recvMsg,&waitNum);
+
+				theApp.m_pView->ShowWaitNum(queID,waitNum);
+			}
+		}
 		if(theApp.m_pView)
 			theApp.m_pView->ShowWaitNum(queID,inlineNum);
 	}
