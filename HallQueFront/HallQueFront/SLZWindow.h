@@ -72,56 +72,56 @@ public:
 		m_iEvaluatorId = iEvaluatorId;
 	}
 	//获取窗口屏地址
-	int GetWndScreenId()const
+	CStringArray& GetWndScreenId()//const
 	{
-		return m_iWndScreenId;
+		return m_sWndScreenIdArray;
 	}
 	//设置窗口屏地址
-	void SetWndScreenId(int iWndScreenId)
+	void SetWndScreenId(const CStringArray& sWndScreenIdArray)
 	{
-		m_iWndScreenId=iWndScreenId;
+		m_sWndScreenIdArray.Copy(sWndScreenIdArray);
 	}
 	//获取综合屏地址
-	int GetComScreenId() const
+	CStringArray& GetComScreenId() //const
 	{
-		return m_iComScreenId;	 
+		return m_sComScreenIdArray;	 
 	}
 	//设置综合屏地址
-	void SetComScreenId(int iComScreenId) 
+	void SetComScreenId(const CStringArray& sComScreenIdArray) 
 	{
-		m_iComScreenId=iComScreenId;
+		m_sComScreenIdArray.Copy(sComScreenIdArray);
 	}
 
 	//获取通屏IP地址
-	CString GetLEDIPId()
+	CStringArray& GetLEDIPId() //const
 	{
-		return m_strLEDIPId;
+		return m_strLEDIPIdArray;
 	}
 
-	void SetLEDIPId(const CString& LEDIPId)
+	void SetLEDIPId(const CStringArray& LEDIPIdArray)
 	{
-		m_strLEDIPId=LEDIPId;
+		m_strLEDIPIdArray.Copy(LEDIPIdArray);
 	}
 	
 	//获取通屏物理地址
-	int GetLEDPhyId()
+	CStringArray& GetLEDPhyId()// const
 	{
-		return m_iLEDPhyId;
+		return m_sLEDPhyIdArray;
 	}
 
-	void SetLEDPhyId(const int LEDPhyId)
+	void SetLEDPhyId(const CStringArray& sLEDPhyIdArray)
 	{
-		m_iLEDPhyId=LEDPhyId;
+		m_sLEDPhyIdArray.Copy(sLEDPhyIdArray);
 	}
 
-	int GetLEDPipeId()
+	CStringArray& GetLEDPipeId() //const
 	{
-		return m_iLEDPipeId;
+		return m_sLEDPipeIdArray;
 	}
 
-	void SetLEDPipeId(const int LEDPipeId)
+	void SetLEDPipeId(const CStringArray& LEDPipeIdArray)
 	{
-		m_iLEDPipeId = LEDPipeId;
+		m_sLEDPipeIdArray.Copy(LEDPipeIdArray);
 	}
 
 	CString GetStbId()const 
@@ -274,11 +274,11 @@ private:
 	CString m_strWindowCallName;	//呼叫名称
 	int m_iCallerId;				//呼叫器地址
 	int m_iEvaluatorId;				//评价器地址
-	int m_iWndScreenId;				//窗口屏地址
-	int m_iComScreenId;				//综合屏地址
-	CString m_strLEDIPId;			//通屏IP地址
-	int m_iLEDPhyId;				//通屏物理地址
-	int m_iLEDPipeId;				//通屏通道号
+	CStringArray m_sWndScreenIdArray;	//窗口屏地址
+	CStringArray m_sComScreenIdArray;	//综合屏地址
+	CStringArray m_strLEDIPIdArray;			//通屏IP地址
+	CStringArray m_sLEDPhyIdArray;				//通屏物理地址
+	CStringArray m_sLEDPipeIdArray;				//通屏通道号
 	CString m_strStbId;				//机顶盒编号
 	//CString m_staffLoginId;			//当前登录员工
 	CString m_staffDefaultId;		//自动登录时预设员工

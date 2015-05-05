@@ -585,6 +585,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\WndContentDlg.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\WndQueSetDlg.cpp"
 				>
 			</File>
@@ -1044,6 +1048,10 @@
 			</File>
 			<File
 				RelativePath=".\WaringDlg.h"
+				>
+			</File>
+			<File
+				RelativePath=".\WndContentDlg.h"
 				>
 			</File>
 			<File

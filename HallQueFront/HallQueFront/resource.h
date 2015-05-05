@@ -67,6 +67,7 @@
 #define IDB_BITMAP_SENDMSG              185
 #define IDD_PROPMSG_JUDGE               186
 #define IDR_TIPMENU                     187
+#define IDD_DIALOG_WNDSCREEN            188
 #define IDC_ED_BNWIDTH                  1000
 #define IDC_ED_BNHEIGHT                 1001
 #define IDC_COMBO_TRANS                 1003
@@ -149,6 +150,7 @@
 #define IDC_BTN_SETBK                   1074
 #define IDC_BUTTON_ADDMSG               1074
 #define IDC_BN_CONTENT                  1074
+#define IDC_BN_ADDWND                   1074
 #define IDC_DELWND                      1075
 #define IDC_BTN_DELQUE                  1075
 #define IDC_BN_CANCEL                   1075
@@ -160,6 +162,7 @@
 #define IDC_BN_DELPAGE                  1075
 #define IDC_BUTTON_DELMSG               1075
 #define IDC_BN_ADDMSG                   1075
+#define IDC_BN_DELWND                   1075
 #define IDC_EDIT_EXAMPLE                1076
 #define IDC_BTN2                        1076
 #define IDC_BUTTON_QUENUMENG            1076
@@ -244,6 +247,7 @@
 #define IDC_LIST_PAGE                   1119
 #define IDC_LIST_MSG                    1119
 #define IDC_LIST_CONTENT                1119
+#define IDC_LIST_WNDCONTENT             1119
 #define IDC_ED_CARDTYPENAME             1120
 #define IDC_EDIT_EVALTIMEOUT            1120
 #define IDC_LIST_SOUNDMSG2              1120
@@ -315,6 +319,7 @@
 #define IDC_BUTTON8                     1160
 #define IDC_BTN_DOWN                    1160
 #define IDC_EDIT_STBID                  1160
+#define IDC_BN_WNDSCRSET                1160
 #define IDC_EDIT_STBNAME                1161
 #define IDC_EDIT_STBIP                  1162
 #define IDC_EDIT_STBPORT                1163
@@ -427,7 +432,7 @@
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        188
+#define _APS_NEXT_RESOURCE_VALUE        189
 #define _APS_NEXT_COMMAND_VALUE         32833
 #define _APS_NEXT_CONTROL_VALUE         1213
 #define _APS_NEXT_SYMED_VALUE           117
