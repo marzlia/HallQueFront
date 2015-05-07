@@ -329,7 +329,7 @@ void SLZCWndScreen::StartHardScreen()
 			this,NULL,0);
 	}
 }
-
+/*
 void SLZCWndScreen::InitThroughScreen(const int address)
 {
 	ThroughScreenHead head;
@@ -357,7 +357,8 @@ void SLZCWndScreen::InitThroughScreen(const int address)
 	CDoComInOut* pComInOut = CDoComInOut::GetInstance();
 	pComInOut->AddWriteComMsg(pMsg);
 }
-
+*/
+/*
 void SLZCWndScreen::InitThroughScreen(const CString IP,USHORT port)
 {
 	ThroughScreenHead head;
@@ -382,7 +383,7 @@ void SLZCWndScreen::InitThroughScreen(const CString IP,USHORT port)
 // 			AddThroughInitStr(recvBuf,actRecvSize);
 // 	}
 }
-
+*/
 CString SLZCWndScreen::FlushCstringToFitWndScreen(const CString& str,const int length,int height)
 {
 	if(height==1)return str;
@@ -459,11 +460,14 @@ CString SLZCWndScreen::FlushCstringToFitWndScreen(const CString& str,const int l
 	return temp;
 }
 
+/*
 void SLZCWndScreen::AddThroughInitStr(const char* buf,const DWORD count)
 {
 	m_recvThroughInitStr.append(buf,count);
 }
+*/
 
+/*
 BOOL SLZCWndScreen::DoThroughInitMsg()
 {
 	CDoComInOut* pComInOut = CDoComInOut::GetInstance();
@@ -511,34 +515,16 @@ BOOL SLZCWndScreen::DoThroughInitMsg()
 						AddThrBasicMsg(ThrScreenMsg);
 					}
 					
-					/*
-					string throughMsg = recvMsg.substr(first_pos+1,32);
-					ThrScreenMsg.address = throughMsg[29];
-					///////////////////////////////////////////
-					string temp = recvMsg.substr(first_pos+33);
-					for(int i=0;i<(int)temp.size();i+=34)
-					{
-						/////////////////通道信息
-						string channel = temp.substr(i,34);
-						ThrScreenMsg.channel = channel[0];//通道号
-						ThrScreenMsg.fone = channel[8];//字体
-						memcpy(&ThrScreenMsg.width,&channel[4],2);
-						memcpy(&ThrScreenMsg.height,&channel[6],2);
-						/////////////////////
-						AddThrBasicMsg(ThrScreenMsg);
-					}
-					*/
-					////////////
+					
 				}
 			}
-//			m_list_recvString.pop_front();
 		}
 		m_list_recvString.clear();//删除
 	}
 	m_recvThroughInitStr.clear();
 	return TRUE;
 }
-
+*/
 void SLZCWndScreen::AddThrBasicMsg(ThrScreenBasicMsg msg)
 {
 	BOOL flag = FALSE;

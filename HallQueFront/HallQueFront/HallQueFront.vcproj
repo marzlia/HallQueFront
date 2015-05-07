@@ -46,6 +46,7 @@
 				Name="VCCLCompilerTool"
 				Optimization="0"
 				PreprocessorDefinitions="WIN32;_WINDOWS;_DEBUG"
+				StringPooling="false"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="3"
@@ -565,6 +566,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\ThroughWndScreenInfo.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\TrackContrl.cpp"
 				>
 			</File>
@@ -1024,6 +1029,10 @@
 			</File>
 			<File
 				RelativePath=".\TCPConnect.h"
+				>
+			</File>
+			<File
+				RelativePath=".\ThroughWndScreenInfo.h"
 				>
 			</File>
 			<File

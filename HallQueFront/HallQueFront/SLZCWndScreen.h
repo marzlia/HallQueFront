@@ -55,9 +55,9 @@ private:
 	string::size_type GetIpPos(const string& msg);//判断是ip的插入地址的位置
 public:
 	void AddScreenMsg(CString& msg,const int address);//向缓冲区里添加数据
-	void InitThroughScreen(const int address);//初始化通屏串口模式
-	void InitThroughScreen(const CString IP,USHORT port);//初始化通屏TCP模式
-	BOOL DoThroughInitMsg();
-	void AddThroughInitStr(const char* buf,const DWORD count);
+//	void InitThroughScreen(const int address);//初始化通屏串口模式
+//	void InitThroughScreen(const CString IP,USHORT port);//初始化通屏TCP模式
+//	BOOL DoThroughInitMsg();
+//	void AddThroughInitStr(const char* buf,const DWORD count);
 	void AddThroughScreenMsg(const CString& msg,int address,int channel);//向缓冲区里添加通屏数据
 };

@@ -8,21 +8,56 @@
 #include "SLZWindowQueryView.h"
 #include "SLZData.h"
 #include "PlaySoundThread.h"
+#include "ThroughWndScreenInfo.h"
 #include <list>
 #pragma comment(lib, "jTTS_ML.lib")
 ///////信息中转结构体/////////
 typedef struct _tagVoiceAndDisplayStr
 {
+public:
+	_tagVoiceAndDisplayStr(void){
+		iShowTime = 0;
+		iWndid = 0;
+	}
+	~_tagVoiceAndDisplayStr(void){}
+	_tagVoiceAndDisplayStr(const _tagVoiceAndDisplayStr& obj){
+		strAd = obj.strAd;
+		strVoiceStr = obj.strVoiceStr;
+		strDisplayStr = obj.strDisplayStr;
+		strConsultStbId = obj.strConsultStbId;
+		iShowTime = obj.iShowTime;
+		iWndid = obj.iWndid;
+
+		ScreenWndInfoArray.RemoveAll();
+		for(int i=0;i<obj.ScreenWndInfoArray.GetCount();i++)
+		{
+			ScreenWndInfoArray.Add(obj.ScreenWndInfoArray.GetAt(i));
+		}
+	}
+	_tagVoiceAndDisplayStr& operator = (const _tagVoiceAndDisplayStr& obj){
+		if(&obj == this)return *this;
+		strAd = obj.strAd;
+		strVoiceStr = obj.strVoiceStr;
+		strDisplayStr = obj.strDisplayStr;
+		strConsultStbId = obj.strConsultStbId;
+		iShowTime = obj.iShowTime;
+		iWndid = obj.iWndid;
+
+		ScreenWndInfoArray.RemoveAll();
+		for(int i=0;i<obj.ScreenWndInfoArray.GetCount();i++)
+		{
+			ScreenWndInfoArray.Add(obj.ScreenWndInfoArray.GetAt(i));
+		}
+		return *this;
+	}
+public:
 	CString		strAd;		//广告
 	CString		strVoiceStr;	//声音内容
 	CString		strDisplayStr;	//显示内容
-	int			iWndScreenId;		//窗口屏地址
 	CString		strConsultStbId;		
-	int			iLEDPhyId;	//物理地址
-	int			iLEDPipeId;		//通道
-	int			iWndComId;		//综合屏地址
 	UINT		iShowTime;	
 	int			iWndid;     //窗口ID
+	CArray<CThroughWndScreenInfo> ScreenWndInfoArray;//各种屏的数组
 } VOICEDISPLAYSTR, *LPVOICEDISPLAYSTR;
 
 ////////显示计时结构体///////

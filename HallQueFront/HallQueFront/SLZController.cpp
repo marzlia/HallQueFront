@@ -285,17 +285,17 @@ BOOL SLZController::InitInterNumServer()
 	return TRUE;
 }
 
-void SLZController::InitThroughScreen()
-{
-	SLZCWndScreen* pWndScreen = SLZCWndScreen::GetInstance();
-	int throughID[255]={0};
-	int size = m_windowTable.GetAllThroughID(throughID);
-	for(int i=0;i<size;i++)
-	{
-		if(throughID[i]>0)
-			pWndScreen->InitThroughScreen(throughID[i]);
-	}
-}
+// void SLZController::InitThroughScreen()
+// {
+// 	SLZCWndScreen* pWndScreen = SLZCWndScreen::GetInstance();
+// 	int throughID[255]={0};
+// 	int size = m_windowTable.GetAllThroughID(throughID);
+// 	for(int i=0;i<size;i++)
+// 	{
+// 		if(throughID[i]>0)
+// 			pWndScreen->InitThroughScreen(throughID[i]);
+// 	}
+// }
 
 BOOL SLZController::End()
 {

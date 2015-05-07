@@ -75,7 +75,7 @@ private:
 	SLZWindowQueryView m_windowTable;//从文件读出的窗口信息类
 	CMap<int,int,CQueueInfo,CQueueInfo&> m_map_que;//队列map
 	BOOL DataNumOut(CString QueId);
-	void InitThroughScreen();//初始化通屏
+//	void InitThroughScreen();//初始化通屏
 	///维护队列人数从0变为1的工作者线程
 	static UINT CountToCallerAlarm(LPVOID pParam);
 	CWinThread* m_pAlarmToCaller;

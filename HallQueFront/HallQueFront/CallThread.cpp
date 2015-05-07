@@ -485,7 +485,16 @@ void CCallThread::OnPause(CallerCmd& callerCmd)
 	BOOL flag = m_rInlineQueData.m_rWindowTable.QueryWindowById(winID,Window);
 	if(flag)
 	{
-		pWnd->AddScreenMsg(msg,Window.GetWndScreenId());	
+		CThroughWndScreenInfo wndScreenInfo;
+		for(int i=0;i<Window.m_throughscreen_array.GetCount();i++)
+		{
+			
+			wndScreenInfo = Window.m_throughscreen_array.GetAt(i);
+					
+			pWnd->AddScreenMsg(msg,wndScreenInfo.GetWndScreenId());
+			pWnd->AddScreenMsg(msg,wndScreenInfo.GetComScreenId());
+			pWnd->AddThroughScreenMsg(msg,wndScreenInfo.GetPhyId(),wndScreenInfo.GetPipeId());
+		}
 		callerCmd.SetSuccess(TRUE);
 	}
 }

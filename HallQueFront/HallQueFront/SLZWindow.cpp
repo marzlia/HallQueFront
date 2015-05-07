@@ -4,6 +4,8 @@
 #include "SLZStaff.h"
 
 unsigned int golbal_windowserial_id;
+extern UINT g_throughWndScreenId;
+
 IMPLEMENT_SERIAL(SLZWindow,CObject,1)
 SLZWindow::SLZWindow(void) : m_iCallerId(0)
 , m_iEvaluatorId(0)
@@ -34,33 +36,27 @@ SLZWindow::SLZWindow(const SLZWindow& obj)
 	m_strWindowCallName=obj.m_strWindowCallName;
 	m_iCallerId=obj.m_iCallerId;
 	m_iEvaluatorId=obj.m_iEvaluatorId;
-//	m_iWndScreenId=obj.m_iWndScreenId;
-	m_sWndScreenIdArray.Copy(obj.m_sWndScreenIdArray);
-//	m_iComScreenId=obj.m_iComScreenId;
-	m_sComScreenIdArray.Copy(obj.m_sComScreenIdArray);
-	//m_StrCurStaffName=obj.m_StrCurStaffName;
-	//m_StrDefStaffName=obj.m_StrDefStaffName;
-	//m_staffLoginId=obj.m_staffLoginId;
+	
 	m_staffDefaultId=obj.m_staffDefaultId;
-	//m_ArraySize=obj.m_ArraySize;
-	//m_AbleQueName=obj.m_AbleQueName;
-	//m_strAbleQueId=obj.m_strAbleQueId;
+	
 	m_arrBussId.Copy(obj.m_arrBussId);
 	m_ArraySize = m_arrBussId.GetCount();
 	m_CalledMsg=obj.m_CalledMsg;
 	m_WaitCalledMsg=obj.m_WaitCalledMsg;
 	m_ShowMsg=obj.m_ShowMsg;
 	m_WaitShowMsg=obj.m_WaitShowMsg;
-	//m_FlagMustEval=obj.m_FlagMustEval;
+	
 	m_iEvaTimeOut = obj.m_iEvaTimeOut;
 	m_iMsgShowTime = obj.m_iMsgShowTime;
-//	m_iLEDPhyId=obj.m_iLEDPhyId;
-	m_sLEDPhyIdArray.Copy(obj.m_sLEDPhyIdArray);
-//	m_strLEDIPId=obj.m_strLEDIPId;
-	m_strLEDIPIdArray.Copy(obj.m_strLEDIPIdArray);
-//	m_iLEDPipeId = obj.m_iLEDPipeId;
-	m_sLEDPipeIdArray.Copy(obj.m_sLEDPipeIdArray);
+
 	m_strAdMsg = obj.m_strAdMsg;
+
+	m_throughscreen_array.RemoveAll();
+	int count = obj.m_throughscreen_array.GetCount();
+	for(int i=0;i<count;i++)
+	{
+		m_throughscreen_array.Add(obj.m_throughscreen_array.GetAt(i));
+	}
 }
 
 SLZWindow& SLZWindow::operator =(const SLZWindow& obj)
@@ -71,33 +67,28 @@ SLZWindow& SLZWindow::operator =(const SLZWindow& obj)
 	m_strWindowCallName=obj.m_strWindowCallName;
 	m_iCallerId=obj.m_iCallerId;
 	m_iEvaluatorId=obj.m_iEvaluatorId;
-//	m_iWndScreenId=obj.m_iWndScreenId;
-	m_sWndScreenIdArray.Copy(obj.m_sWndScreenIdArray);
-//	m_iComScreenId=obj.m_iComScreenId;
-	m_sComScreenIdArray.Copy(obj.m_sComScreenIdArray);
-	//m_StrCurStaffName=obj.m_StrCurStaffName;
-	//m_StrDefStaffName=obj.m_StrDefStaffName;
-	//m_staffLoginId=obj.m_staffLoginId;
+	
 	m_staffDefaultId=obj.m_staffDefaultId;
-	//m_ArraySize=obj.m_ArraySize;
-	//m_AbleQueName=obj.m_AbleQueName;
-	//m_strAbleQueId=obj.m_strAbleQueId;
+	
 	m_arrBussId.Copy(obj.m_arrBussId);
 	m_ArraySize = m_arrBussId.GetCount();
 	m_CalledMsg=obj.m_CalledMsg;
 	m_WaitCalledMsg=obj.m_WaitCalledMsg;
 	m_ShowMsg=obj.m_ShowMsg;
 	m_WaitShowMsg=obj.m_WaitShowMsg;
-	//m_FlagMustEval=obj.m_FlagMustEval;
+	
 	m_iEvaTimeOut = obj.m_iEvaTimeOut;
 	m_iMsgShowTime = obj.m_iMsgShowTime;
-//	m_iLEDPhyId=obj.m_iLEDPhyId;
-	m_sLEDPhyIdArray.Copy(obj.m_sLEDPhyIdArray);
-//	m_strLEDIPId=obj.m_strLEDIPId;
-	m_strLEDIPIdArray.Copy(obj.m_strLEDIPIdArray);
-//	m_iLEDPipeId = obj.m_iLEDPipeId;
-	m_sLEDPipeIdArray.Copy(obj.m_sLEDPipeIdArray);
+
 	m_strAdMsg = obj.m_strAdMsg;
+
+	m_throughscreen_array.RemoveAll();
+	int count = obj.m_throughscreen_array.GetCount();
+	for(int i=0;i<count;i++)
+	{
+		m_throughscreen_array.Add(obj.m_throughscreen_array.GetAt(i));
+	}
+
 	return *this;
 }
 
@@ -116,40 +107,17 @@ void SLZWindow::Serialize( CArchive& ar)
 		{
 			ar << m_arrBussId[i];
 		}
-		//<< m_sWndScreenIdArray << m_sComScreenIdArray << m_strLEDIPIdArray << m_sLEDPhyIdArray << m_sLEDPipeIdArray
-		int ArraySize = m_sWndScreenIdArray.GetCount();
-		ar << ArraySize;
-		for(int i=0; i<ArraySize; i++)
-		{
-			ar << m_sWndScreenIdArray.GetAt(i);
-		}
+		
 
-		ArraySize = m_sComScreenIdArray.GetCount();
+		int ArraySize = m_throughscreen_array.GetCount();
 		ar << ArraySize;
-		for(int i=0; i<ArraySize; i++)
+		for(int i=0;i<ArraySize;i++)
 		{
-			ar << m_sComScreenIdArray.GetAt(i);
-		}
-
-		ArraySize = m_strLEDIPIdArray.GetCount();
-		ar << ArraySize;
-		for(int i=0; i<ArraySize; i++)
-		{
-			ar << m_strLEDIPIdArray.GetAt(i);
-		}
-
-		ArraySize = m_sLEDPhyIdArray.GetCount();
-		ar << ArraySize;
-		for(int i=0; i<ArraySize; i++)
-		{
-			ar << m_sLEDPhyIdArray.GetAt(i);
-		}
-
-		ArraySize = m_sLEDPipeIdArray.GetCount();
-		ar << ArraySize;
-		for(int i=0; i<ArraySize; i++)
-		{
-			ar << m_sLEDPipeIdArray.GetAt(i);
+			CThroughWndScreenInfo throughWndInfo;
+			throughWndInfo = m_throughscreen_array.GetAt(i);
+			ar << throughWndInfo.GetThroughWndScreenId() << throughWndInfo.GetLocalIp()
+				<< throughWndInfo.GetPhyId() << throughWndInfo.GetPipeId() << throughWndInfo.GetWndScreenId()
+				<< throughWndInfo.GetComScreenId();
 		}
 	}
 	else
@@ -158,7 +126,7 @@ void SLZWindow::Serialize( CArchive& ar)
 			>> m_iEvaluatorId  >> m_strStbId >> m_staffDefaultId >> m_CalledMsg >> m_WaitCalledMsg
 			>> m_ShowMsg >> m_WaitShowMsg >> m_iMsgShowTime >> m_strAdMsg 
 			>> m_iEvaTimeOut>>m_iShowWndId;
-		//m_ArraySize = m_arrBussId.GetCount();
+		
 		ar >> m_ArraySize;
 		for(int i = 0; i < m_ArraySize; i++)
 		{
@@ -166,46 +134,33 @@ void SLZWindow::Serialize( CArchive& ar)
 			ar >> strQueId;
 			m_arrBussId.Add(strQueId);
 		}
-		//>> m_sWndScreenIdArray >> m_sComScreenIdArray >> m_strLEDIPIdArray >> m_sLEDPhyIdArray >> m_sLEDPipeIdArray
+		
 		int ArraySize = 0;
 		ar >> ArraySize;
-		for(int i=0; i<ArraySize; i++)
+
+		CString strLocalIp;
+		int nPhyId = 0;
+		int nPipeId = 0;
+		int nWndScreenId = 0;
+		int nComScreenId = 0;
+		UINT nThroughWndScreenId = 0;
+		CThroughWndScreenInfo throughWndInfo;
+
+		for(int i=0;i<ArraySize;i++)
 		{
-			CString sWndScreenId;
-			ar >> sWndScreenId;
-			m_sWndScreenIdArray.Add(sWndScreenId);
+			ar >>nThroughWndScreenId >> strLocalIp >> nPhyId >> nPipeId >> nWndScreenId >> nComScreenId;
+
+			g_throughWndScreenId = g_throughWndScreenId > nThroughWndScreenId ? g_throughWndScreenId : nThroughWndScreenId;
+
+			throughWndInfo.SetThroughWndScreenId(nThroughWndScreenId);
+			throughWndInfo.SetLocalIP(strLocalIp);
+			throughWndInfo.SetPhyId(nPhyId);
+			throughWndInfo.SetPipeId(nPipeId);
+			throughWndInfo.SetWndScreenId(nWndScreenId);
+			throughWndInfo.SetComScreenId(nComScreenId);
+
+			m_throughscreen_array.Add(throughWndInfo);
 		}
 
-		ar >> ArraySize;
-		for(int i=0; i<ArraySize; i++)
-		{
-			CString sComScreenId;
-			ar >> sComScreenId;
-			m_sComScreenIdArray.Add(sComScreenId);
-		}
-
-		ar >> ArraySize;
-		for(int i=0; i<ArraySize; i++)
-		{
-			CString sLEDIPId;
-			ar >> sLEDIPId;
-			m_strLEDIPIdArray.Add(sLEDIPId);
-		}
-
-		ar >> ArraySize;
-		for(int i=0;i<ArraySize; i++)
-		{
-			CString sLEDPhyId;
-			ar >> sLEDPhyId;
-			m_sLEDPhyIdArray.Add(sLEDPhyId);
-		}
-
-		ar >> ArraySize;
-		for(int i=0; i<ArraySize; i++)
-		{
-			CString sLEDPipe;
-			ar >> sLEDPipe;
-			m_sLEDPipeIdArray.Add(sLEDPipe);
-		}
 	}
 }
