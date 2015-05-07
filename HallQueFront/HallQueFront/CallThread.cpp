@@ -493,7 +493,7 @@ void CCallThread::OnPause(CallerCmd& callerCmd)
 					
 			pWnd->AddScreenMsg(msg,wndScreenInfo.GetWndScreenId());
 			pWnd->AddScreenMsg(msg,wndScreenInfo.GetComScreenId());
-			pWnd->AddThroughScreenMsg(msg,wndScreenInfo.GetPhyId(),wndScreenInfo.GetPipeId());
+			pWnd->AddThroughScreenMsg(msg,wndScreenInfo.GetPhyId(),wndScreenInfo.GetPipeId(),wndScreenInfo.GetLocalIp());
 		}
 		callerCmd.SetSuccess(TRUE);
 	}

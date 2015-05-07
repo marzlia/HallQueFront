@@ -108,7 +108,7 @@ BOOL SoundPlay::ShowAdven()
 
 					if (nLedPhyId != 0 && nLedPipeId != 0)
 					{
-						WndScreen->AddThroughScreenMsg(strAdmsg,nLedPhyId,nLedPipeId);
+						WndScreen->AddThroughScreenMsg(strAdmsg,nLedPhyId,nLedPipeId,itera->m_throughscreen_array.GetAt(i).GetLocalIp());
 					}
 
 					if(nWndScreenId != 0)
@@ -186,8 +186,10 @@ BOOL SoundPlay::DataPlay(const SLZData& Data,BOOL bWait)
 		for(int i=0;i<count;i++)
 		{
 			vst.ScreenWndInfoArray.Add(WindowInfo.m_throughscreen_array.GetAt(i));
-			AddPlayText(vst);
+//			AddPlayText(vst);
 		}
+		
+		AddPlayText(vst);
 
 		return TRUE;
 	}
@@ -593,7 +595,7 @@ void CALLBACK SoundPlay::MyDoOutTimerMsg(HWND hwnd, UINT uMsg, UINT idEvent, DWO
 			}
 			if (ShowTime.LedAddress!=0&&ShowTime.LedPipe!=0)
 			{
-				pWndScreen->AddThroughScreenMsg(ShowTime.strAd,ShowTime.LedAddress,ShowTime.LedPipe);
+				pWndScreen->AddThroughScreenMsg(ShowTime.strAd,ShowTime.LedAddress,ShowTime.LedPipe,ShowTime.localIP);
 			}
 			playsound->m_MsgShowList.RemoveAt(pos);
 		}
@@ -641,9 +643,10 @@ UINT SoundPlay::PlayVoiceThread(LPVOID pParam)
 					if (WndScreenInfo.GetPhyId() != 0 && WndScreenInfo.GetPipeId() != 0)
 					{
 						
-						pWndScreen->AddThroughScreenMsg(PlayStr.strDisplayStr,WndScreenInfo.GetPhyId(),WndScreenInfo.GetPipeId());
+						pWndScreen->AddThroughScreenMsg(PlayStr.strDisplayStr,WndScreenInfo.GetPhyId(),WndScreenInfo.GetPipeId(),WndScreenInfo.GetLocalIp());
 						showtime.LedAddress = WndScreenInfo.GetPhyId();
 						showtime.LedPipe = WndScreenInfo.GetPipeId();
+						showtime.localIP = WndScreenInfo.GetLocalIp();
 					}
 					if (WndScreenInfo.GetComScreenId() != 0)
 					{

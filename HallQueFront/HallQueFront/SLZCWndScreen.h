@@ -28,6 +28,7 @@ private:
 		CString msg;
 		int address;
 		int channel;
+		CString localIp;
 	}SendThrScreenMsg;
 	int DoScreenMsg(CString& msg,int address,
 		char* buf);
@@ -49,7 +50,7 @@ private:
 	std::list<string> m_list_recvString;//分解接受的通屏数据
 	std::list<SendThrScreenMsg> m_list_sendThrMsg;//通屏数据缓冲区
 	CString FlushCstringToFitWndScreen(const CString& str,const int length,int height);//用于通屏时格式化字符串
-	BOOL SendDataToThroughScreen(const CString& str,int address,int channel);
+	BOOL SendDataToThroughScreen(const CString& str,int address,int channel,const CString& localIp);
 	int  FindChannelWidth(int address,int channel,int& height);//算出该通道能显示多少个字
 	void AddThrBasicMsg(ThrScreenBasicMsg msg);
 	string::size_type GetIpPos(const string& msg);//判断是ip的插入地址的位置
@@ -59,5 +60,5 @@ public:
 //	void InitThroughScreen(const CString IP,USHORT port);//初始化通屏TCP模式
 //	BOOL DoThroughInitMsg();
 //	void AddThroughInitStr(const char* buf,const DWORD count);
-	void AddThroughScreenMsg(const CString& msg,int address,int channel);//向缓冲区里添加通屏数据
+	void AddThroughScreenMsg(const CString& msg,int address,int channel,const CString& localIp = _T(""));//向缓冲区里添加通屏数据
 };

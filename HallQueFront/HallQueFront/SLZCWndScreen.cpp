@@ -5,6 +5,7 @@
 #include "ComplSocketClient.h"
 #include "ComputeFuncationTime.h"
 #include "DoComInOut.h"
+#include "ComplSocketClient.h"
 
 
 //SLZCWndScreen* SLZCWndScreen::m_pInstance=NULL;//new SLZCWndScreen;
@@ -544,87 +545,8 @@ void SLZCWndScreen::AddThrBasicMsg(ThrScreenBasicMsg msg)
 		m_list_thrBasicMsg.push_back(msg);
 }
 
-BOOL SLZCWndScreen::SendDataToThroughScreen(const CString& str,int address,int channel)
+BOOL SLZCWndScreen::SendDataToThroughScreen(const CString& str,int address,int channel,const CString& localIp)
 {
-//	CString str =_T("123");
-	/*
-	ThroughScreenHead head;memset(&head,0,sizeof(head));
-	head.address=1;head.flagFirst=HARDWARE_THROUGH_FLAG1;
-	head.flagSecond = HARDWARE_THROUGH_FLAG2;
-	head.type = 0;//命令
-	head.length = 11;//第一包长度
-	
-	
-	char firstPacket[19]={0};
-	memcpy(firstPacket,&head,sizeof(head));
-	const char cmd[8] = "qtdata ";
-	memcpy(&firstPacket[7],cmd,7);
-	firstPacket[14] = 0;
-	firstPacket[15] = ' ';
-	short int length = 29;
-	memcpy(&firstPacket[16],&length,sizeof(length));
-	DWORD dwWrite = 0;
-	CComInit* pComInit = CComInit::GetInstance();
-	Sleep(3);
-	int res=WriteFile(pComInit->m_hComWndScreen,
-		firstPacket,19,&dwWrite,NULL);//发送第一包协议头 + qtdata┗┛实时数据窗口号┗┛数据文件总长度
-	char secondPacket[512]={0};
-	head.type=0x10;
-	head.length = 3;
-	memcpy(secondPacket,&head,sizeof(head));
-	secondPacket[7]='1';
-	secondPacket[8]='2';
-	secondPacket[9]='3';
-	secondPacket[10]='\0';
-	res = WriteFile(pComInit->m_hComWndScreen,
-		secondPacket,11,&dwWrite,NULL);
-		*/
-	/*
-	//格式化字符串
-	int width = FindChannelWidth(address,channel);
-	if(width==-1)return FALSE;
-	CString FitStr = FlushCstringToFitWndScreen(str,width);
-#ifdef _DEBUG
-	MyWriteConsole(FitStr);
-#endif
-	///////////////
-	CCommonConvert convert;
-	int length = convert.CStringToChar(FitStr,NULL);
-	short int dataLength = (short int)length;//强转
-	///数据文件总长度
-	memcpy(&firstPacket[16],&dataLength,sizeof(dataLength));
-	DWORD dwWrite = 0;
-	CComInit* pComInit = CComInit::GetInstance();
-	Sleep(3);
-	int res=WriteFile(pComInit->m_hComWndScreen,
-		firstPacket,19,&dwWrite,NULL);//发送第一包协议头 + qtdata┗┛实时数据窗口号┗┛数据文件总长度
-	///////////////////////////////////////////////
-	char* buf = new char[length+1];//数据
-	memset(buf,0,sizeof(buf));
-	length = convert.CStringToChar(FitStr,buf);
-	if(length<512)
-	{
-		head.type = 0x10;//数据类
-		head.length = length;
-		char seconedPacket[512]={0};
-		memcpy(seconedPacket,&head,sizeof(head));
-		memcpy(&seconedPacket[7],buf,length+1);
-		Sleep(3);
-		int res=WriteFile(pComInit->m_hComWndScreen,
-			seconedPacket,8+length,&dwWrite,NULL);
-		///发送第二包协议头 + 512字节数据 +[CRC];返回send@
-	}
-	else
-	{
-		for(int i=0;i<length/512;i++)
-		{
-			
-		}
-	}
-//	head.length = length;
-	///////////////////
-	delete [] buf;
-	*/
 	///自己公司协议
 	int height = 0;
 	int width = FindChannelWidth(address,channel,height);
@@ -647,6 +569,12 @@ BOOL SLZCWndScreen::SendDataToThroughScreen(const CString& str,int address,int c
 	pMsg->length = length;
 	CDoComInOut* pComInOut = CDoComInOut::GetInstance();
 	pComInOut->AddWriteComMsg(pMsg);
+
+	if(!localIp.IsEmpty())//TCP发送
+	{
+		CComplSocketClient Client;
+		Client.SendData(1024,localIp,buf,length);
+	}
 	return TRUE;
 }
 
@@ -671,13 +599,14 @@ int SLZCWndScreen::FindChannelWidth(int address,int channel,int& height)
 	return width;
 }
 
-void SLZCWndScreen::AddThroughScreenMsg(const CString& msg,int address,int channel)
+void SLZCWndScreen::AddThroughScreenMsg(const CString& msg,int address,int channel,const CString& localIp)
 {
 	if(address<=0||msg.IsEmpty())return;
 	SendThrScreenMsg sendMsg;
 	sendMsg.msg = msg;
 	sendMsg.address = address;
 	sendMsg.channel = channel-1;
+	sendMsg.localIp = localIp;
 	m_ThrWndMutex.Lock();
 	m_list_sendThrMsg.push_back(sendMsg);
 	m_ThrWndMutex.Unlock();
@@ -702,7 +631,7 @@ DWORD WINAPI SLZCWndScreen::DoThrWndMsgThread(LPVOID pParam)
 			pThis->m_ThrWndMutex.Unlock();
 //			WaitForSingleObject(pThis->m_hDoWndScreenMsgThread,3);
 
-			pThis->SendDataToThroughScreen(msg.msg,msg.address,msg.channel);
+			pThis->SendDataToThroughScreen(msg.msg,msg.address,msg.channel,msg.localIp);
 		}
 	}
 	return 0;

@@ -302,3 +302,111 @@ BOOL CComplSocketClient::AppendListMsg()
 	}
 	return TRUE;
 }
+
+BOOL CComplSocketClient::SendData(USHORT port,CString IP,char buf[],int size)
+{
+
+
+
+	m_sClient = socket(AF_INET,SOCK_STREAM,IPPROTO_TCP);
+	if(INVALID_SOCKET == m_sClient)
+	{
+		WSACleanup();
+
+
+
+#ifdef _DEBUG
+		MyWriteConsole(_T("socket error"));
+#endif
+
+
+
+		return FALSE;
+	}
+	SOCKADDR_IN ServerAddr;
+	ServerAddr.sin_port = htons(port);
+	ServerAddr.sin_family = AF_INET;
+	///×ª»»
+	int len = CCommonConvert::CStringToChar(IP,NULL);
+	char* aIP = new char[len+1]; 
+	ZeroMemory(aIP,len+1);
+	CCommonConvert::CStringToChar(IP,aIP);
+	////////////////////////////////////////////
+	ServerAddr.sin_addr.S_un.S_addr = inet_addr(aIP);
+	delete [] aIP;
+
+
+#ifdef _DEBUG
+	CComputeFuncationTime connectTime;
+	connectTime.SetStartTime(clock());
+#endif
+
+
+	if(SOCKET_ERROR==connect(m_sClient,(SOCKADDR*)&ServerAddr,
+		sizeof(ServerAddr)))
+	{
+
+#ifdef _DEBUG
+		MyWriteConsole(_T("connect error"));
+#endif
+
+		closesocket(m_sClient);
+		return FALSE;
+	}
+
+
+#ifdef _DEBUG
+	connectTime.SetFinshTime(clock());
+	double connDur = connectTime.GetDuration();
+	CString strConDur;
+	strConDur.Format(_T("conntime:%f"),connDur);
+	MyWriteConsole(strConDur);
+#endif
+
+
+	//·¢ËÍ
+#ifdef _DEBUG
+	CComputeFuncationTime sendTime;
+	sendTime.SetStartTime(clock());
+#endif
+
+	
+	
+
+
+
+	setsockopt(m_sClient,SOL_SOCKET,SO_SNDTIMEO,(char *)&m_nTimeOut,sizeof(UINT));
+	
+	int actSendSize = 0;
+	while(true)
+	{
+		int tempSize = send(m_sClient,buf,size,0);
+		if(tempSize == SOCKET_ERROR)
+		{
+#ifdef _DEBUG
+			MyWriteConsole(_T("send failed"));
+#endif
+			closesocket(m_sClient);
+			return FALSE;
+		}
+		else
+		{
+			actSendSize += tempSize;
+			if(actSendSize >= size)break;
+		}
+	}
+
+
+#ifdef _DEBUG
+	sendTime.SetFinshTime(clock());
+	double durSendTime = sendTime.GetDuration();
+	CString strSendTime;
+	strSendTime.Format(_T("sendTime:%f"),durSendTime);
+	MyWriteConsole(strSendTime);
+#endif
+
+
+	
+	closesocket(m_sClient);
+	return TRUE;
+}

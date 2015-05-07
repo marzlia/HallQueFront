@@ -70,6 +70,7 @@ typedef struct _tagShowMsgTime
 	UINT ComId;	//综合屏地址
 	int	iWndid;	//窗口ID
 	UINT time;
+	CString localIP;//同频IP地址
 }ShowMsgTime,*LPSHOWMSGTIME;
 
 class SoundPlay
