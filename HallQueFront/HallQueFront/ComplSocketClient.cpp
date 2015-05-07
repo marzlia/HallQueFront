@@ -405,6 +405,12 @@ BOOL CComplSocketClient::SendData(USHORT port,CString IP,char buf[],int size)
 	MyWriteConsole(strSendTime);
 #endif
 
+// 	char recvBuf[MAXRECVBUF+1]={0};
+// 	setsockopt(m_sClient,SOL_SOCKET,SO_RCVTIMEO,(char *)&m_nTimeOut,sizeof(UINT));
+// 	
+// 	memset(recvBuf,0,MAXRECVBUF+1);
+// 	int actRecvSize = recv(m_sClient,recvBuf,MAXRECVBUF,0);
+// 	std::string recvTemp(recvBuf);
 
 	
 	closesocket(m_sClient);

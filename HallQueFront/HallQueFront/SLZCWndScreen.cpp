@@ -570,12 +570,23 @@ BOOL SLZCWndScreen::SendDataToThroughScreen(const CString& str,int address,int c
 	CDoComInOut* pComInOut = CDoComInOut::GetInstance();
 	pComInOut->AddWriteComMsg(pMsg);
 
+	BOOL flag = FALSE;
 	if(!localIp.IsEmpty())//TCP发送
 	{
 		CComplSocketClient Client;
-		Client.SendData(1024,localIp,buf,length);
+		flag = Client.SendData(1024,localIp,buf,length);
+#ifdef _DEBUG
+		if(flag)
+		{
+			MyWriteConsole(_T("发送通屏消息成功"));
+		}
+		else
+		{
+			MyWriteConsole(_T("发送同频消息失败"));
+		}
+#endif
 	}
-	return TRUE;
+	return flag;
 }
 
 int SLZCWndScreen::FindChannelWidth(int address,int channel,int& height)
@@ -630,7 +641,9 @@ DWORD WINAPI SLZCWndScreen::DoThrWndMsgThread(LPVOID pParam)
 			pThis->m_list_sendThrMsg.pop_front();
 			pThis->m_ThrWndMutex.Unlock();
 //			WaitForSingleObject(pThis->m_hDoWndScreenMsgThread,3);
-
+#ifdef _DEBUG
+			MyWriteConsole(_T("通屏信息") + msg.msg);
+#endif
 			pThis->SendDataToThroughScreen(msg.msg,msg.address,msg.channel,msg.localIp);
 		}
 	}
