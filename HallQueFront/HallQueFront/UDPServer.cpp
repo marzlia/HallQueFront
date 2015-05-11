@@ -153,6 +153,7 @@ DWORD WINAPI CUDPServer::WorkThread(LPVOID pParam)
 			CString wQueSerialID;
 			theApp.m_Controller.GetQueSerialIDByManQueNum(wQueSerialID,wQueManNum);
 			theApp.m_pView->ShowWaitNum(wQueSerialID,nWaitNum);
+//			theApp.m_Controller.m_pCallThread->ShowCallerWaitNum(wQueSerialID);
 		}
 	}
 	Sleep(100);

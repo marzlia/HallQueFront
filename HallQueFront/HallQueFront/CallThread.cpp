@@ -9,6 +9,7 @@
 #include "ComputeFuncationTime.h"
 #include "ComplSocketClient.h"
 #include "DealInterMsg.h"
+#include "UDPBrodcast.h"
 
 
 extern void MyWriteConsole(CString str);
@@ -385,6 +386,8 @@ void CCallThread::OnCall(CallerCmd& callerCmd)
  			m_pShortMsg->ClearSendBox();
  			m_pShortMsg->SendMsg(data.GetPhoneNum(),data.GetSendMsg());
  		}
+
+		
 	}
 	if(theApp.IsLocal())
 		///重新写file，保存没处理（呼叫）的数据
@@ -847,6 +850,8 @@ BOOL CCallThread::ShowCallerWaitNum(const CString& queID,int nWaitNum)
 
 BOOL CCallThread::ShowViewWaitNum(const CString& queserial_id,const SLZData& data,CallerCmd& callerCmd)
 {
+	CString queManNum;
+	theApp.m_Controller.GetManQueNumByQueSerialID(queserial_id,queManNum);
 	if(theApp.m_logicVariables.IsOpenInterNum)
 	{
 		if(theApp.m_logicVariables.strInterIP[0] == '\0')//主机
@@ -856,8 +861,7 @@ BOOL CCallThread::ShowViewWaitNum(const CString& queserial_id,const SLZData& dat
 		else//客户机
 		{
 			CComplSocketClient client;
-			CString queManNum;
-			theApp.m_Controller.GetManQueNumByQueSerialID(queserial_id,queManNum);
+			
 			string sendMsg,recvMsg;
 			int actRecvSize = 0;
 			CDealInterMsg::ProduceSendInNumMsg(queManNum,sendMsg);
@@ -895,6 +899,14 @@ Normal:
 		wStrWaitNum.Format(_T("%d"),nWaitNum);
 		CString carriedData = data.GetQueueNumber() + _T(" ") + wStrWaitNum;
 		callerCmd.SetCarriedData(carriedData);
+
+		//广播人数
+		CUDPBrodcast brodcast;
+		string retMsg;
+		CDealInterMsg::ProduceBrodcastRetInNumMsg(queManNum,nWaitNum,retMsg);
+		CString wRetMsg(retMsg.c_str());
+		brodcast.BroadCast(wRetMsg);
+		
 		return TRUE;
 	}
 	return FALSE;

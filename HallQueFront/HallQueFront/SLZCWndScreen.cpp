@@ -5,8 +5,8 @@
 #include "ComplSocketClient.h"
 #include "ComputeFuncationTime.h"
 #include "DoComInOut.h"
-#include "ComplSocketClient.h"
-
+//#include "ComplSocketClient.h"
+#include "UDPBrodcast.h"
 
 //SLZCWndScreen* SLZCWndScreen::m_pInstance=NULL;//new SLZCWndScreen;
 extern void MyWriteConsole(CString str);
@@ -573,8 +573,8 @@ BOOL SLZCWndScreen::SendDataToThroughScreen(const CString& str,int address,int c
 	BOOL flag = FALSE;
 	if(!localIp.IsEmpty())//TCP·¢ËÍ
 	{
-		CComplSocketClient Client;
-		flag = Client.SendData(1024,localIp,buf,length);
+		CUDPBrodcast Client;
+		flag = Client.SendData(localIp,buf,length);
 #ifdef _DEBUG
 		if(flag)
 		{
