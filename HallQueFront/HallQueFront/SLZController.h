@@ -28,6 +28,7 @@
 using namespace std;
 
 class CInterNumSocketServer; 
+class CUDPServer;
 
 class SLZController//处理整个数组逻辑类           
 {
@@ -160,6 +161,11 @@ private:
 private:
 	CInterNumSocketServer* m_pInterNumServer;
 	BOOL InitInterNumServer();
+
+
+	CUDPServer* m_pUDPServer;
+	void InitUDPServer();
+
 	
 	CMutex m_mtModifyQueLock;
 public:

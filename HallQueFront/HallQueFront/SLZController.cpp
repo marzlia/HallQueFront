@@ -1,9 +1,5 @@
 #include "StdAfx.h"
 #include "SLZController.h"
-//#include "SLZCallerData.h"
-//#include "SLZCardReader.h"
-//#include "SLZCCaller.h"
-//#include "SLZPrinter.h"
 #include "SLZCEvaluator.h"
 #include "HallQueFront.h"
 #include "CommonConvert.h"
@@ -17,6 +13,8 @@
 #include "InterNumSocketServer.h"
 #include "ComplSocketClient.h"
 #include "DealInterMsg.h"
+#include "UDPServer.h"
+#include "UDPBrodcast.h"
 
 extern  void MyWriteConsole(CString str); 
 
@@ -35,6 +33,7 @@ SLZController::SLZController(void)
 , m_pAlarmToCaller(NULL)
 , m_pFinshQueData(NULL)
 , m_pInterNumServer(NULL)
+, m_pUDPServer(NULL)
 {
 	m_print.Start();
 	m_infofile_path = m_convert.GetExeFullFilePath();
@@ -236,10 +235,13 @@ BOOL SLZController::Start()
 	{
 		return FALSE;
 	}
-	m_pAlarmToCaller = AfxBeginThread(CountToCallerAlarm,this,0,0,0,NULL);
-	if(!m_pAlarmToCaller)
+	if(theApp.IsLocal())
 	{
-		return FALSE;
+		m_pAlarmToCaller = AfxBeginThread(CountToCallerAlarm,this,0,0,0,NULL);
+		if(!m_pAlarmToCaller)
+		{
+			return FALSE;
+		}
 	}
 
 	//呼叫线程开始
@@ -255,6 +257,8 @@ BOOL SLZController::Start()
 
 	//初始化联机取号服务器
 	InitInterNumServer();
+	//初始化UDP
+	InitUDPServer();
 
 	return TRUE;
 }
@@ -283,6 +287,26 @@ BOOL SLZController::InitInterNumServer()
 		}
 	}
 	return TRUE;
+}
+
+void SLZController::InitUDPServer()
+{
+	if(theApp.IsLocal())
+	{
+		if(m_pUDPServer)
+		{
+			delete m_pUDPServer;
+			m_pUDPServer = NULL;
+		}
+	}
+	else
+	{
+		if(!m_pUDPServer)
+		{
+			m_pUDPServer = new CUDPServer(&m_windowTable);
+			m_pUDPServer->Start();
+		}
+	}
 }
 
 // void SLZController::InitThroughScreen()
@@ -621,6 +645,25 @@ BOOL SLZController::ReFlushSysLogicVarlibles()
 	SetCursor(LoadCursor(NULL,IDC_ARROW));
 
 	flag = InitInterNumServer();//初始化联机取号服务器
+
+	InitUDPServer();
+
+	if(theApp.IsLocal())
+	{
+		if(!m_pAlarmToCaller)
+		{
+			m_pAlarmToCaller = AfxBeginThread(CountToCallerAlarm,this,0,0,0,NULL);
+		}
+	}
+	else
+	{
+		if(m_pAlarmToCaller)
+		{
+			TerminateThread(m_pAlarmToCaller->m_hThread,0);
+			delete m_pAlarmToCaller;
+			m_pAlarmToCaller = NULL;
+		}
+	}
 
 	return flag;
 }
@@ -997,21 +1040,21 @@ UINT SLZController::CountToCallerAlarm(LPVOID pParam)
 			{
 				pThis->m_pInlineQueData->GetAllBussCount(queID,&count);
 			}
-			else
-			{
-				CComplSocketClient client;
-				CString queManNum;
-				theApp.m_Controller.GetManQueNumByQueSerialID(queID,queManNum);
-				string sendMsg,recvMsg;
-				int actRecvSize = 0;
-				CDealInterMsg::ProduceSendInNumMsg(queManNum,sendMsg);
-				if(client.SendData(INTERPORT,theApp.m_logicVariables.strInterIP,
-					sendMsg,sendMsg.size(),recvMsg,actRecvSize) && actRecvSize)
-				{
-					//CDealInterMsg::AnaRetInterMsg(recvMsg,&iQueNum,pInlineNum);
-					CDealInterMsg::AnaRetInNumMsg(recvMsg,&count);
-				}
-			}
+// 			else
+// 			{
+// 				CComplSocketClient client;
+// 				CString queManNum;
+// 				theApp.m_Controller.GetManQueNumByQueSerialID(queID,queManNum);
+// 				string sendMsg,recvMsg;
+// 				int actRecvSize = 0;
+// 				CDealInterMsg::ProduceSendInNumMsg(queManNum,sendMsg);
+// 				if(client.SendData(INTERPORT,theApp.m_logicVariables.strInterIP,
+// 					sendMsg,sendMsg.size(),recvMsg,actRecvSize) && actRecvSize)
+// 				{
+// 					//CDealInterMsg::AnaRetInterMsg(recvMsg,&iQueNum,pInlineNum);
+// 					CDealInterMsg::AnaRetInNumMsg(recvMsg,&count);
+// 				}
+// 			}
 			std::map<CString,alarmStatus>::iterator alarmItera;
 			alarmItera = pThis->m_map_alarmStatus.find(queID);
 			if(alarmItera!=pThis->m_map_alarmStatus.end())//找到了
@@ -1063,6 +1106,18 @@ UINT SLZController::CountToCallerAlarm(LPVOID pParam)
 							callerData.SetCallerId(window.GetCallerId());
 							callerData.SetCmdType(callerCmdShowAlarm);
 							pThis->m_pCaller->AddWriteCallerData(callerData);
+							////////////////////////
+							
+							if(theApp.IsLocal())
+							{
+								CUDPBrodcast brodcast;
+								CString wQueManNum;
+								string aAlterMsg;
+								pThis->GetManQueNumByQueSerialID(queArrary[j],wQueManNum);
+								CDealInterMsg::ProduceRetAlertCallerMsg(wQueManNum,aAlterMsg);
+								CString wAlterMsg(aAlterMsg.c_str());
+								brodcast.BroadCast(wAlterMsg);
+							}
 							break;
 						}
 					}
@@ -1072,7 +1127,7 @@ UINT SLZController::CountToCallerAlarm(LPVOID pParam)
 			}
 		}
 		pThis->m_mtAlarm.Unlock();
-		Sleep(800);
+		Sleep(500);
 	}
 }
 
@@ -1901,6 +1956,17 @@ void SLZController::TakeViewNum(const CString& queserial_id)
 				else
 					m_pCallThread->ShowCallerWaitNum(data.GetBussinessType(),inlineNum);
 				
+				if(theApp.IsLocal())
+				{
+					CString wQueManNum;
+					GetManQueNumByQueSerialID(queserial_id,wQueManNum);
+					string aRetMsg;
+					CDealInterMsg::ProduceBrodcastRetInNumMsg(wQueManNum,inlineNum,aRetMsg);
+					CString wRetMsg(aRetMsg.c_str());
+					CUDPBrodcast brodcast;
+					brodcast.BroadCast(wRetMsg);
+				}
+
 				ReturnMainFrame(data);//流程结束
 				break;
 			}

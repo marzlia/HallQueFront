@@ -601,3 +601,78 @@ void CDealInterMsg::StringToTime(const string& strTime,CTime& time)
 	CTime temptime(nYear,nMonth,nDay,nHour,nMin,nSec);
 	time = temptime;
 }
+
+
+void CDealInterMsg::ProduceRetAlertCallerMsg(const CString& queManNum,string& retAlertMsg)
+{
+	CString msg = _T("<?xml version=\"1.0\" encoding=\"UTF-8\"?><dataPacket version=\"1.0\">");
+	msg.Append(_T("<headCode>retAlertMsg</headCode>"));
+	msg.AppendFormat(_T("<queManNum>%s</queManNum>"),queManNum);
+
+	CStringA a_retPacket(msg.GetBuffer(0));
+	msg.ReleaseBuffer(0);
+	retAlertMsg = a_retPacket.GetBuffer(0);
+	a_retPacket.ReleaseBuffer(0);
+}
+
+
+BOOL CDealInterMsg::AnaRetAlterCallerMsg(const string& retAlterMsg,CString& queManNum)
+{
+	string::size_type pos1 = retAlterMsg.find("<headCode>");
+	string::size_type pos2 = retAlterMsg.find("</headCode>");
+	if(pos1 == retAlterMsg.npos || pos2 == retAlterMsg.npos)
+		return FALSE;
+
+	string headCode = retAlterMsg.substr(pos1 + strlen("<headCode>"),pos2 - pos1 - strlen("<headCode>"));
+	if(headCode != "retAlertMsg")
+		return FALSE;
+
+	string aQueManNum;
+	BOOL flag = GetMsgData(retAlterMsg,enumSlzDataqueManNum,aQueManNum);
+	CString wQueManNum(aQueManNum.c_str());
+	queManNum = wQueManNum;
+	return flag;
+}
+
+void CDealInterMsg::ProduceBrodcastRetInNumMsg(const CString& queManNum,UINT inlineNum,string& retBrodcastNumMsg)
+{
+	CString msg = _T("<?xml version=\"1.0\" encoding=\"UTF-8\"?><dataPacket version=\"1.0\">");
+	msg.Append(_T("<headCode>retBrodcastNumMsg</headCode>"));
+	msg.AppendFormat(_T("<queManNum>%s</queManNum>"),queManNum);
+	msg.AppendFormat(_T("<inlineNum>%d</inlineNum>"),inlineNum);
+	msg.Append(_T("</dataPacket>"));
+
+	CStringA a_retPacket(msg.GetBuffer(0));
+	msg.ReleaseBuffer(0);
+	retBrodcastNumMsg = a_retPacket.GetBuffer(0);
+	a_retPacket.ReleaseBuffer(0);
+}
+
+BOOL CDealInterMsg::AnaRetBrodcastNumMsg(CString& queManNum,UINT* pInlineNum,string& retBrodcastNumMsg)
+{
+	string::size_type pos1 = retBrodcastNumMsg.find("<headCode>");
+	string::size_type pos2 = retBrodcastNumMsg.find("</headCode>");
+	if(pos1 == retBrodcastNumMsg.npos || pos2 == retBrodcastNumMsg.npos)
+		return FALSE;
+
+	string headCode = retBrodcastNumMsg.substr(pos1 + strlen("<headCode>"),pos2 - pos1 - strlen("<headCode>"));
+	if(headCode != "retBrodcastNumMsg")
+		return FALSE;
+	
+	string aQueManNum;
+	BOOL flag = GetMsgData(retBrodcastNumMsg,enumSlzDataqueManNum,aQueManNum);
+	CString wQueManNum(aQueManNum.c_str());
+	queManNum = wQueManNum;
+
+	if(pInlineNum != NULL)
+	{
+		pos1 = retBrodcastNumMsg.find("<inlineNum>");
+		pos2 = retBrodcastNumMsg.find("</inlineNum>");
+		if(pos1 == retBrodcastNumMsg.npos || pos2 == retBrodcastNumMsg.npos)
+			return FALSE;
+
+		string inlineNum = retBrodcastNumMsg.substr(pos1 + strlen("<inlineNum>"),pos2 - pos1 - strlen("<inlineNum>"));
+		*pInlineNum = atoi(const_cast<char*>(inlineNum.c_str()));
+	}
+	return flag;
+}

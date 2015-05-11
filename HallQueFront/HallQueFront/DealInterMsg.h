@@ -34,6 +34,8 @@ public:
 	static void ProduceRetInNumMsg(UINT inlineNum,string& retInlineMsg);//产生联机取号返回排队人数报文
 	static void ProduceSendCallMsg(const CStringArray& queManNumArray,string& retCallMsg,const CString& organId);//呼叫时联机取号产生的消息
 	static void ProduceRetCallMsg(BOOL isSucced,string& retMsg,const SLZData* pData);//呼叫联机取号信息返回
+	static void ProduceRetAlertCallerMsg(const CString& queManNum,string& retAlertMsg);//联机取号时，让客户机呼叫器发声
+	static void ProduceBrodcastRetInNumMsg(const CString& queManNum,UINT inlineNum,string& retBrodcastNumMsg);//广播排队人数
 public:
 	static BOOL AnaRetInterMsg(const string& retMsg,SLZData* pData,UINT* pInLineNum=NULL);//分析返回的联机取号报文，得到当前队列的最大号和排队人数
 	static BOOL AnaRetInNumMsg(const string& retMsg,UINT* pInlineNum);//分析返回的当前排队人数的报文,得到当前队列排队人数
@@ -45,6 +47,10 @@ public:
 	static BOOL AnaSendCallMsg(const string& retSendMsg,CStringArray& queManNumArray,CString& organId);//分析发送的呼叫联机取号产生的消息
 
 	static BOOL AnaRetCallMsg(const string& retMsg,BOOL* pIsSucced,SLZData* pData);//分析返回的联机取号呼叫产生的消息/报文
+
+	static BOOL AnaRetAlterCallerMsg(const string& retAlterMsg,CString& queManNum);//分析返回的呼叫器发声消息
+
+	static BOOL AnaRetBrodcastNumMsg(CString& queManNum,UINT* pInlineNum,string& retBrodcastNumMsg);//分析广播人数数据
 private:
 	static BOOL GetMsgData(const string& msg,SlzDataType dataType,string& data);
 	static void StringToTime(const string& strTime,CTime& time);

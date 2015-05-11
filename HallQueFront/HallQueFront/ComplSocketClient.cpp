@@ -306,8 +306,6 @@ BOOL CComplSocketClient::AppendListMsg()
 BOOL CComplSocketClient::SendData(USHORT port,CString IP,char buf[],int size)
 {
 
-
-
 	m_sClient = socket(AF_INET,SOCK_STREAM,IPPROTO_TCP);
 	if(INVALID_SOCKET == m_sClient)
 	{
