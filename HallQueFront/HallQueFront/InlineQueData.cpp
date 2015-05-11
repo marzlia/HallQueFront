@@ -55,6 +55,7 @@ BOOL CInlineQueData::GetInlineQueData(const UINT iWinId,
 			{
 				if(arrStrQueId[i].Compare(data.GetBussinessType()) == 0)
 				{
+					/*
 					if(!data.GetIsLocalData())//客户机产生的数据
 					{
 						if( theApp.IsLocal())//主机
@@ -84,6 +85,11 @@ BOOL CInlineQueData::GetInlineQueData(const UINT iWinId,
 						}
 						
 					}
+					*/
+					bFind = TRUE;
+					rdata = data;
+					m_lstInlineQue.RemoveAt(posLast);
+					break;
 				}
 			}
 			else//设置了指定窗口优先呼叫
