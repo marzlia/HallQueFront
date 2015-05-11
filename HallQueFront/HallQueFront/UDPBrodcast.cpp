@@ -49,7 +49,7 @@ BOOL CUDPBrodcast::BroadCast(const CString& msg)
 	char* buf = new char[size + 1];
 	CCommonConvert::CStringToChar(msg,buf);
 	
-	int len = sendto(sockClient,buf,10,0,(SOCKADDR*)&addrin,sizeof(SOCKADDR));
+	int len = sendto(sockClient,buf,size,0,(SOCKADDR*)&addrin,sizeof(SOCKADDR));
 	if(len == SOCKET_ERROR)
 	{
 		int errcode = WSAGetLastError();

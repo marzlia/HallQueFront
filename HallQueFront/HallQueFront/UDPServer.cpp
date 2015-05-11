@@ -90,12 +90,12 @@ DWORD WINAPI CUDPServer::WorkThread(LPVOID pParam)
 			(sockaddr *)&addrSender, &addrSenderLen );
 		if( nError == SOCKET_ERROR )
 		{
-#ifdef _DEBUG
-			int i_errcode = WSAGetLastError();
-			CString str = _T("recvfrom error:");
-			str.AppendFormat(_T("%d"),i_errcode);
-			MyWriteConsole(str);
-#endif
+// #ifdef _DEBUG
+// 			int i_errcode = WSAGetLastError();
+// 			CString str = _T("recvfrom error:");
+// 			str.AppendFormat(_T("%d"),i_errcode);
+// 			MyWriteConsole(str);
+// #endif
 			continue;
 		}
 #ifdef _DEBUG

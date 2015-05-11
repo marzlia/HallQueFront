@@ -350,10 +350,6 @@
 				>
 			</File>
 			<File
-				RelativePath=".\MySocketUDP.cpp"
-				>
-			</File>
-			<File
 				RelativePath=".\MyString.cpp"
 				>
 			</File>
@@ -801,10 +797,6 @@
 			</File>
 			<File
 				RelativePath=".\MyListBox.h"
-				>
-			</File>
-			<File
-				RelativePath=".\MySocketUDP.h"
 				>
 			</File>
 			<File
