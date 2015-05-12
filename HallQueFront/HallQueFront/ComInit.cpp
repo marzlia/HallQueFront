@@ -137,7 +137,7 @@ int CComInit::OpenWndScreen(int ncom)
 	m_cWndComm.Format(_T("%d"),ncom);
 	if(m_hWndScr != INVALID_HANDLE_VALUE)
 	{
-		CloseHandle(m_hCaller);
+		CloseHandle(m_hWndScr);
 		m_hWndScr=INVALID_HANDLE_VALUE;
 	}
 	if(ncom== 0) return 0;
