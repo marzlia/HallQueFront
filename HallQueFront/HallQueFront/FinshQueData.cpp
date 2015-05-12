@@ -170,6 +170,8 @@ BOOL CFinshQueData::ReFlushListShortMsg()
 
 BOOL CFinshQueData::SendMsgToPhone(const SLZData& data)
 {
+	CShortMsgModem* pMsgModem = CShortMsgModem::GetInstance();
+	pMsgModem->ClearSendBox();
 	BOOL flag = FALSE;
 	list<CJudgeShortMsg*>::const_iterator itera = m_list_shortmsg.begin();
 	for(itera;itera!=m_list_shortmsg.end();itera++)
@@ -183,8 +185,7 @@ BOOL CFinshQueData::SendMsgToPhone(const SLZData& data)
 		CString staffName = theApp.m_Controller.GetStaffNameByID(data.GetStaffId());
 		strShortMsg.Replace(_T("[员工姓名]"),staffName);
 		strShortMsg.Replace(_T("[员工工号]"),data.GetStaffId());
-		CShortMsgModem* pMsgModem = CShortMsgModem::GetInstance();
-		pMsgModem->ClearSendBox();
+		
 		flag = pMsgModem->SendMsg(pMsg->GetPhoneNum(),strShortMsg);
 	}
 	return flag;
