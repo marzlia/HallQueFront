@@ -211,7 +211,7 @@ DWORD WINAPI SLZCardReader::ReadCard(LPVOID pParam)
 		CComInit* pComInit = CComInit::GetInstance();
 		if(pComInit->m_hComReadCard!=INVALID_HANDLE_VALUE)
 		{	
-			ClearCommError(pComInit->m_hComWndScreen,&dwErrorFlags,&ComStat);
+			ClearCommError(pComInit->m_hComReadCard,&dwErrorFlags,&ComStat);
 			Sleep(300);
 			bres=ReadFile(pComInit->m_hComReadCard,buf,MAX_CARD_NO,&dwReaded,&osRead); //从设备中读数据
 			std::string strbuf((char*)buf);

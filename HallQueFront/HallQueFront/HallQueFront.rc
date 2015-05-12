@@ -447,8 +447,8 @@ BEGIN
     RTEXT           "远程服务器端口",IDC_STATIC,18,97,49,8
     GROUPBOX        "远程服务器",IDC_STATIC,12,58,201,82
     GROUPBOX        "串口",IDC_STATIC,219,58,120,82
-    LTEXT           "呼叫器/屏串口",IDC_STATIC,226,73,45,8
-    LTEXT           "刷卡器串口",IDC_STATIC,226,97,35,8
+    LTEXT           "呼叫器串口",IDC_STATIC,226,73,35,8
+    LTEXT           "屏串口",IDC_STATIC,226,97,22,8
     CONTROL         "自动关机",IDC_CHECK_CLOSECMP,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,23,167,41,13
     CONTROL         "系统清零",IDC_CHECK_CLEARDATA,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,23,191,41,13
     GROUPBOX        "逻辑选项",IDC_STATIC,178,151,161,172

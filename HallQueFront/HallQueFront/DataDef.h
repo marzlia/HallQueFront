@@ -132,7 +132,9 @@ public:
 	_tagWriteComMsg(){
 		memset(buf,0,DATABUFLEN);
 		length = 0;
+		messagetype = 0;
 	}
+	int messagetype;//0为屏数据1为呼叫器数据
 	int length;
 	char buf[DATABUFLEN];
 }WriteComMsg;

@@ -44,23 +44,23 @@ DWORD WINAPI CDoComInOut::ReadCallerThread(LPVOID pParam)
 //		OVERLAPPED m_osRead;
 //		memset(&m_osRead,0,sizeof(OVERLAPPED));
 		CComInit* pComInit = CComInit::GetInstance();
-		if(pComInit->m_hComWndScreen
+		if(pComInit->m_hCaller
 			!=INVALID_HANDLE_VALUE)
 		{	
 			//////考虑枷锁
-			ClearCommError(pComInit->m_hComWndScreen,&dwErrorFlags,&ComStat);
+			ClearCommError(pComInit->m_hCaller,&dwErrorFlags,&ComStat);
 			Sleep(100);
-			bres=ReadFile(pComInit->m_hComWndScreen,buf,1024,&dwReaded,&pComInit->m_read_os);
+			bres=ReadFile(pComInit->m_hCaller,buf,1024,&dwReaded,&pComInit->m_read_os);
 			if(!bres)
 			{
 				if(GetLastError()==ERROR_IO_PENDING)
 				{
-					while(!GetOverlappedResult(pComInit->m_hComWndScreen, &pComInit->m_read_os,&dwReaded,TRUE))
+					while(!GetOverlappedResult(pComInit->m_hCaller, &pComInit->m_read_os,&dwReaded,TRUE))
 					{
 						dwErrorFlags = GetLastError();
 						if(dwErrorFlags == ERROR_IO_INCOMPLETE) continue;
 						else{
-							ClearCommError(pComInit->m_hComWndScreen,&dwErrorFlags, &ComStat ) ;
+							ClearCommError(pComInit->m_hCaller,&dwErrorFlags, &ComStat ) ;
 							break;
 						}
 					}
@@ -123,6 +123,7 @@ DWORD WINAPI CDoComInOut::ReadCallerThread(LPVOID pParam)
  						memset(pMsg->buf,0,DATABUFLEN);
 						memcpy(pMsg->buf,evabuf,8);
 						pMsg->length = 8;
+						pMsg->messagetype = 1;//数据类型
 						pThis->AddWriteComMsg(pMsg);
 						WaitForSingleObject(pThis->m_hWriteComThread,80);
 						//判断评价超时并改值(当前一次评价没结束时，（同一个评价器）
@@ -138,6 +139,7 @@ DWORD WINAPI CDoComInOut::ReadCallerThread(LPVOID pParam)
 						memset(pMsg->buf,0,DATABUFLEN);
 						memcpy(pMsg->buf,buf,dwReaded);
 						pMsg->length = dwReaded;
+						pMsg->messagetype = 1;
 						pThis->AddWriteComMsg(pMsg);
 						WaitForSingleObject(pThis->m_hWriteComThread,80);
 						pThis->m_pSlzCaller->DoReadMsg(dwReaded,buf);
@@ -203,39 +205,50 @@ DWORD WINAPI CDoComInOut::WriteComThread(LPVOID pParam)
 			strLength.Format(_T("msg length:%d"),pMsg->length);
 			MyWriteConsole(strLength);
 #endif
-//			OVERLAPPED osWrite;
-//			memset(&osWrite,0,sizeof(osWrite));
-//			do
-//			{
-				DWORD dwTrans;
-				BOOL bWriteStat = WriteFile(pComInit->m_hComWndScreen,pMsg->buf,
+
+			DWORD dwTrans;
+			if(pMsg->messagetype == 0)//屏数据
+			{
+				BOOL bWriteStat = WriteFile(pComInit->m_hWndScr,pMsg->buf,
 					pMsg->length,NULL,&pComInit->m_write_os);
 				if(!bWriteStat)
 				{
 					if(GetLastError()==ERROR_IO_PENDING)
 					{	 
-						while(!GetOverlappedResult(pComInit->m_hComWndScreen,&pComInit->m_write_os,&dwTrans,TRUE)){
+						while(!GetOverlappedResult(pComInit->m_hWndScr,&pComInit->m_write_os,&dwTrans,TRUE)){
 							dwError = GetLastError();
 							if(dwError == ERROR_IO_INCOMPLETE){
 								continue;
 							}
 							else{
-								 ClearCommError(pComInit->m_hComWndScreen, &dwErrorFlags, &ComStat ) ;
+								 ClearCommError(pComInit->m_hWndScr, &dwErrorFlags, &ComStat ) ;
 							}
 						}
 					}
 				}
-				
-// #ifdef _DEBUG
-// 				CString strCount;
-// 				strCount.Format(_T("dwAcWrite:%d"),dwAcWrite);
-// 				MyWriteConsole(strCount);
-// #endif
-//			}while(dwAcWrite < (UINT)pMsg->length);
-			
-// 			PurgeComm( pComInit->m_hComWndScreen, PURGE_TXABORT | PURGE_RXABORT | PURGE_TXCLEAR
-// 				| PURGE_RXCLEAR );
+			}
+			else if(pMsg->messagetype == 1)
+			{
+				BOOL bWriteStat = WriteFile(pComInit->m_hCaller,pMsg->buf,
+					pMsg->length,NULL,&pComInit->m_write_os);
+				if(!bWriteStat)
+				{
+					if(GetLastError()==ERROR_IO_PENDING)
+					{	 
+						while(!GetOverlappedResult(pComInit->m_hCaller,&pComInit->m_write_os,&dwTrans,TRUE)){
+							dwError = GetLastError();
+							if(dwError == ERROR_IO_INCOMPLETE){
+								continue;
+							}
+							else{
+								ClearCommError(pComInit->m_hCaller, &dwErrorFlags, &ComStat ) ;
+							}
+						}
+					}
+				}
+			}
 			delete pMsg;
+			/////////////////////////////
 		}
 	}
 	return 0;

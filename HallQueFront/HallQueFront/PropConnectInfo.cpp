@@ -162,9 +162,10 @@ BOOL CPropConnectInfo::OnInitDialog()
 	m_ed_timeOut.SetWindowText(cTimeOut);
 
 	///////////////////////////////////////////
-	CString readCardCom = m_pComInit->GetCardComm();
-	CString callerCom = m_pComInit->GetWndComm();
+	CString WndCom = m_pComInit->GetWndComm();
+	CString callerCom = m_pComInit->GetCallerComm();
 	CString MsgCom = m_pComInit->GetMsgComm();
+
 	m_com_caller.AddString(_T("0"));
 	m_com_readcard.AddString(_T("0"));
 	m_com_msg.AddString(_T("0"));
@@ -195,7 +196,7 @@ BOOL CPropConnectInfo::OnInitDialog()
 	{
 		CString content;
 		m_com_readcard.GetLBText(i,content);
-		if(readCardCom == content)
+		if(WndCom == content)
 		{
 			m_com_readcard.SetCurSel(i);
 			break;
@@ -332,12 +333,12 @@ void CPropConnectInfo::OnCbnSelchangeComCaller()
 	{
 		return;
 	}
-	CString wndScreenCom=_T("");
-	m_com_caller.GetLBText(index,wndScreenCom);
-	int i_wndsScreenCom=0;
-	convert.CStringToint(i_wndsScreenCom,wndScreenCom);
+	CString strCallerCom=_T("");
+	m_com_caller.GetLBText(index,strCallerCom);
+	int i_CallerCom=0;
+	convert.CStringToint(i_CallerCom,strCallerCom);
 
-	if(m_pComInit->OpenWndScreen(i_wndsScreenCom) == -1)
+	if(m_pComInit->OpenCaller(i_CallerCom) == -1)
 	{
 		m_com_caller.SetCurSel(0);		
 		MessageBox(_T("呼叫器串口打开失败或被占用"),_T("注意"),MB_OK|MB_ICONINFORMATION);
@@ -355,15 +356,15 @@ void CPropConnectInfo::OnCbnSelchangeComReadcard()
 	{
 		return;
 	}
-	CString readCardCom=_T("");
-	m_com_readcard.GetLBText(index,readCardCom);
-	int i_readCardCom=0;
-	convert.CStringToint(i_readCardCom,readCardCom);
+	CString wndScreenCom=_T("");
+	m_com_readcard.GetLBText(index,wndScreenCom);
+	int i_wndCom=0;
+	convert.CStringToint(i_wndCom,wndScreenCom);
 
-	if(m_pComInit->OpenCardComm(i_readCardCom) == -1)
+	if(m_pComInit->OpenWndScreen(i_wndCom) == -1)
 	{
 		m_com_readcard.SetCurSel(0);
-		MessageBox(_T("刷卡串口打开失败或被占用"),_T("注意"),MB_OK|MB_ICONINFORMATION);
+		MessageBox(_T("屏串口打开失败或被占用"),_T("注意"),MB_OK|MB_ICONINFORMATION);
 	}
 }
 

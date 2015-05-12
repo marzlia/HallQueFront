@@ -509,6 +509,7 @@ DWORD WINAPI SLZCCaller::WriteCallerThread(LPVOID pParam)
 			memset(pMsg->buf,0,textNum);
 			memcpy(pMsg->buf,buf,length);
 			pMsg->length = length;
+			pMsg->messagetype = 1;
 			CDoComInOut* pDoComInOut = CDoComInOut::GetInstance();
 			pDoComInOut->AddWriteComMsg(pMsg);
   			pThis->m_writeCallerLock.Unlock();
@@ -523,12 +524,22 @@ void SLZCCaller::InitHardWareCaller()
 	CComInit* pComInit = CComInit::GetInstance();
 	CString wndCom = pComInit->GetWndComm();
 	int i_wndCom = 0;
-	CCommonConvert convert;
-	convert.CStringToint(i_wndCom,wndCom);
+	
+	CCommonConvert::CStringToint(i_wndCom,wndCom);
 	int re = pComInit->OpenWndScreen(i_wndCom);
 	if(re == -1)
 	{
-		::MessageBox((HWND)AfxGetMainWnd(),_T("呼叫器屏串口打开失败或被占用"),
+		::MessageBox((HWND)AfxGetMainWnd(),_T("屏串口打开失败或被占用"),
+			_T("注意"),MB_OK|MB_ICONINFORMATION);
+	}
+
+	CString strCallerCom = pComInit->GetCallerComm();
+	int i_iCallerCom = 0;
+	CCommonConvert::CStringToint(i_iCallerCom,strCallerCom);
+	re = pComInit->OpenCaller(i_iCallerCom);
+	if(re == -1)
+	{
+		::MessageBox((HWND)AfxGetMainWnd(),_T("呼叫器串口打开失败或被占用"),
 			_T("注意"),MB_OK|MB_ICONINFORMATION);
 	}
 	/////////////////////////////////////////////////////
