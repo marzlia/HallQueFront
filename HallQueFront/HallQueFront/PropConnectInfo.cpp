@@ -7,6 +7,8 @@
 #include "CommonStrMethod.h"
 #include "DoFile.h"
 #include "PropertyShortMsg.h"
+#include "ComplSocketClient.h"
+#include "DealInterMsg.h"
 
 
 
@@ -692,4 +694,14 @@ void CPropConnectInfo::OnCbnSelchangeComboMsg()
 void CPropConnectInfo::OnBnClickedBnTestinternet()
 {
 	// TODO: 在此添加控件通知处理程序代码
+	CComplSocketClient client;
+	CDealInterMsg dealInterMsg;
+	string retMsg;
+	dealInterMsg.ProduceSendInNumMsg(_T(""),retMsg);
+	int actRecvSize = 0;
+	if(client.SendData(INTERPORT,theApp.m_logicVariables.strInterIP,
+		retMsg,retMsg.size(),retMsg,actRecvSize) && actRecvSize)
+	{
+		AfxMessageBox(_T("连接成功"));
+	}
 }
