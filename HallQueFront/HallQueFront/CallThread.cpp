@@ -40,7 +40,7 @@ CCallThread::CCallThread(CInlineQueData& rInlineQueData,
 	m_pShortMsg = CShortMsgModem::GetInstance();
 	pCallThread = this;
 
-	SetTimer(NULL,0,1000,MyDoCountTimeMsg);
+	SetTimer(NULL,0,5000,MyDoCountTimeMsg);
 }
 
 CCallThread::~CCallThread(void)
@@ -945,7 +945,7 @@ void CALLBACK CCallThread::MyDoCountTimeMsg( HWND hwnd, UINT uMsg, UINT idEvent,
 	for(itera;itera != pCallThread->m_list_CountTime.end();++itera)
 	{
 		CountTime* pTime = *itera;
-		pTime->nTimeSec--;
+		pTime->nTimeSec -= 5;
 		if(pTime->nTimeSec <= 0)
 		{
 			CThroughWndScreenInfo wndScreenInfo;
