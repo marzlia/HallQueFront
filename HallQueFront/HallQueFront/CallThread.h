@@ -83,6 +83,8 @@ private:
 	CString ChangeTimeToCstring(int nTimeSec);
 
 	void ClearListCountTime();
+
+	void DeleteCountTimeWindow(UINT uWindowID);
 private:
 	
 	CInlineQueData& m_rInlineQueData;//ее╤с╤сап

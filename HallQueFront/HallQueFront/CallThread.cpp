@@ -399,6 +399,8 @@ void CCallThread::OnCall(CallerCmd& callerCmd)
 	if(theApp.IsLocal())
 		///重新写file，保存没处理（呼叫）的数据
 		theApp.m_Controller.WriteInlineDataToFile();
+
+	DeleteCountTimeWindow(callerCmd.GetWindowId());
 }
 
 void CCallThread::OnRecall(CallerCmd& callerCmd)
@@ -945,7 +947,7 @@ void CALLBACK CCallThread::MyDoCountTimeMsg( HWND hwnd, UINT uMsg, UINT idEvent,
 	for(itera;itera != pCallThread->m_list_CountTime.end();++itera)
 	{
 		CountTime* pTime = *itera;
-		pTime->nTimeSec--;
+		pTime->nTimeSec -= 5;
 		if(pTime->nTimeSec <= 0)
 		{
 			CThroughWndScreenInfo wndScreenInfo;
@@ -1006,4 +1008,20 @@ void CCallThread::ClearListCountTime()
 	}
 
 	m_list_CountTime.clear();
+}
+
+void CCallThread::DeleteCountTimeWindow(UINT uWindowID)
+{
+	list<CountTime*>::const_iterator itera = m_list_CountTime.begin();
+	for(itera;itera != m_list_CountTime.end();++itera)
+	{
+		CountTime* pCountTime = *itera;
+		if(pCountTime->window.GetWindowId() == uWindowID)
+		{
+			m_mtCountTime.Lock();
+			m_list_CountTime.erase(itera);
+			m_mtCountTime.Unlock();
+			break;
+		}
+	}
 }
