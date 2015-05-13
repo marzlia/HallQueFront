@@ -79,12 +79,11 @@ BOOL CUDPBrodcast::SendData(const CString& IP,const char* buf,int len)
 	char* aIp = new char[nNum+1];
 	CCommonConvert::CStringToChar(IP,aIp);
 	
-
 	addrin.sin_addr.S_un.S_addr = inet_addr( aIp );
 	delete [] aIp;
 
-
-
+	u_long nMode = 1; //·Ç×èÈûÄ£Ê½
+	int nError = ioctlsocket( sockClient, FIONBIO, &nMode );
 	int errcode = sendto(sockClient,buf,len,0,(SOCKADDR*)&addrin,sizeof(SOCKADDR));
 	if(errcode == SOCKET_ERROR)
 	{

@@ -107,6 +107,8 @@ typedef struct _tagLogicVariables//系统综合逻辑变量
 	BOOL IsOpenJudgeShortMsg;//是否开启评价器（出现差评时）发送短信到手机
 	BOOL IsOpenInterNum;//是否开启联机取号
 	WCHAR strInterIP[MYBUFLEN];//联机取号服务器ip
+	BOOL IsOpenCountTime;//是否开启倒计时
+	int nTimeMintue;//倒计时时间（分钟）
 }LogicVariables,*pLogicVariables;
 /*
 显示缺纸还是显示等候

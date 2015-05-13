@@ -365,6 +365,9 @@
 #define IDC_ED_INTERPORT                1210
 #define IDC_CHECK5                      1212
 #define IDC_CHECK_INTER                 1212
+#define IDC_CHECK_OPENTIMELEFT          1213
+#define IDC_EDIT1                       1214
+#define IDC_EDIT_TIMELEFT               1214
 #define ID_32771                        32771
 #define ID_32772                        32772
 #define ID_32773                        32773
@@ -434,7 +437,7 @@
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        189
 #define _APS_NEXT_COMMAND_VALUE         32833
-#define _APS_NEXT_CONTROL_VALUE         1213
+#define _APS_NEXT_CONTROL_VALUE         1215
 #define _APS_NEXT_SYMED_VALUE           117
 #endif
 #endif

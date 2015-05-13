@@ -57,8 +57,10 @@ void CPropConnectInfo::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX, IDC_CHECK4, m_check_changePage);
 	DDX_Control(pDX, IDC_COM_PARENTORG, m_combox_parentOrg);
 	DDX_Control(pDX, IDC_ED_INTERIP, m_ed_interIP);
-//	DDX_Control(pDX, IDC_ED_INTERPORT, m_ed_interPort);
+	//	DDX_Control(pDX, IDC_ED_INTERPORT, m_ed_interPort);
 	DDX_Control(pDX, IDC_CHECK_INTER, m_check_inter);
+	DDX_Control(pDX, IDC_EDIT_TIMELEFT, m_ed_countdown);
+	DDX_Control(pDX, IDC_CHECK_OPENTIMELEFT, m_check_countdown);
 }
 
 
@@ -292,6 +294,20 @@ BOOL CPropConnectInfo::OnInitDialog()
 		{
 			m_check_inter.SetCheck(BST_UNCHECKED);
 		}
+
+		if(m_logicVariables.IsOpenCountTime)
+		{
+			m_check_countdown.SetCheck(BST_CHECKED);
+		}
+		else
+		{
+			m_check_countdown.SetCheck(BST_UNCHECKED);
+		}
+
+		CString strTimeMintue;
+		CCommonConvert::intToCString(m_logicVariables.nTimeMintue,strTimeMintue);
+		m_ed_countdown.SetWindowText(strTimeMintue);
+
 		m_ed_interIP.SetWindowText(m_logicVariables.strInterIP);
 		m_ed_organID.SetWindowText(m_logicVariables.strOrganID);
 		m_ed_organName.SetWindowText(m_logicVariables.strOrganNmae);
@@ -552,6 +568,19 @@ BOOL CPropConnectInfo::WriteSysLogicVaribiles()
 	{
 		m_logicVariables.iNumberCallType = 2;
 	}
+
+	if(m_check_countdown.GetCheck() == BST_CHECKED)
+	{
+		m_logicVariables.IsOpenCountTime = TRUE;
+	}
+	else
+	{
+		m_logicVariables.IsOpenCountTime = FALSE;
+	}
+	
+	CString strMintue;
+	m_ed_countdown.GetWindowText(strMintue);
+	CCommonConvert::CStringToint(m_logicVariables.nTimeMintue,strMintue);
 	///////////////////////////////////////////
 	int index = m_combox_parentOrg.GetCurSel();
 	if(index!=CB_ERR)

@@ -14,6 +14,8 @@
 
 extern void MyWriteConsole(CString str);
 
+CCallThread* pCallThread;
+
 CCallThread::CCallThread(CInlineQueData& rInlineQueData,
 						 CCalledQueData& rCalledQueData,
 						 CCallerCmdData& rCallerCmdData,
@@ -36,11 +38,14 @@ CCallThread::CCallThread(CInlineQueData& rInlineQueData,
  , m_staffQueryView(staffQueryView)
 {
 	m_pShortMsg = CShortMsgModem::GetInstance();
+	pCallThread = this;
+
+	SetTimer(NULL,0,1000,MyDoCountTimeMsg);
 }
 
 CCallThread::~CCallThread(void)
 {
-	
+	ClearListCountTime();
 }
 
 BOOL CCallThread::OpenMsgQueue()
@@ -82,6 +87,8 @@ void CCallThread::Run()
 	{
 		Sleep(10);
 	}
+
+	
 }
 
 void CCallThread::DoEvaMsg(const MSG& msg)
@@ -488,6 +495,7 @@ void CCallThread::OnPause(CallerCmd& callerCmd)
 	BOOL flag = m_rInlineQueData.m_rWindowTable.QueryWindowById(winID,Window);
 	if(flag)
 	{
+		
 		CThroughWndScreenInfo wndScreenInfo;
 		for(int i=0;i<Window.m_throughscreen_array.GetCount();i++)
 		{
@@ -498,8 +506,26 @@ void CCallThread::OnPause(CallerCmd& callerCmd)
 			pWnd->AddScreenMsg(msg,wndScreenInfo.GetComScreenId());
 			pWnd->AddThroughScreenMsg(msg,wndScreenInfo.GetPhyId(),wndScreenInfo.GetPipeId(),wndScreenInfo.GetLocalIp());
 		}
+		///////倒计时
+		if(theApp.m_logicVariables.IsOpenCountTime)
+		{
+			CountTime* pTime = new CountTime;
+			pTime->nTimeSec = theApp.m_logicVariables.nTimeMintue * 60;
+			pTime->window = Window;
+			AddCountTime(pTime);
+		}
 		callerCmd.SetSuccess(TRUE);
 	}
+}
+
+
+void CCallThread::AddCountTime(CountTime* pTime)
+{
+	if(pTime == NULL)return;
+
+	m_mtCountTime.Lock();
+	m_list_CountTime.push_back(pTime);
+	m_mtCountTime.Unlock();
 }
 
 void CCallThread::OnResume(CallerCmd& callerCmd)
@@ -912,3 +938,72 @@ Normal:
 	return FALSE;
 }
 
+void CALLBACK CCallThread::MyDoCountTimeMsg( HWND hwnd, UINT uMsg, UINT idEvent, DWORD dwTime )
+{
+	SLZCWndScreen* pWnd = SLZCWndScreen::GetInstance();
+	list<CountTime*>::const_iterator itera = pCallThread->m_list_CountTime.begin();
+	for(itera;itera != pCallThread->m_list_CountTime.end();++itera)
+	{
+		CountTime* pTime = *itera;
+		pTime->nTimeSec--;
+		if(pTime->nTimeSec <= 0)
+		{
+			CThroughWndScreenInfo wndScreenInfo;
+			CString strMsg = _T("恢复办理");
+			for(int i=0;i<pTime->window.m_throughscreen_array.GetCount();i++)
+			{
+				wndScreenInfo = pTime->window.m_throughscreen_array.GetAt(i);
+
+				pWnd->AddScreenMsg(strMsg,wndScreenInfo.GetWndScreenId());
+				pWnd->AddScreenMsg(strMsg,wndScreenInfo.GetComScreenId());
+				pWnd->AddThroughScreenMsg(strMsg,wndScreenInfo.GetPhyId(),wndScreenInfo.GetPipeId(),wndScreenInfo.GetLocalIp());
+			}
+
+			delete pTime;
+			pTime = NULL;
+			pCallThread->m_list_CountTime.erase(itera);
+			break;
+		}
+
+		CString strTime = pCallThread->ChangeTimeToCstring(pTime->nTimeSec);
+		CString strMsg = _T("暂停服务") + strTime;
+		CThroughWndScreenInfo wndScreenInfo;
+		for(int i=0;i<pTime->window.m_throughscreen_array.GetCount();i++)
+		{
+			wndScreenInfo = pTime->window.m_throughscreen_array.GetAt(i);
+
+			pWnd->AddScreenMsg(strMsg,wndScreenInfo.GetWndScreenId());
+			pWnd->AddScreenMsg(strMsg,wndScreenInfo.GetComScreenId());
+			pWnd->AddThroughScreenMsg(strMsg,wndScreenInfo.GetPhyId(),wndScreenInfo.GetPipeId(),wndScreenInfo.GetLocalIp());
+		}
+	}
+}
+
+
+CString CCallThread::ChangeTimeToCstring(int nTimeSec)
+{
+	CString retStrTime;
+
+	int nMintue = nTimeSec / 60;
+	int nSec = nTimeSec % 60;
+
+	if(nMintue != 0)
+		retStrTime.Format(_T("%d分"),nMintue);
+	if(nSec != 0)
+		retStrTime.AppendFormat(_T("%d秒"),nSec);
+
+	return retStrTime;
+}
+
+void CCallThread::ClearListCountTime()
+{
+	list<CountTime*>::const_iterator itera = m_list_CountTime.begin();
+	for(itera;itera != m_list_CountTime.end();++itera)
+	{
+		CountTime* pTime = *itera;
+		delete pTime;
+		pTime = NULL;
+	}
+
+	m_list_CountTime.clear();
+}

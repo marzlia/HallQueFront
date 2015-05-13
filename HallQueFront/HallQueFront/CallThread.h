@@ -6,6 +6,7 @@
 #include "CallerCmdData.h"
 #include "FinshQueData.h"
 #include <map>
+#include <list>
 #include "SLZStaff.h"
 #include "SLZStaffQueryView.h"
 #include "DiscardQueData.h"
@@ -34,6 +35,13 @@ public:
 	BOOL ShowCallerWaitNum(const CString& queID);
 	BOOL ShowCallerWaitNum(const CString& queID,int nWaitNum);
 private:
+
+	typedef struct CountTime
+	{
+		SLZWindow window;
+		int nTimeSec;
+	};
+
 	virtual void Run();
 	void DispatchCallerCmd(CallerCmd& callerCmd);
 
@@ -62,7 +70,21 @@ private:
 	CString GetCandoQueInlineCount(UINT iWinID);//获取该窗口能够处理的队列排队人数
 	BOOL ShowViewWaitNum(const CString& queserial_id,const SLZData& data,CallerCmd& callerCmd);//显示界面剩余人数
 	
+	void AddCountTime(CountTime* pTime);
+
+
+	static void CALLBACK MyDoCountTimeMsg(
+		HWND hwnd, // handle of window for timer messages
+		UINT uMsg, // WM_TIMER message
+		UINT idEvent, // timer identifier
+		DWORD dwTime // current system time	
+		);///回调函数处理时间
+
+	CString ChangeTimeToCstring(int nTimeSec);
+
+	void ClearListCountTime();
 private:
+	
 	CInlineQueData& m_rInlineQueData;//排队队列
 	CCalledQueData& m_rCalledQueData;//正在呼叫队列
 	CCallerCmdData& m_rCallerCmdData;//呼叫命令表
@@ -76,4 +98,6 @@ private:
 	LogicVariables& m_logicVariables;//系统逻辑变量
 	MSG m_msg;//消息队列
 	CShortMsgModem* m_pShortMsg;
+	list<CountTime*> m_list_CountTime;//计算倒计时
+	CMutex m_mtCountTime;//倒计时锁
 };
