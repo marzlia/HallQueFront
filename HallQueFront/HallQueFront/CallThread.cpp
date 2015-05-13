@@ -40,7 +40,7 @@ CCallThread::CCallThread(CInlineQueData& rInlineQueData,
 	m_pShortMsg = CShortMsgModem::GetInstance();
 	pCallThread = this;
 
-	SetTimer(NULL,0,1000,MyDoCountTimeMsg);
+	SetTimer(NULL,0,5000,MyDoCountTimeMsg);
 }
 
 CCallThread::~CCallThread(void)
