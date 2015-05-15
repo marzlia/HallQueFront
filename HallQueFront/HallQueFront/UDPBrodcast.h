@@ -10,6 +10,6 @@ public:
 	BOOL SendData(const CString& IP,const char* buf,int len);
 private:
 	BOOL Start();
-	SOCKET m_sockClient;
+//	SOCKET m_sockClient;
 	USHORT m_sockPort;
 };
