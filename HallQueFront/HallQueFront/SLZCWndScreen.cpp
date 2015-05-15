@@ -575,6 +575,7 @@ BOOL SLZCWndScreen::SendDataToThroughScreen(const CString& str,int address,int c
 	if(!localIp.IsEmpty())//TCP·¢ËÍ
 	{
 		MySocketUDP Client;
+		Client.StartSocket();
 		flag = Client.SendTo(buf,length,localIp,1024);
 #ifdef _DEBUG
 		if(flag)
