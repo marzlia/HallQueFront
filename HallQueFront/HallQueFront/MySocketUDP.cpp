@@ -34,14 +34,14 @@ BOOL MySocketUDP::StartSocket(USHORT uPort)
 	}
 	if(!Startup())
 	{
-		AfxMessageBox(_T("初始化Socket失败"));
+//		AfxMessageBox(_T("初始化Socket失败"));
 		//ShowSocketError();
 		return FALSE;
 	}
 
 	if(!CreateSocket())
 	{
-		AfxMessageBox(_T("创建Socket套接字失败"));
+//		AfxMessageBox(_T("创建Socket套接字失败"));
 		return FALSE;
 	}
 
@@ -52,7 +52,7 @@ BOOL MySocketUDP::StartSocket(USHORT uPort)
 		{
 			CString str;
 			str.Format(_T("%d端口绑定失败,请配置另一个端口号"), m_uPort);
-			AfxMessageBox(str);
+//			AfxMessageBox(str);
 			CloseSocket();
 			return FALSE;
 		}
