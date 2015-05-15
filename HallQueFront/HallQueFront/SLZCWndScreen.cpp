@@ -6,7 +6,8 @@
 #include "ComputeFuncationTime.h"
 #include "DoComInOut.h"
 //#include "ComplSocketClient.h"
-#include "UDPBrodcast.h"
+//#include "UDPBrodcast.h"
+#include "MySocketUDP.h"
 
 //SLZCWndScreen* SLZCWndScreen::m_pInstance=NULL;//new SLZCWndScreen;
 extern void MyWriteConsole(CString str);
@@ -573,8 +574,8 @@ BOOL SLZCWndScreen::SendDataToThroughScreen(const CString& str,int address,int c
 	BOOL flag = FALSE;
 	if(!localIp.IsEmpty())//TCP·¢ËÍ
 	{
-		CUDPBrodcast Client;
-		flag = Client.SendData(localIp,buf,length);
+		MySocketUDP Client;
+		flag = Client.SendTo(buf,length,localIp,1024);
 #ifdef _DEBUG
 		if(flag)
 		{
