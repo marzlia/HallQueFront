@@ -9,7 +9,7 @@ CUDPBrodcast::CUDPBrodcast(void) : m_sockPort(61000)
 
 CUDPBrodcast::~CUDPBrodcast(void)
 {
-	closesocket(m_sockClient);
+//	closesocket(m_sockClient);
 	WSACleanup();
 }
 
@@ -41,6 +41,7 @@ BOOL CUDPBrodcast::BroadCast(const CString& msg)
 		(char *)&bBroadcast,sizeof( bBroadcast ) );
 	if(SOCKET_ERROR == iRet)
 	{
+		closesocket(sockClient);
 		return FALSE;
 	}
 	
@@ -53,6 +54,7 @@ BOOL CUDPBrodcast::BroadCast(const CString& msg)
 	if(len == SOCKET_ERROR)
 	{
 		int errcode = WSAGetLastError();
+		closesocket(sockClient);
 		return FALSE;
 	}
 
@@ -65,6 +67,7 @@ BOOL CUDPBrodcast::BroadCast(const CString& msg)
 // 	{
 // 		//Create();
 // 	}
+	closesocket(sockClient);
 	return TRUE;
 }
 
@@ -82,15 +85,16 @@ BOOL CUDPBrodcast::SendData(const CString& IP,const char* buf,int len)
 	addrin.sin_addr.S_un.S_addr = inet_addr( aIp );
 	delete [] aIp;
 
-	u_long nMode = 1; //非阻塞模式
-	int nError = ioctlsocket( sockClient, FIONBIO, &nMode );
+//	u_long nMode = 1; //非阻塞模式
+//	int nError = ioctlsocket( sockClient, FIONBIO, &nMode );
 	int errcode = sendto(sockClient,buf,len,0,(SOCKADDR*)&addrin,sizeof(SOCKADDR));
 	if(errcode == SOCKET_ERROR)
 	{
 		errcode = WSAGetLastError();
-
+		closesocket(sockClient);
 		return FALSE;
 	}
 
+	closesocket(sockClient);
 	return TRUE;
 }
