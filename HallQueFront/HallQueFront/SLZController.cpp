@@ -2125,7 +2125,7 @@ BOOL SLZController::GetQueueInfoBySerialID(const CString& queserial_id,CQueueInf
 	{
 		if(m_map_que.Lookup(i,info))
 		{
-			if(queInfo.GetQueID() == queserial_id)
+			if(info.GetQueID() == queserial_id)
 			{
 				queInfo = info;
 				flag = TRUE;
