@@ -582,6 +582,7 @@ void CCallThread::OnCallBusc(CallerCmd& callerCmd)
 */
 void CCallThread::OnExChange(CallerCmd& callerCmd)
 {
+
 	SLZData data;
 	if(m_logicVariables.ExchangeQue)
 	{
