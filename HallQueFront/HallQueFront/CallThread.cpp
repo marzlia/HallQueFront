@@ -578,7 +578,7 @@ void CCallThread::OnResume(CallerCmd& callerCmd)
 		}
 		callerCmd.SetSuccess(TRUE);
 	}
-	callerCmd.SetSuccess(FALSE);
+
 	
 	DeleteCountTimeWindow(callerCmd.GetWindowId());
 }
@@ -1024,7 +1024,7 @@ void CALLBACK CCallThread::MyDoCountTimeMsg( HWND hwnd, UINT uMsg, UINT idEvent,
 		}
 
 		CString strTime = pCallThread->ChangeTimeToCstring(pTime->nTimeSec);
-		CString strMsg = _T("ÔÝÍ£·þÎñ") + strTime;
+		CString strMsg = _T("ÇëÉÔºò") + strTime;
 		CThroughWndScreenInfo wndScreenInfo;
 		for(int i=0;i<pTime->window.m_throughscreen_array.GetCount();i++)
 		{
