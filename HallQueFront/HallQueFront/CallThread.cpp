@@ -547,6 +547,8 @@ void CCallThread::AddCountTime(CountTime* pTime)
 {
 	if(pTime == NULL)return;
 
+	if(ModifyCountTimeWindow(pTime))
+		return;
 	m_mtCountTime.Lock();
 	m_list_CountTime.push_back(pTime);
 	m_mtCountTime.Unlock();
@@ -1078,4 +1080,23 @@ void CCallThread::DeleteCountTimeWindow(UINT uWindowID)
 			break;
 		}
 	}
+}
+
+BOOL CCallThread::ModifyCountTimeWindow(CountTime* pTime)
+{
+	if(pTime == NULL) return FALSE;
+	CountTime* pCountTime = NULL;
+	list<CountTime*>::const_iterator itera = m_list_CountTime.begin();
+	for(itera;itera != m_list_CountTime.end();++itera)
+	{
+		pCountTime = *itera;
+		if(pCountTime->window.GetWindowId() == pTime->window.GetWindowId())
+		{
+			m_mtCountTime.Lock();
+			pCountTime->nTimeSec = pTime->nTimeSec;
+			m_mtCountTime.Unlock();
+			return TRUE;
+		}
+	}
+	return FALSE;
 }

@@ -86,6 +86,8 @@ private:
 	void ClearListCountTime();
 
 	void DeleteCountTimeWindow(UINT uWindowID);
+
+	BOOL ModifyCountTimeWindow(CountTime* pTime);
 private:
 	
 	CInlineQueData& m_rInlineQueData;//ее╤с╤сап
