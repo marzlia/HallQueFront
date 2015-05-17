@@ -40,7 +40,7 @@ CCallThread::CCallThread(CInlineQueData& rInlineQueData,
 	m_pShortMsg = CShortMsgModem::GetInstance();
 	pCallThread = this;
 
-	SetTimer(NULL,0,5000,MyDoCountTimeMsg);
+	SetTimer(NULL,0,2000,MyDoCountTimeMsg);
 }
 
 CCallThread::~CCallThread(void)
@@ -539,6 +539,7 @@ void CCallThread::OnCountTime(CallerCmd& callerCmd)
 			pTime->nTimeSec = theApp.m_logicVariables.nTimeMintue * 60;
 			pTime->window = Window;
 			AddCountTime(pTime);
+			callerCmd.SetSuccess(TRUE);
 		}
 	}
 }
@@ -561,7 +562,7 @@ void CCallThread::OnResume(CallerCmd& callerCmd)
 	//∑¢ÀÕ‘›Õ£∑˛ŒÒ
 	//playsound,display
 	SLZCWndScreen* pWnd = SLZCWndScreen::GetInstance();
-	CString msg = _T("ª÷∏¥∞Ï¿Ì");
+	CString msg = _T("                   ");
 	SLZWindow Window;
 	BOOL flag = m_rInlineQueData.m_rWindowTable.QueryWindowById(winID,Window);
 	if(flag)
@@ -776,8 +777,14 @@ void CCallThread::ReturnToCaller(CallerCmd& callerCmd)
 	case cmdExChange:
 		data.SetCmdType(callerCmd.GetSuccess() ? callerCmdShowSuc : callerCmdShowFail);
 		break;
+	case cmdResume:
+		data.SetCmdType(callerCmd.GetSuccess() ? callerCmdShowSuc : callerCmdShowFail);
+		break;
 	case callerCmdShowAdd:
 		data.SetCmdType(callerCmdShowAdd);
+		break;
+	case callerCmdCountTime:
+		data.SetCmdType(callerCmd.GetSuccess() ? callerCmdShowSuc : callerCmdShowFail);
 		break;
 	default:
 		break;
@@ -1003,11 +1010,11 @@ void CALLBACK CCallThread::MyDoCountTimeMsg( HWND hwnd, UINT uMsg, UINT idEvent,
 	for(itera;itera != pCallThread->m_list_CountTime.end();++itera)
 	{
 		CountTime* pTime = *itera;
-		pTime->nTimeSec -= 5;
+		pTime->nTimeSec -= 2;
 		if(pTime->nTimeSec <= 0)
 		{
 			CThroughWndScreenInfo wndScreenInfo;
-			CString strMsg = _T("ª÷∏¥∞Ï¿Ì");
+			CString strMsg = _T("                     ");
 			for(int i=0;i<pTime->window.m_throughscreen_array.GetCount();i++)
 			{
 				wndScreenInfo = pTime->window.m_throughscreen_array.GetAt(i);
@@ -1024,7 +1031,7 @@ void CALLBACK CCallThread::MyDoCountTimeMsg( HWND hwnd, UINT uMsg, UINT idEvent,
 		}
 
 		CString strTime = pCallThread->ChangeTimeToCstring(pTime->nTimeSec);
-		CString strMsg = _T("«Î…‘∫Ú") + strTime;
+		CString strMsg = _T("«Î…‘∫Ú ") + strTime;
 		CThroughWndScreenInfo wndScreenInfo;
 		for(int i=0;i<pTime->window.m_throughscreen_array.GetCount();i++)
 		{
