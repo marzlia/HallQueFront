@@ -234,6 +234,11 @@ void CCallThread::DispatchCallerCmd(CallerCmd& callerCmd)
 			OnExChange(callerCmd);
 		}
 		break;
+	case callerCmdCountTime:
+		{
+			OnCountTime(callerCmd);
+		}
+		break;
 	case callerCmdShowAdd:
 		break;
 	default:
@@ -417,6 +422,7 @@ void CCallThread::OnRecall(CallerCmd& callerCmd)
 		//playsound,display
 		theApp.m_Controller.m_pPlaySound->DataPlay(data);
 	}
+	DeleteCountTimeWindow(callerCmd.GetWindowId());
 }
 
 void CCallThread::OnDiscard(CallerCmd& callerCmd)
@@ -468,6 +474,7 @@ void CCallThread::OnWait(CallerCmd& callerCmd)
 		//playsound,display
 		theApp.m_Controller.m_pPlaySound->DataPlay(data,TRUE);
 	}
+	DeleteCountTimeWindow(callerCmd.GetWindowId());
 }
 /*
 接收到开启评价命令
@@ -508,6 +515,23 @@ void CCallThread::OnPause(CallerCmd& callerCmd)
 			pWnd->AddScreenMsg(msg,wndScreenInfo.GetComScreenId());
 			pWnd->AddThroughScreenMsg(msg,wndScreenInfo.GetPhyId(),wndScreenInfo.GetPipeId(),wndScreenInfo.GetLocalIp());
 		}
+		
+		callerCmd.SetSuccess(TRUE);
+	}
+}
+
+
+void CCallThread::OnCountTime(CallerCmd& callerCmd)
+{
+	UINT winID = callerCmd.GetWindowId();
+
+	//发送暂停服务
+	//playsound,display
+	SLZCWndScreen* pWnd = SLZCWndScreen::GetInstance();
+	SLZWindow Window;
+	BOOL flag = m_rInlineQueData.m_rWindowTable.QueryWindowById(winID,Window);
+	if(flag)
+	{
 		///////倒计时
 		if(theApp.m_logicVariables.IsOpenCountTime)
 		{
@@ -516,10 +540,8 @@ void CCallThread::OnPause(CallerCmd& callerCmd)
 			pTime->window = Window;
 			AddCountTime(pTime);
 		}
-		callerCmd.SetSuccess(TRUE);
 	}
 }
-
 
 void CCallThread::AddCountTime(CountTime* pTime)
 {
@@ -532,7 +554,31 @@ void CCallThread::AddCountTime(CountTime* pTime)
 
 void CCallThread::OnResume(CallerCmd& callerCmd)
 {
+	UINT winID = callerCmd.GetWindowId();
 
+	//发送暂停服务
+	//playsound,display
+	SLZCWndScreen* pWnd = SLZCWndScreen::GetInstance();
+	CString msg = _T("恢复办理");
+	SLZWindow Window;
+	BOOL flag = m_rInlineQueData.m_rWindowTable.QueryWindowById(winID,Window);
+	if(flag)
+	{
+		CThroughWndScreenInfo wndScreenInfo;
+		for(int i=0;i<Window.m_throughscreen_array.GetCount();i++)
+		{
+
+			wndScreenInfo = Window.m_throughscreen_array.GetAt(i);
+
+			pWnd->AddScreenMsg(msg,wndScreenInfo.GetWndScreenId());
+			pWnd->AddScreenMsg(msg,wndScreenInfo.GetComScreenId());
+			pWnd->AddThroughScreenMsg(msg,wndScreenInfo.GetPhyId(),wndScreenInfo.GetPipeId(),wndScreenInfo.GetLocalIp());
+		}
+		callerCmd.SetSuccess(TRUE);
+	}
+	callerCmd.SetSuccess(FALSE);
+	
+	DeleteCountTimeWindow(callerCmd.GetWindowId());
 }
 /*
 呼叫特定号码
@@ -547,6 +593,8 @@ void CCallThread::OnCallNum(CallerCmd& callerCmd)
 	data.SetWindowId(winID);
 	data.SetQueueNumber(callNum);
 	theApp.m_Controller.m_pPlaySound->DataPlay(data);
+
+	DeleteCountTimeWindow(callerCmd.GetWindowId());
 }
 /*
 呼叫保安
@@ -566,6 +614,8 @@ void CCallThread::OnCallSec(CallerCmd& callerCmd)
 	callName.Remove(_T('口'));
 	strMsg.Format(_T("#请#保安#到#%s#号窗口"),callName);
 	theApp.m_Controller.m_pPlaySound->DataPlay(strMsg);
+
+	DeleteCountTimeWindow(callerCmd.GetWindowId());
 }
 /*
 呼叫大堂经理
@@ -585,6 +635,8 @@ void CCallThread::OnCallMana(CallerCmd& callerCmd)
 	callName.Remove(_T('口'));
 	strMsg.Format(_T("#请#大堂经理#到#%s#号窗口"),callName);
 	theApp.m_Controller.m_pPlaySound->DataPlay(strMsg);
+
+	DeleteCountTimeWindow(callerCmd.GetWindowId());
 }
 /*
 呼叫业务顾问
@@ -604,6 +656,8 @@ void CCallThread::OnCallBusc(CallerCmd& callerCmd)
 	callName.Remove(_T('口'));
 	strMsg.Format(_T("#请#业务顾问#到#%s#号窗口"),callName);
 	theApp.m_Controller.m_pPlaySound->DataPlay(strMsg);
+
+	DeleteCountTimeWindow(callerCmd.GetWindowId());
 }
 /*
 转移队列/窗口

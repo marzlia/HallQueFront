@@ -59,6 +59,7 @@ private:
 	void OnCallMana(CallerCmd& callerCmd);
 	void OnCallBusc(CallerCmd& callerCmd);
 	void OnExChange(CallerCmd& callerCmd);
+	void OnCountTime(CallerCmd& callerCmd);
 	
 	void DoEvaMsg(const MSG& msg);
 	void ReturnToCaller(CallerCmd& callerCmd);

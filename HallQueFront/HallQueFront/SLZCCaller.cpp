@@ -215,6 +215,16 @@ void SLZCCaller::DoCallerMsg(char *buf,int size)
 		{
 			callerData.SetCmdType(cmdPause);
 		}
+		//2+功能-------恢复
+		if(size==11 && buf[size-4] == 0x02)
+		{
+			callerData.SetCmdType(cmdResume);
+		}
+		//00+功能-------倒计时
+		if(size==12  &&  buf[size-4] == 0x00 && buf[size-5] == 0x00)
+		{
+			callerData.SetCmdType(callerCmdCountTime);
+		}
 	}
 	if(buf[size-3]==HARDWARE_CALLER_START && size>=11)//数字+开始，转移窗口或队列
 	{

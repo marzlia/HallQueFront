@@ -32,7 +32,8 @@ typedef enum _tagCmdType
 	callerCmdShowSuc	= 16,		//显示成功(即处理成功)
 	callerCmdShowFail	= 17,		//显示失败
 	callerCmdShowNum	= 18,		//显示剩余人数
-	callerCmdShowAlarm	= 19		//发出滴滴声
+	callerCmdShowAlarm	= 19,		//发出滴滴声
+	callerCmdCountTime = 20       //倒计时
 } CmdType;
 
 //typedef enum _tagCtlCmdType
