@@ -146,7 +146,7 @@ BOOL CDealInterMsg::AnaRetInterMsg(const string& retMsg,SLZData* pData,UINT* pIn
 	string queNum;
 	GetMsgData(retMsg,enumSlzDataqueNum,queNum);
 	CString wQueNum(queNum.c_str());
-	pData->SetQueSerialID(wQueNum);
+	pData->SetQueueNumber(wQueNum);
 
 
 	string intQueNum;

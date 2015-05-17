@@ -504,7 +504,28 @@ void CCallThread::OnPause(CallerCmd& callerCmd)
 
 void CCallThread::OnResume(CallerCmd& callerCmd)
 {
+	UINT winID = callerCmd.GetWindowId();
 
+	//发送暂停服务
+	//playsound,display
+	SLZCWndScreen* pWnd = SLZCWndScreen::GetInstance();
+	CString msg = _T("恢复办理");
+	SLZWindow Window;
+	BOOL flag = m_rInlineQueData.m_rWindowTable.QueryWindowById(winID,Window);
+	if(flag)
+	{
+		CThroughWndScreenInfo wndScreenInfo;
+		for(int i=0;i<Window.m_throughscreen_array.GetCount();i++)
+		{
+
+			wndScreenInfo = Window.m_throughscreen_array.GetAt(i);
+
+			pWnd->AddScreenMsg(msg,wndScreenInfo.GetWndScreenId());
+			pWnd->AddScreenMsg(msg,wndScreenInfo.GetComScreenId());
+			pWnd->AddThroughScreenMsg(msg,wndScreenInfo.GetPhyId(),wndScreenInfo.GetPipeId(),wndScreenInfo.GetLocalIp());
+		}
+		callerCmd.SetSuccess(TRUE);
+	}
 }
 /*
 呼叫特定号码
