@@ -221,7 +221,7 @@ void SLZCCaller::DoCallerMsg(char *buf,int size)
 			callerData.SetCmdType(cmdResume);
 		}
 		//00+功能-------倒计时
-		if(size==12  &&  buf[size-4] == 0x00 && buf[size-5] == 0x00)
+		if(size==11  &&  buf[size-4] == 0x01)
 		{
 			callerData.SetCmdType(callerCmdCountTime);
 		}

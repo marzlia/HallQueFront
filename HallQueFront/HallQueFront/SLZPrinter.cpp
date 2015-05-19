@@ -383,7 +383,7 @@ void SLZPrinter::SetPrintStyle(CDC* pDC,const WINDOWCTRINFO& info,const SLZData&
 	rect.bottom = info.rectBottom - m_printRect.top;
 	if(info.IsForPrintChangeObjec)
 	{
-		pt.x = rect.left;pt.y = rect.top;
+//		pt.x = rect.left;pt.y = rect.top;
 		switch(info.printObject)
 		{
 		case enumPrintType://业务类型(队列)

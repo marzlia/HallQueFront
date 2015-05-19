@@ -604,63 +604,63 @@ void CCallThread::OnCallNum(CallerCmd& callerCmd)
 */
 void CCallThread::OnCallSec(CallerCmd& callerCmd)
 {
-	UINT winID = callerCmd.GetWindowId();//窗口ID
-	callerCmd.SetSuccess(TRUE);
-	//playsound,display
-	SLZWindow Wnd; 
-	BOOL flag = m_rInlineQueData.m_rWindowTable.QueryWindowById(winID,Wnd);
-	if(!flag)return;
-	CString callName = Wnd.GetWindowCallName();
-	CString strMsg;
-	callName.Remove(_T('号'));
-	callName.Remove(_T('窗'));
-	callName.Remove(_T('口'));
-	strMsg.Format(_T("#请#保安#到#%s#号窗口"),callName);
-	theApp.m_Controller.m_pPlaySound->DataPlay(strMsg);
-
-	DeleteCountTimeWindow(callerCmd.GetWindowId());
+// 	UINT winID = callerCmd.GetWindowId();//窗口ID
+// 	callerCmd.SetSuccess(TRUE);
+// 	//playsound,display
+// 	SLZWindow Wnd; 
+// 	BOOL flag = m_rInlineQueData.m_rWindowTable.QueryWindowById(winID,Wnd);
+// 	if(!flag)return;
+// 	CString callName = Wnd.GetWindowCallName();
+// 	CString strMsg;
+// 	callName.Remove(_T('号'));
+// 	callName.Remove(_T('窗'));
+// 	callName.Remove(_T('口'));
+// 	strMsg.Format(_T("#请#保安#到#%s#号窗口"),callName);
+// 	theApp.m_Controller.m_pPlaySound->DataPlay(strMsg);
+// 
+// 	DeleteCountTimeWindow(callerCmd.GetWindowId());
 }
 /*
 呼叫大堂经理
 */
 void CCallThread::OnCallMana(CallerCmd& callerCmd)
 {
-	UINT winID = callerCmd.GetWindowId();//窗口ID
-	callerCmd.SetSuccess(TRUE);
-	//playsound,display
-	SLZWindow Wnd;
-	BOOL flag = m_rInlineQueData.m_rWindowTable.QueryWindowById(winID,Wnd);
-	if(!flag)return;
-	CString callName = Wnd.GetWindowCallName();
-	CString strMsg;
-	callName.Remove(_T('号'));
-	callName.Remove(_T('窗'));
-	callName.Remove(_T('口'));
-	strMsg.Format(_T("#请#大堂经理#到#%s#号窗口"),callName);
-	theApp.m_Controller.m_pPlaySound->DataPlay(strMsg);
-
-	DeleteCountTimeWindow(callerCmd.GetWindowId());
+// 	UINT winID = callerCmd.GetWindowId();//窗口ID
+// 	callerCmd.SetSuccess(TRUE);
+// 	//playsound,display
+// 	SLZWindow Wnd;
+// 	BOOL flag = m_rInlineQueData.m_rWindowTable.QueryWindowById(winID,Wnd);
+// 	if(!flag)return;
+// 	CString callName = Wnd.GetWindowCallName();
+// 	CString strMsg;
+// 	callName.Remove(_T('号'));
+// 	callName.Remove(_T('窗'));
+// 	callName.Remove(_T('口'));
+// 	strMsg.Format(_T("#请#大堂经理#到#%s#号窗口"),callName);
+// 	theApp.m_Controller.m_pPlaySound->DataPlay(strMsg);
+// 
+// 	DeleteCountTimeWindow(callerCmd.GetWindowId());
 }
 /*
 呼叫业务顾问
 */
 void CCallThread::OnCallBusc(CallerCmd& callerCmd)
 {
-	UINT winID = callerCmd.GetWindowId();//窗口ID
-	callerCmd.SetSuccess(TRUE);
-	//playsound,display
-	SLZWindow Window; 
-	BOOL flag = m_rInlineQueData.m_rWindowTable.QueryWindowById(winID,Window);
-	if(!flag)return;
-	CString callName = Window.GetWindowCallName();
-	CString strMsg;
-	callName.Remove(_T('号'));
-	callName.Remove(_T('窗'));
-	callName.Remove(_T('口'));
-	strMsg.Format(_T("#请#业务顾问#到#%s#号窗口"),callName);
-	theApp.m_Controller.m_pPlaySound->DataPlay(strMsg);
-
-	DeleteCountTimeWindow(callerCmd.GetWindowId());
+// 	UINT winID = callerCmd.GetWindowId();//窗口ID
+// 	callerCmd.SetSuccess(TRUE);
+// 	//playsound,display
+// 	SLZWindow Window; 
+// 	BOOL flag = m_rInlineQueData.m_rWindowTable.QueryWindowById(winID,Window);
+// 	if(!flag)return;
+// 	CString callName = Window.GetWindowCallName();
+// 	CString strMsg;
+// 	callName.Remove(_T('号'));
+// 	callName.Remove(_T('窗'));
+// 	callName.Remove(_T('口'));
+// 	strMsg.Format(_T("#请#业务顾问#到#%s#号窗口"),callName);
+// 	theApp.m_Controller.m_pPlaySound->DataPlay(strMsg);
+// 
+// 	DeleteCountTimeWindow(callerCmd.GetWindowId());
 }
 /*
 转移队列/窗口

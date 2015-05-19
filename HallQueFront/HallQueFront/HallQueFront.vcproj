@@ -498,10 +498,6 @@
 				>
 			</File>
 			<File
-				RelativePath=".\SLZDataManager.cpp"
-				>
-			</File>
-			<File
 				RelativePath=".\SLZPrinter.cpp"
 				>
 			</File>
@@ -969,10 +965,6 @@
 			</File>
 			<File
 				RelativePath=".\SLZData.h"
-				>
-			</File>
-			<File
-				RelativePath=".\SLZDataManager.h"
 				>
 			</File>
 			<File
