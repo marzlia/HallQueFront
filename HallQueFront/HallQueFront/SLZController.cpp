@@ -15,6 +15,7 @@
 #include "DealInterMsg.h"
 #include "UDPServer.h"
 #include "UDPBrodcast.h"
+#include "SLZPrinter.h"
 
 extern  void MyWriteConsole(CString str); 
 
@@ -34,8 +35,10 @@ SLZController::SLZController(void)
 , m_pFinshQueData(NULL)
 , m_pInterNumServer(NULL)
 , m_pUDPServer(NULL)
+, m_pPrint(NULL)
 {
-	m_print.Start();
+	m_pPrint = new SLZPrinter;
+	m_pPrint->Start();
 	m_infofile_path = m_convert.GetExeFullFilePath();
 	m_infofile_path += _T("\\QueBasicInfo\\QueBasicInfo.dat");
 	m_InlineDataPath = m_convert.GetExeFullFilePath();
@@ -126,6 +129,12 @@ SLZController::~SLZController(void)
 	{
 		delete m_pInterNumServer;
 		m_pInterNumServer = NULL;
+	}
+
+	if(m_pPrint)
+	{
+		delete m_pPrint;
+		m_pPrint = NULL;
 	}
 }
 
@@ -561,7 +570,7 @@ BOOL SLZController::VerifyCountLimit(const CString& QueId)
 
 BOOL SLZController::ReFlushPrintInfoTable()
 {
-	return m_print.ReFreshPrintInfo(); 
+	return m_pPrint->ReFreshPrintInfo(); 
 }
 
 BOOL SLZController::ReFlushQueInfoTable()
@@ -733,7 +742,7 @@ void SLZController::DoPrintStatus(EnumPrintStaus status,const SLZData& data,cons
 	case enumPrintNormal://正常
 	case enumPrintPrinting:
 		{
-			m_print.Print(data,waitNum-1);
+			m_pPrint->Print(data,waitNum-1);
 			showVaria.bShowWait = TRUE;
 			SendMessage(theApp.m_pView->m_hWnd,WM_SHOWMSG,(WPARAM)&showVaria,0);
 		}
@@ -1998,7 +2007,7 @@ void SLZController::ReturnMainFrame(const SLZData& data)
 
 void SLZController::DoPrint(const SLZData& data,UINT inLineNum)
 {
-	EnumPrintStaus status = m_print.CheckPrinterStatus();//获取打印机状态
+	EnumPrintStaus status = m_pPrint->CheckPrinterStatus();//获取打印机状态
 	DoPrintStatus(status,data,inLineNum);///处理打印
 }
 
@@ -2119,4 +2128,27 @@ BOOL SLZController::GetQueueInfoBySerialID(const CString& queserial_id,CQueueInf
 		}
 	}
 	return flag;
+}
+
+CString SLZController::GetCandoWndName(const SLZData& data)
+{
+	CString retWndName;
+	std::map<UINT,SLZWindow>::const_iterator itera = m_windowTable.m_mapIdWindow.begin();
+	SLZWindow Window;
+	CStringArray arrayQueID;
+	for(itera;itera != m_windowTable.m_mapIdWindow.end();++itera)
+	{
+		Window = itera->second;
+		Window.GetArrayQueId(arrayQueID);
+		int count = arrayQueID.GetCount();
+		for(int i=0;i<count;i++)
+		{
+			if(arrayQueID.GetAt(i) == data.GetBussinessType())
+			{
+				retWndName += Window.GetWindowName();
+				retWndName += _T(" ");
+			}
+		}
+	}
+	return retWndName;
 }

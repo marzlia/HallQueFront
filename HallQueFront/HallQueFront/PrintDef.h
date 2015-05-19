@@ -7,7 +7,8 @@ typedef enum _tagEnumPrintObjectEnum
 	enumPrintWaitNum = 1,//排队人数
 	enumPrintClientNum = 2,//客户号码
 	enumPrintClientName = 3,//客户姓名
-	enumPrintClientLevel  = 4 //客户星级
+	enumPrintClientLevel  = 4, //客户星级
+	enumPrintClientWndNum = 5 //可以处理该业务的窗口号
 }EnumPrintObject;
 
 typedef enum _tagEnumPrintStatus
@@ -26,6 +27,7 @@ const CString CS_printWaitNum = _T("等候人数");
 const CString CS_printClientNum = _T("客户号码");
 const CString CS_printClientName = _T("客户姓名");
 const CString CS_printClientLevel = _T("客户星级");
+const CString CS_printClientWndNum = _T("窗口");
 
 const double PI = 3.14159265359;
 #endif

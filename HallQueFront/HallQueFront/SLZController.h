@@ -5,14 +5,12 @@
 #include "SLZCEvaluator.h"
 #include "SLZData.h"
 #include "SLZEvaData.h"              
-#include "SLZPrinter.h"
 //#include "HallQueFrontDoc.h"
 //#include "HallQueFrontView.h"
 #include "SLZStaff.h"
 #include "SLZWindow.h"
 #include "QueueInfo.h"
 #include "CommonConvert.h"
-#include "SLZPrinter.h"
 #include "QueSetDlg.h"
 #include "SLZStaffQueryView.h"
 #include "SLZWindowQueryView.h"
@@ -29,6 +27,7 @@ using namespace std;
 
 class CInterNumSocketServer; 
 class CUDPServer;
+class SLZPrinter;
 
 class SLZController//处理整个数组逻辑类           
 {
@@ -65,7 +64,7 @@ private:
 	//处理评价线程类对象
 	CEvaThread* m_pEvaThread;
 	SLZCardReader m_cardread; //读卡，读身份证变量
-	SLZPrinter m_print;//打印变量
+	SLZPrinter* m_pPrint;//打印变量
 	////////////////////////////////////////
 	BOOL ReadQueInfoFromFile();//读队列信息
 	CString m_infofile_path; //队列基本信息的文件地址
@@ -183,4 +182,6 @@ public:
 	CList<SLZData,SLZData&> m_list_Data;
 	BOOL InsertListData(SLZData data);
 	BOOL WriteListQueIntoFile();
+
+	CString GetCandoWndName(const SLZData& data);
 };
