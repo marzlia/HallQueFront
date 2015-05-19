@@ -646,7 +646,12 @@ DWORD WINAPI SLZCWndScreen::DoThrWndMsgThread(LPVOID pParam)
 			pThis->m_ThrWndMutex.Unlock();
 //			WaitForSingleObject(pThis->m_hDoWndScreenMsgThread,3);
 #ifdef _DEBUG
-			MyWriteConsole(_T("通屏信息") + msg.msg);
+			CString strAddress;
+			strAddress.Format(_T("%d"),msg.address);
+			CString strChannel;
+			strChannel.Format(_T("%d"),msg.channel);
+
+			MyWriteConsole(_T("通屏信息:") + msg.msg + _T("地址:") + strAddress + _T("通道:") + strChannel + _T("ip:") + msg.localIp );
 #endif
 			pThis->SendDataToThroughScreen(msg.msg,msg.address,msg.channel,msg.localIp);
 		}
