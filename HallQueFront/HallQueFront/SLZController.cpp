@@ -1040,21 +1040,6 @@ UINT SLZController::CountToCallerAlarm(LPVOID pParam)
 			{
 				pThis->m_pInlineQueData->GetAllBussCount(queID,&count);
 			}
-// 			else
-// 			{
-// 				CComplSocketClient client;
-// 				CString queManNum;
-// 				theApp.m_Controller.GetManQueNumByQueSerialID(queID,queManNum);
-// 				string sendMsg,recvMsg;
-// 				int actRecvSize = 0;
-// 				CDealInterMsg::ProduceSendInNumMsg(queManNum,sendMsg);
-// 				if(client.SendData(INTERPORT,theApp.m_logicVariables.strInterIP,
-// 					sendMsg,sendMsg.size(),recvMsg,actRecvSize) && actRecvSize)
-// 				{
-// 					//CDealInterMsg::AnaRetInterMsg(recvMsg,&iQueNum,pInlineNum);
-// 					CDealInterMsg::AnaRetInNumMsg(recvMsg,&count);
-// 				}
-// 			}
 			std::map<CString,alarmStatus>::iterator alarmItera;
 			alarmItera = pThis->m_map_alarmStatus.find(queID);
 			if(alarmItera!=pThis->m_map_alarmStatus.end())//ур╣╫ак

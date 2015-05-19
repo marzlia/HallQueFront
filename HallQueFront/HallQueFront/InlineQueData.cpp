@@ -340,7 +340,7 @@ BOOL CInlineQueData::GetInlineQueData(int i,SLZData& data)
 
 void CInlineQueData::GetAllBussCount(const CString& strBussid,UINT* pWaitNum)
 {
-//	m_mtInlineQue.Lock();
+	m_mtInlineQue.Lock();
 	UINT iCount = 0;
 	POSITION pos = m_lstInlineQue.GetHeadPosition();
 	SLZData data;
@@ -355,7 +355,7 @@ void CInlineQueData::GetAllBussCount(const CString& strBussid,UINT* pWaitNum)
 			iCount++;
 		}
 	}
-//	m_mtInlineQue.Unlock();
+	m_mtInlineQue.Unlock();
 	*pWaitNum = iCount;
 }
 
