@@ -11,9 +11,12 @@ using namespace std;
 //读到的卡的信息
 class SLZCardReader
 {
-public:
+private:
 	SLZCardReader(void);
+public:
 	~SLZCardReader(void);
+
+	static SLZCardReader* GetInstance();
 
 	BOOL HasData(); //判断缓冲区里是否有数据可以读
 	CARDINFO GetData(); //获取缓冲区里读到的刷卡信息
@@ -25,6 +28,7 @@ private:
 	CMutex m_CardReaderMutex; //线程锁
 	HANDLE  m_hReadTread;//线程句柄
 	HANDLE m_hReadCard;//线程句柄
+	HANDLE m_hReadNewCard;//芯片卡线程句柄
 	CList<CARDINFO,CARDINFO&> m_CardInfoList; //缓冲区
 	//读身份证函数
 	int (_stdcall *SDT_StartFindIDCard)(int iPort,unsigned char* pucManaInfo,int iIfOpen);
@@ -32,6 +36,7 @@ private:
 	int (_stdcall *SDT_ReadBaseMsg)(int iPort,unsigned char* pucCHMsg,unsigned int* puiCHMsgLen,unsigned char* pucPHMsg,unsigned int* puiPHMsgLen,int iIfOpen);
 	static DWORD WINAPI ReadThread(LPVOID pParam); //读身份证线程
 	static DWORD WINAPI ReadCard(LPVOID pParam); //读磁卡线程
+	static DWORD WINAPI ReadNewCard(LPVOID pParam);//芯片卡线程
 private:
 	BOOL OpenReadCard();
 	CString m_cardcofinfo_path;//卡识别信息文件路径
@@ -57,4 +62,43 @@ public:
 	BOOL ReFlushCardLevelInfo();//接口,刷新卡等级返回队列信息
 private:
 	string m_strCardNum;
+
+private:
+	/**************************新刷卡器（二合一）***************************/
+	BOOL MultiReadCard(int nPort,int nWaitTime,char* pErrInfo,CString& cCardNum); //二合一刷卡器
+	//打开端口
+	typedef int (CALLBACK* lpOpenPort)(int,char,char*);
+	//读IC卡函数
+	typedef int (CALLBACK* lpICC_getIcInfo)(int,char,char,char*,int,char*,char*);
+	//读磁卡函数
+	typedef int (CALLBACK* lpMsrRead)(int,char,int,char*,char*,int,char*);
+	//关闭端口
+	typedef int (CALLBACK* lpClosePort)(char* );
+	//卡片在位判断(判断接触式芯片卡是否在位)
+	typedef int  (CALLBACK* lpCardPresent)(  int *,  char * );
+	//IC卡上电
+	typedef int  (CALLBACK* lpPowerOn)(  unsigned char *,   int *,   int ,   char *,   int );
+	//IC卡下电
+	typedef int  (CALLBACK* lpPowerOff)(  char *,  int );
+
+	lpICC_getIcInfo m_pGetIcInfo;
+	lpMsrRead m_pMsrRead;
+	lpCardPresent m_pCardPresent;
+	lpPowerOn m_pPowerOn;
+	lpPowerOff m_pPowerOff;
+
+	//新刷卡（二合一）初始化动态库
+	BOOL Init_ICLibrary();
+
+	void DealCardInfo(CARDINFO* cardinfo);
+
+	CString GetCardNum(const char* buf);//得到卡号
+
+	BOOL OpenNewReadCard();//芯片卡
+	BOOL CloseNewReadCard();//关闭芯片卡端口
+private:
+	CString m_strCurrentCardNum;//用于判断当前接触式卡卡号是否重复刷
+public:
+	lpOpenPort m_pOpenPort;//打开端口
+	lpClosePort m_pClosePort;//关闭端口
 };

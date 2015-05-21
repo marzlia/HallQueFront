@@ -1,6 +1,6 @@
 #pragma once
 #include "SLZCallerData.h"
-#include "SLZCardReader.h"
+
 #include "SLZCCaller.h"
 #include "SLZCEvaluator.h"
 #include "SLZData.h"
@@ -29,6 +29,7 @@ using namespace std;
 
 class CInterNumSocketServer; 
 class CUDPServer;
+class SLZCardReader;
 
 class SLZController//处理整个数组逻辑类           
 {
@@ -64,7 +65,7 @@ private:
 	CCallThread* m_pCallThread;
 	//处理评价线程类对象
 	CEvaThread* m_pEvaThread;
-	SLZCardReader m_cardread; //读卡，读身份证变量
+	SLZCardReader* m_pCardread; //读卡，读身份证变量
 	SLZPrinter m_print;//打印变量
 	////////////////////////////////////////
 	BOOL ReadQueInfoFromFile();//读队列信息

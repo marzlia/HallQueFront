@@ -360,6 +360,7 @@
 #define IDC_STATIC_MSG                  1202
 #define IDC_EDIT_MSG                    1203
 #define IDC_COMBO1                      1206
+#define IDC_COMBO_NEWCARD               1206
 #define IDC_EDIT_PHONENUM               1208
 #define IDC_ED_INTERIP                  1209
 #define IDC_ED_INTERPORT                1210

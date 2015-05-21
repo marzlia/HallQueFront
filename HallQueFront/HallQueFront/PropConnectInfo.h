@@ -90,4 +90,6 @@ public:
 	CEdit m_ed_interIP;
 //	CEdit m_ed_interPort;
 	CButton m_check_inter;
+	CComboBox m_combo_newcard;
+	afx_msg void OnCbnSelchangeComboNewcard();
 };

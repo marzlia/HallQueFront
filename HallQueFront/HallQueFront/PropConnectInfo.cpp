@@ -7,6 +7,7 @@
 #include "CommonStrMethod.h"
 #include "DoFile.h"
 #include "PropertyShortMsg.h"
+#include "DealInterMsg.h"
 
 
 
@@ -55,8 +56,9 @@ void CPropConnectInfo::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX, IDC_CHECK4, m_check_changePage);
 	DDX_Control(pDX, IDC_COM_PARENTORG, m_combox_parentOrg);
 	DDX_Control(pDX, IDC_ED_INTERIP, m_ed_interIP);
-//	DDX_Control(pDX, IDC_ED_INTERPORT, m_ed_interPort);
+	//	DDX_Control(pDX, IDC_ED_INTERPORT, m_ed_interPort);
 	DDX_Control(pDX, IDC_CHECK_INTER, m_check_inter);
+	DDX_Control(pDX, IDC_COMBO_NEWCARD, m_combo_newcard);
 }
 
 
@@ -75,6 +77,7 @@ ON_BN_CLICKED(IDC_BN_SAVECON, &CPropConnectInfo::OnBnClickedBnSavecon)
 ON_BN_CLICKED(IDC_BUTTON_MSGSET, &CPropConnectInfo::OnBnClickedButtonMsgset)
 ON_CBN_SELCHANGE(IDC_COMBO_MSG, &CPropConnectInfo::OnCbnSelchangeComboMsg)
 ON_BN_CLICKED(IDC_BN_TESTINTERNET, &CPropConnectInfo::OnBnClickedBnTestinternet)
+ON_CBN_SELCHANGE(IDC_COMBO_NEWCARD, &CPropConnectInfo::OnCbnSelchangeComboNewcard)
 END_MESSAGE_MAP()
 
 
@@ -165,9 +168,15 @@ BOOL CPropConnectInfo::OnInitDialog()
 	CString readCardCom = m_pComInit->GetCardComm();
 	CString callerCom = m_pComInit->GetWndComm();
 	CString MsgCom = m_pComInit->GetMsgComm();
+	CString newCardCom = m_pComInit->GetNewCardComm();
+
 	m_com_caller.AddString(_T("0"));
 	m_com_readcard.AddString(_T("0"));
 	m_com_msg.AddString(_T("0"));
+
+	m_combo_newcard.AddString(_T("0"));
+	m_combo_newcard.AddString(_T("USB"));
+
 	for(int i=0;i<10;i++)
 	{
 		if(m_pComInit->m_canUse[i]>0)
@@ -177,6 +186,7 @@ BOOL CPropConnectInfo::OnInitDialog()
 			m_com_caller.AddString(comm);
 			m_com_readcard.AddString(comm);
 			m_com_msg.AddString(comm);
+			m_combo_newcard.AddString(comm);
 		}
 	}
 	////////////////////////////////////////////
@@ -209,6 +219,17 @@ BOOL CPropConnectInfo::OnInitDialog()
 		if(MsgCom == content)
 		{
 			m_com_msg.SetCurSel(i);
+			break;
+		}
+	}
+	////////////////////////////////////////
+	for(int i=0;i<m_combo_newcard.GetCount();i++)
+	{
+		CString content;
+		m_combo_newcard.GetLBText(i,content);
+		if(newCardCom == content)
+		{
+			m_combo_newcard.SetCurSel(i);
 			break;
 		}
 	}
@@ -691,4 +712,62 @@ void CPropConnectInfo::OnCbnSelchangeComboMsg()
 void CPropConnectInfo::OnBnClickedBnTestinternet()
 {
 	// TODO: 在此添加控件通知处理程序代码
+	if(theApp.IsLocal())
+		return;
+	
+	CComplSocketClient client;
+
+	string sendMsg,recvMsg;
+	int actRecvSize = 0;
+	CDealInterMsg::ProduceSendInNumMsg(_T("1"),sendMsg);
+	if(client.SendData(INTERPORT,theApp.m_logicVariables.strInterIP,
+		sendMsg,sendMsg.size(),recvMsg,actRecvSize) && actRecvSize)
+	{
+		MessageBox(_T("链接成功"),_T("注意"),MB_OK | MB_ICONINFORMATION);
+	}
+}
+
+void CPropConnectInfo::OnCbnSelchangeComboNewcard()
+{
+	// TODO: 在此添加控件通知处理程序代码
+	CCommonConvert convert;
+	int index=m_combo_newcard.GetCurSel();
+	if(index == CB_ERR)
+	{
+		return;
+	}
+
+	CComInit* pComInit = CComInit::GetInstance();
+	CString newCardCom;
+	m_combo_newcard.GetLBText(index,newCardCom);
+
+	char* pErrInfo = new char[256];
+
+	if(newCardCom == _T("USB"))//为usb时传0
+	{
+		pComInit->CloseNewCardComm(pErrInfo);
+		if(pComInit->OpenNewCardComm(0,pErrInfo) != 0)
+		{
+			MessageBox(_T("打开芯片卡刷卡器端口失败"),_T("注意"),MB_OK | MB_ICONINFORMATION);
+		}
+	}
+	else
+	{
+		int i_newCardCom=0;
+		convert.CStringToint(i_newCardCom,newCardCom);
+		if(!i_newCardCom)
+		{
+			pComInit->CloseNewCardComm(pErrInfo);
+		}
+		else
+		{
+			pComInit->CloseNewCardComm(pErrInfo);
+			if(pComInit->OpenNewCardComm(i_newCardCom,pErrInfo) != 0)
+			{
+				MessageBox(_T("打开芯片卡刷卡器端口失败"),_T("注意"),MB_OK | MB_ICONINFORMATION);
+			}
+		}
+	}
+	pComInit->SetNewCardComm(newCardCom);
+	delete [] pErrInfo;
 }

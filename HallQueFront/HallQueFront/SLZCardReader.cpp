@@ -10,6 +10,7 @@ extern  void MyWriteConsole(CString str);
 
 SLZCardReader::SLZCardReader(void) : m_hReadTread(NULL),
 m_hReadCard(NULL)
+,m_hReadNewCard(NULL)
 {
 	OpenReadCard();
 	CDoFile doFile;
@@ -28,6 +29,15 @@ SLZCardReader::~SLZCardReader(void)
 {
 	TerminateThread(m_hReadTread,0);
 	TerminateThread(m_hReadCard,0);
+
+	TerminateThread(m_hReadNewCard,0);
+
+	if(m_hReadNewCard)
+	{
+		CloseHandle(m_hReadNewCard);
+		m_hReadNewCard = NULL;
+	}
+
 	if(m_hReadTread)
 	{
 		CloseHandle(m_hReadTread);
@@ -48,6 +58,13 @@ SLZCardReader::~SLZCardReader(void)
 	ClearCardLevInfo();
 }
 
+
+SLZCardReader* SLZCardReader::GetInstance()
+{
+	static SLZCardReader Instance;
+	return &Instance;
+}
+
 void SLZCardReader::Run()
 {
 	//初始化后 启动两个线程
@@ -59,6 +76,13 @@ void SLZCardReader::Run()
 			AfxMessageBox(_T("身份证识别启动失败！"));
 		}
 	}
+
+	if(Init_ICLibrary())//初始化芯片卡库
+	{
+		OpenNewReadCard();//打开端口
+		m_hReadNewCard = CreateThread(NULL,0,ReadNewCard,this,0,0);
+	}
+
 	m_hReadCard=CreateThread(NULL,0,ReadCard,this,0,NULL);
 	if (m_hReadCard==0)
 	{
@@ -249,31 +273,7 @@ DWORD WINAPI SLZCardReader::ReadCard(LPVOID pParam)
 #endif
 				if(cardinfo.strCardNumber.IsEmpty()) continue;
 				cardinfo.iCardType=cardMagCard;
-				if(!pCard->m_cardConnectInfo.IsConnect)
-				{
-					cardinfo.strAttchQueID = pCard->JudgeCardAttchQue(cardinfo.strCardNumber);
-					cardinfo.nAttchPageID = pCard->JudgeCardAttchPageID(cardinfo.strCardNumber);
-				}
-				else
-				{
-					//这里对接
- 					/*int nLev = pCard->GetCustLev(cardinfo.strCardNumber);
- 					if(nLev!=-1)
- 					{
- 						CString queID = pCard->JudgeCardAttchQue(nLev);
- 						cardinfo.strAttchQueID = queID;
- 						cardinfo.iCustLevel = nLev;
- 					}*/
-				}
-				//判断是否超出工作时间
-				if(!theApp.m_Controller.JudgeWorkTimeOut(cardinfo.strAttchQueID)&&!cardinfo.strAttchQueID.IsEmpty())
-				{
-					pCard->m_CardReaderMutex.Lock();
-					pCard->m_CardInfoList.AddTail(cardinfo); //加入缓冲区
-					pCard->m_CardReaderMutex.Unlock();
-				}
-//				theApp.m_pView->ShowPage(cardinfo.nAttchPageID);
-				SendMessage(theApp.m_pView->m_hWnd,WM_SHOWPAGE,(WPARAM)cardinfo.nAttchPageID,NULL);
+				pCard->DealCardInfo(&cardinfo);
 			}
 		}
 		Sleep(20);
@@ -540,4 +540,207 @@ int SLZCardReader::JudgeCardAttchPageID(int level)
 		}
 	}
 	return nPageID;
+}
+
+
+BOOL SLZCardReader::MultiReadCard(int nPort,int nWaitTime,char* pErrInfo,CString& cCardNum)
+{
+	int nStatus = 0;
+	char* cTagList = "A";
+	char* cUserInfo = new char[1024];
+	//	unsigned char* psAtr = new unsigned char[256];
+
+	if(m_pCardPresent(&nStatus,pErrInfo) == 0)
+	{
+		if(nStatus)//接触式IC卡
+		{
+			if(m_pGetIcInfo(nPort,'9','1',cTagList,nWaitTime,cUserInfo,pErrInfo) == 0)//成功m_getinfo(nPort,'9','3',(char*)strtaglist.c_str(),0,cBuf,CError);
+			{
+				cCardNum = GetCardNum(cUserInfo);
+				if(cCardNum == m_strCurrentCardNum)//非接触式同一张卡只刷一次
+				{
+					delete [] cUserInfo;
+					return FALSE;
+				}
+				m_strCurrentCardNum = cCardNum;
+				delete [] cUserInfo;
+				return TRUE;
+			}
+		}
+		else
+		{
+			m_strCurrentCardNum.Empty();
+		}
+	}
+
+	//非接触式的IC卡
+	if(m_pGetIcInfo(nPort,'9','2',cTagList,nWaitTime,cUserInfo,pErrInfo) == 0)//读取成功
+	{
+		cCardNum = GetCardNum(cUserInfo);
+		delete [] cUserInfo;
+		return TRUE;
+	}
+	delete [] cUserInfo;
+	return FALSE;
+}
+
+BOOL SLZCardReader::Init_ICLibrary()
+{
+	HINSTANCE hInstance = NULL;
+	hInstance=LoadLibrary(_T("Lib_MsrIc.dll"));
+	if (hInstance==NULL)
+	{
+		//		AfxMessageBox(_T("读取动态库失败"));
+		return FALSE;
+	}
+	else
+	{
+		m_pGetIcInfo = (lpICC_getIcInfo)GetProcAddress(hInstance,"ICC_getIcInfo");
+		m_pMsrRead = (lpMsrRead)GetProcAddress(hInstance,"MsrRead");
+		m_pOpenPort = (lpOpenPort)GetProcAddress(hInstance,"OpenPort");
+		m_pClosePort = (lpClosePort)GetProcAddress(hInstance,"ClosePort");
+		m_pCardPresent = (lpCardPresent)GetProcAddress(hInstance,"CardPresent");
+		m_pPowerOn = (lpPowerOn)GetProcAddress(hInstance,"PowerOn");
+		m_pPowerOff = (lpPowerOff)GetProcAddress(hInstance,"PowerOff");
+		if (m_pGetIcInfo && m_pMsrRead && m_pOpenPort && m_pClosePort && m_pCardPresent && m_pPowerOn && m_pPowerOff)
+		{
+			return TRUE;
+		}
+		else return FALSE;
+	}
+	return TRUE;
+}
+
+BOOL SLZCardReader::OpenNewReadCard()
+{
+	CComInit* pComInit = CComInit::GetInstance();
+	CString c_NewCardCom = pComInit->GetNewCardComm();
+	char* pErrInfo = new char[256];
+	if(c_NewCardCom == _T("USB"))
+	{
+		if(pComInit->OpenNewCardComm(0,pErrInfo) != 0)
+		{
+			::MessageBox((HWND)AfxGetMainWnd(),_T("芯片卡端口打开失败或被占用"),
+				_T("注意"),MB_OK|MB_ICONINFORMATION);
+			delete [] pErrInfo;
+			return FALSE;
+		}
+	}
+	else
+	{
+		CCommonConvert convert;
+		int i_NewCardCom = 0;
+		convert.CStringToint(i_NewCardCom,c_NewCardCom);
+		if(i_NewCardCom != 0)
+		{
+			if(pComInit->OpenNewCardComm(i_NewCardCom,pErrInfo))
+			{
+				::MessageBox((HWND)AfxGetMainWnd(),_T("刷卡器串口打开失败或被占用"),
+					_T("注意"),MB_OK|MB_ICONINFORMATION);
+				delete [] pErrInfo;
+				return FALSE;
+			}
+		}
+	}
+	delete [] pErrInfo;
+	return TRUE;
+}
+
+BOOL SLZCardReader::CloseNewReadCard()
+{
+	char* pErrInfo = new char[256];
+	CComInit* pComInit = CComInit::GetInstance();
+	if(pComInit->CloseNewCardComm(pErrInfo) == 0)
+	{
+		delete [] pErrInfo;
+		return TRUE;
+	}
+	delete [] pErrInfo;
+	return FALSE;
+}
+
+CString SLZCardReader::GetCardNum(const char* buf)
+{
+	ASSERT(buf != NULL);
+	CString strCardNum;
+	char strLen[4] = {0};
+	strncat_s(strLen,4,buf + 1,3);
+	int nLen = atoi(strLen);
+
+	char* destBuf = new char[nLen + 1];
+	memset(destBuf,0,nLen + 1);
+	strncat_s(destBuf,nLen+1,buf + 4,nLen);
+	strCardNum = destBuf;
+	delete [] destBuf;
+	return strCardNum;
+}
+
+DWORD WINAPI SLZCardReader::ReadNewCard(LPVOID pParam)
+{
+	SLZCardReader* pThis = (SLZCardReader*)pParam;
+	CComInit* pComInit = CComInit::GetInstance();
+	char* pErrInfo = new char[256];
+	while(1)
+	{
+		memset(pErrInfo,0,256);
+		CString strNewCardCom = pComInit->GetNewCardComm();
+		CString strCardNum;
+		////////////////////////卡信息结构
+		CARDINFO cardinfo;
+		cardinfo.iCardType=cardMagCard;
+
+		if(strNewCardCom == _T("USB"))
+		{
+			if(pThis->MultiReadCard(0,0,pErrInfo,strCardNum) && !strCardNum.IsEmpty())
+			{
+				cardinfo.strCardNumber = strCardNum;
+			}
+		}
+		int i_cardCom = 0;
+		CCommonConvert::CStringToint(i_cardCom,strNewCardCom);
+		if(i_cardCom)
+		{
+			if(pThis->MultiReadCard(i_cardCom,0,pErrInfo,strCardNum) && !strCardNum.IsEmpty())
+			{
+				cardinfo.strCardNumber = strCardNum;
+			}
+		}
+
+		if(!cardinfo.strCardNumber.IsEmpty())
+		{
+			pThis->DealCardInfo(&cardinfo);
+		}
+		Sleep(10);
+	}
+	delete [] pErrInfo;
+	return 0;
+}
+
+void SLZCardReader::DealCardInfo(CARDINFO* cardinfo)
+{
+	if(!m_cardConnectInfo.IsConnect)
+	{
+		cardinfo->strAttchQueID = JudgeCardAttchQue(cardinfo->strCardNumber);
+		cardinfo->nAttchPageID = JudgeCardAttchPageID(cardinfo->strCardNumber);
+	}
+	else
+	{
+		//这里对接
+		/*int nLev = pCard->GetCustLev(cardinfo.strCardNumber);
+		if(nLev!=-1)
+		{
+		CString queID = pCard->JudgeCardAttchQue(nLev);
+		cardinfo.strAttchQueID = queID;
+		cardinfo.iCustLevel = nLev;
+		}*/
+	}
+	//判断是否超出工作时间
+	if(!theApp.m_Controller.JudgeWorkTimeOut(cardinfo->strAttchQueID)&&!cardinfo->strAttchQueID.IsEmpty())
+	{
+		m_CardReaderMutex.Lock();
+		m_CardInfoList.AddTail(*cardinfo); //加入缓冲区
+		m_CardReaderMutex.Unlock();
+	}
+	//				theApp.m_pView->ShowPage(cardinfo.nAttchPageID);
+	SendMessage(theApp.m_pView->m_hWnd,WM_SHOWPAGE,(WPARAM)cardinfo->nAttchPageID,NULL);
 }

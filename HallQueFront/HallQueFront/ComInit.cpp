@@ -1,6 +1,7 @@
 #include "StdAfx.h"
 #include "ComInit.h"
 #include "DoFile.h"
+#include "SLZCardReader.h"
 
 CComInit::CComInit(void) :
 m_hComReadCard(INVALID_HANDLE_VALUE)
@@ -13,6 +14,8 @@ m_hComReadCard(INVALID_HANDLE_VALUE)
 		int result = TryCom(i);
 		m_canUse[i] = result;
 	}
+
+	ReadComInfo();
 }
 
 CComInit::~CComInit(void)
@@ -185,16 +188,17 @@ void CComInit::SaveComm()
 	WritePrivateProfileString(_T("com"),_T("CARDCOM"),m_cCardComm,m_strPath);
 	WritePrivateProfileString(_T("com"),_T("WNDCOM"),m_cWndComm,m_strPath);
 	WritePrivateProfileString(_T("com"),_T("MSGCOM"),m_cMsgComm,m_strPath);
+	WritePrivateProfileString(_T("com"),_T("NEWCARDCOM"),m_cNewCardComm,m_strPath);
 }
 /*
 ¶ÁÈ¡Ë¢¿¨Æ÷COM¿Ú
 */
 CString CComInit::GetCardComm()
 {
-	wchar_t wbuf[255];
-	ZeroMemory(wbuf,255);
-	GetPrivateProfileString(_T("com"),_T("CARDCOM"),NULL,wbuf,255,m_strPath);
-	m_cCardComm.Format(_T("%s"),wbuf);
+// 	wchar_t wbuf[255];
+// 	ZeroMemory(wbuf,255);
+// 	GetPrivateProfileString(_T("com"),_T("CARDCOM"),NULL,wbuf,255,m_strPath);
+// 	m_cCardComm.Format(_T("%s"),wbuf);
 	return m_cCardComm;
 }
 /*
@@ -202,18 +206,62 @@ CString CComInit::GetCardComm()
 */
 CString CComInit::GetWndComm()
 {
-	wchar_t wbuf[255];
-	ZeroMemory(wbuf,255);
-	GetPrivateProfileString(_T("com"),_T("WNDCOM"),NULL,wbuf,255,m_strPath);
-	m_cWndComm.Format(_T("%s"),wbuf);
+// 	wchar_t wbuf[255];
+// 	ZeroMemory(wbuf,255);
+// 	GetPrivateProfileString(_T("com"),_T("WNDCOM"),NULL,wbuf,255,m_strPath);
+// 	m_cWndComm.Format(_T("%s"),wbuf);
 	return m_cWndComm; 
 }
 
 CString CComInit::GetMsgComm()
 {
+// 	wchar_t wbuf[255];
+// 	ZeroMemory(wbuf,255);
+// 	GetPrivateProfileString(_T("com"),_T("MSGCOM"),NULL,wbuf,255,m_strPath);
+// 	m_cMsgComm.Format(_T("%s"),wbuf);
+	return m_cMsgComm; 
+}
+
+void CComInit::ReadComInfo()
+{
 	wchar_t wbuf[255];
+	ZeroMemory(wbuf,255);
+	GetPrivateProfileString(_T("com"),_T("CARDCOM"),NULL,wbuf,255,m_strPath);
+	m_cCardComm.Format(_T("%s"),wbuf);
+
+	ZeroMemory(wbuf,255);
+	GetPrivateProfileString(_T("com"),_T("WNDCOM"),NULL,wbuf,255,m_strPath);
+	m_cWndComm.Format(_T("%s"),wbuf);
+
+
+	ZeroMemory(wbuf,255);
+	GetPrivateProfileString(_T("com"),_T("NEWCARDCOM"),NULL,wbuf,255,m_strPath);
+	m_cNewCardComm.Format(_T("%s"),wbuf);
+
+	
 	ZeroMemory(wbuf,255);
 	GetPrivateProfileString(_T("com"),_T("MSGCOM"),NULL,wbuf,255,m_strPath);
 	m_cMsgComm.Format(_T("%s"),wbuf);
-	return m_cMsgComm; 
+}
+
+CString CComInit::GetNewCardComm()
+{
+	return m_cNewCardComm;
+}
+
+void CComInit::SetNewCardComm(const CString& strNewCardComm)
+{
+	m_cNewCardComm = strNewCardComm;
+}
+
+int CComInit::OpenNewCardComm(int nCom,char* psOpenErrInfo)
+{
+	SLZCardReader* pCardReader = SLZCardReader::GetInstance();
+	return pCardReader->m_pOpenPort(nCom,'9', psOpenErrInfo);
+}
+
+int CComInit::CloseNewCardComm(char* psCloseErrInfo)
+{
+	SLZCardReader* pCardReader = SLZCardReader::GetInstance();
+	return pCardReader->m_pClosePort(psCloseErrInfo);
 }

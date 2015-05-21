@@ -15,6 +15,7 @@
 #include "DealInterMsg.h"
 #include "UDPServer.h"
 #include "UDPBrodcast.h"
+#include "SLZCardReader.h"
 
 extern  void MyWriteConsole(CString str); 
 
@@ -34,6 +35,7 @@ SLZController::SLZController(void)
 , m_pFinshQueData(NULL)
 , m_pInterNumServer(NULL)
 , m_pUDPServer(NULL)
+,m_pCardread(NULL)
 {
 	m_print.Start();
 	m_infofile_path = m_convert.GetExeFullFilePath();
@@ -131,6 +133,7 @@ SLZController::~SLZController(void)
 
 BOOL SLZController::Start()
 {
+	m_pCardread = SLZCardReader::GetInstance();
 	////读远程数据库的信息
 	BOOL flag1 = FALSE;BOOL flag2 = FALSE; BOOL flag3 = FALSE; BOOL flag4 = FALSE;
 	if(theApp.m_logicVariables.IsAutoSendToServer)
@@ -150,7 +153,7 @@ BOOL SLZController::Start()
 	m_pCalledQueData = new CCalledQueData(m_windowTable);
 	m_pFinshQueData = new CFinshQueData;
 	ReFlushSwingCardTable();
-	m_cardread.Run();
+	m_pCardread->Run();
 	/////////////////////////发送本地信息到服务端数据库
 	if(flag1&&flag2&&flag3&&flag4)
 	{
@@ -344,10 +347,10 @@ UINT SLZController::TakingNumThreadProc(LPVOID pParam)
 	//////////run
 	while(1)
 	{
-		if(pControl->m_cardread.HasData())
+		if(pControl->m_pCardread->HasData())
 		{
 			SLZData data;
-			CARDINFO cardInfo = pControl->m_cardread.GetData();
+			CARDINFO cardInfo = pControl->m_pCardread->GetData();
 			if(pControl->DataNumOut(cardInfo.strAttchQueID))
 			{
 				AfxMessageBox(_T("取号失败，已取到最大号码！"));
@@ -360,26 +363,29 @@ UINT SLZController::TakingNumThreadProc(LPVOID pParam)
 				BOOL isClientData = FALSE;
 				iQueNum = pControl->GetQueNum(cardInfo.strAttchQueID,&CurNum,&isClientData,&data);
 				////排队号码
-				CString QueCount;
-				CString StrQueNum;
-				StrQueNum.Format(_T("%03d"),iQueNum);
-				StrQueNum=pControl->m_queinfo.GetFrontID()+StrQueNum;
-				data.SetQueSerialID(pControl->m_queinfo.GetQueManNum());//队列编号
-				data.SetQueueNumber(StrQueNum);
+				if(theApp.IsLocal())
+				{
+					CString QueCount;
+					CString StrQueNum;
+					StrQueNum.Format(_T("%03d"),iQueNum);
+					StrQueNum=pControl->m_queinfo.GetFrontID()+StrQueNum;
+					data.SetQueSerialID(pControl->m_queinfo.GetQueManNum());//队列编号
+					data.SetQueueNumber(StrQueNum);
+					data.SetIntQueNum(iQueNum);
+
+					CString bussName = pControl->GetQueNameFromID(cardInfo.strAttchQueID);
+					if(!bussName.IsEmpty()) data.SetBussName(bussName);//队列名称
+
+					CTime GetTime = CTime::GetCurrentTime();
+					data.SetTakingNumTime(GetTime);
+				}
 				pControl->map_QueNum.SetAt(cardInfo.strAttchQueID,iQueNum);	
-				data.SetIntQueNum(iQueNum);
 				data.SetCardType(cardInfo.iCardType);//卡类型
 				data.SetCardNumber(cardInfo.strCardNumber);//卡号
 				data.SetBussinessType(cardInfo.strAttchQueID);//属于哪个队列
 				data.SetCustomerLevel(cardInfo.iCustLevel);//客户级别
 				data.SetCustName(cardInfo.strCustName);//客户姓名
 				
-				CString bussName = pControl->GetQueNameFromID(cardInfo.strAttchQueID);
-				if(!bussName.IsEmpty()) data.SetBussName(bussName);//队列名称
-			///卡号
-				CString cardNumber = data.GetCardNumber();			
-				CTime GetTime = CTime::GetCurrentTime();
-				data.SetTakingNumTime(GetTime);
 				///设置机构代码和名称
 				data.SetOrganId(theApp.m_logicVariables.strOrganID);
 				data.SetOrganName(theApp.m_logicVariables.strOrganNmae);
@@ -394,14 +400,14 @@ UINT SLZController::TakingNumThreadProc(LPVOID pParam)
 				/////////////////////////保存信息到本地文件
 				pControl->WriteInlineDataToFile();
 				///打印
-				//CurNum=pControl->m_pInlineQueData->GetBussCount(cardInfo.strAttchQueID);
-				//EnumPrintStaus status = pControl->m_print.CheckPrinterStatus();
-				//pControl->DoPrintStatus(status,data,CurNum);
 				pControl->DoPrint(data,CurNum);
 				///界面显示等待人数
 				theApp.m_pView->ShowWaitNum(data.GetBussinessType(),CurNum);
 				///呼叫器更新等待人数
-				pControl->m_pCallThread->ShowCallerWaitNum(data.GetBussinessType());
+				if(theApp.IsLocal())
+					pControl->m_pCallThread->ShowCallerWaitNum(data.GetBussinessType());///呼叫器更新等待人数
+				else
+					pControl->m_pCallThread->ShowCallerWaitNum(data.GetBussinessType(),CurNum);
 			}
 		}
 		else Sleep(10);
@@ -670,9 +676,9 @@ BOOL SLZController::ReFlushSysLogicVarlibles()
 
 BOOL SLZController::ReFlushSwingCardTable()
 {
-	m_cardread.ReFlushCardConnectInfo();//刷新卡连接信息
-	m_cardread.ReFlushCardConfigInof();//刷新卡识别信息
-	m_cardread.ReFlushCardLevelInfo();//刷新卡的对接等级，对应队列信息
+	m_pCardread->ReFlushCardConnectInfo();//刷新卡连接信息
+	m_pCardread->ReFlushCardConfigInof();//刷新卡识别信息
+	m_pCardread->ReFlushCardLevelInfo();//刷新卡的对接等级，对应队列信息
 	return TRUE;
 }
 
