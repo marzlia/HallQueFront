@@ -57,10 +57,12 @@ void CWndContentDlg::OnBnClickedBnAddwnd()
 {
 	// TODO: 在此添加控件通知处理程序代码
 	int count = m_slzCurSelectWindow.m_throughscreen_array.GetCount();
+	SLZWindowSetDlg* pParent = (SLZWindowSetDlg*)this->GetParent();
+	int nMaxID = pParent->GetAllMaxWndScreenID();
 	CThroughWndScreenInfo WndScreenInfo;
 	
-	WndScreenInfo.SetWndScreenId(count+1);
-	WndScreenInfo.SetComScreenId(count+1);
+	WndScreenInfo.SetWndScreenId(nMaxID+1);
+	WndScreenInfo.SetComScreenId(nMaxID+1);
 	m_slzCurSelectWindow.m_throughscreen_array.Add(WndScreenInfo);
 	
 	CString strSerialId,strScreenId,strPhyId,strPipeId,strComId;

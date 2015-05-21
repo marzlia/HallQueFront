@@ -549,8 +549,8 @@ void SLZCWndScreen::AddThrBasicMsg(ThrScreenBasicMsg msg)
 BOOL SLZCWndScreen::SendDataToThroughScreen(const CString& str,int address,int channel,const CString& localIp)
 {
 	///自己公司协议
-	int height = 0;
-	int width = FindChannelWidth(address,channel,height);
+// 	int height = 0;
+// 	int width = FindChannelWidth(address,channel,height);
 	CString msg = str;
 // #ifdef _DEBUG
 //  	CString test;
@@ -558,10 +558,10 @@ BOOL SLZCWndScreen::SendDataToThroughScreen(const CString& str,int address,int c
 //  	MyWriteConsole(test);
 // 	MyWriteConsole(str);
 // #endif
- 	if(width>0 && width<=128)//注意小于128是因为同屏卡最多显示128个汉字
- 	{
- 		msg = FlushCstringToFitWndScreen(msg,width,height);
- 	}
+//  	if(width>0 && width<=128)//注意小于128是因为同屏卡最多显示128个汉字
+//  	{
+//  		msg = FlushCstringToFitWndScreen(msg,width,height);
+//  	}
 	char buf[512]={0};
 	int length = DoScreenMsg(msg,address+channel,buf);
 	WriteComMsg *pMsg = new WriteComMsg;
@@ -572,7 +572,7 @@ BOOL SLZCWndScreen::SendDataToThroughScreen(const CString& str,int address,int c
 	pComInOut->AddWriteComMsg(pMsg);
 
 	BOOL flag = FALSE;
-	if(!localIp.IsEmpty())//TCP发送
+	if(!localIp.IsEmpty())//UDP发送
 	{
 		MySocketUDP Client;
 		Client.StartSocket();

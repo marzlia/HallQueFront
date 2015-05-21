@@ -95,4 +95,5 @@ public:
 	afx_msg void OnBnClickedBnWndscrset();
 public:
 	int m_nCurSelectItem;
+	int GetAllMaxWndScreenID();
 };

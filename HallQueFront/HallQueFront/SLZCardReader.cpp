@@ -29,7 +29,6 @@ SLZCardReader::~SLZCardReader(void)
 {
 	TerminateThread(m_hReadTread,0);
 	TerminateThread(m_hReadCard,0);
-
 	TerminateThread(m_hReadNewCard,0);
 
 	if(m_hReadNewCard)
