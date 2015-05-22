@@ -935,8 +935,8 @@ END
 //
 
 VS_VERSION_INFO VERSIONINFO
- FILEVERSION 3,0,6,0
- PRODUCTVERSION 3,0,6,0
+ FILEVERSION 4,0,0,0
+ PRODUCTVERSION 4,0,0,0
  FILEFLAGSMASK 0x3fL
 #ifdef _DEBUG
  FILEFLAGS 0x1L
@@ -953,12 +953,12 @@ BEGIN
         BEGIN
             VALUE "CompanyName", "北京凌邦合创电子科技有限公司"
             VALUE "FileDescription", "智能排队系统"
-            VALUE "FileVersion", "3.0.6"
+            VALUE "FileVersion", "4.0.0"
             VALUE "InternalName", "HallQueFront.exe"
             VALUE "LegalCopyright", "TODO: (C) <公司名>。保留所有权利。"
             VALUE "OriginalFilename", "HallQueFront.exe"
             VALUE "ProductName", "智能排队系统"
-            VALUE "ProductVersion", "3.0.6"
+            VALUE "ProductVersion", "4.0.0"
         END
     END
     BLOCK "VarFileInfo"
