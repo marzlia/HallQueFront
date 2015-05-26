@@ -12,7 +12,6 @@ extern void MyWriteConsole(CString str);
 
 SLZCWndScreen::SLZCWndScreen(void) : 
 m_hDoWndScreenMsgThread(NULL)
-, m_ThrWndMutex(NULL)
 {
 	StartHardScreen();
 	////////////////////////´°¿ÚÆÁ
