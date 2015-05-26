@@ -33,9 +33,9 @@ public:
 	CString GetNewCardComm();
 	void SetNewCardComm(const CString& strNewCardComm);
 	//打开芯片卡com
-	int OpenNewCardComm(int nCom,char* psOpenErrInfo);
+	int OpenNewCardComm(CString ICCardComm);
 	//关闭芯片卡com
-	int CloseNewCardComm(char* psCloseErrInfo);
+	int CloseNewCardComm();
 private:
 	//初始化串口
 	void InitCom();

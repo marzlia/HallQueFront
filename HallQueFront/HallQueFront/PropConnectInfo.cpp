@@ -741,33 +741,9 @@ void CPropConnectInfo::OnCbnSelchangeComboNewcard()
 	CString newCardCom;
 	m_combo_newcard.GetLBText(index,newCardCom);
 
-	char* pErrInfo = new char[256];
+//	char* pErrInfo = new char[256];
 
-	if(newCardCom == _T("USB"))//ÎªusbÊ±´«0
-	{
-		pComInit->CloseNewCardComm(pErrInfo);
-		if(pComInit->OpenNewCardComm(0,pErrInfo) != 0)
-		{
-			MessageBox(_T("´ò¿ªÐ¾Æ¬¿¨Ë¢¿¨Æ÷¶Ë¿ÚÊ§°Ü"),_T("×¢Òâ"),MB_OK | MB_ICONINFORMATION);
-		}
-	}
-	else
-	{
-		int i_newCardCom=0;
-		convert.CStringToint(i_newCardCom,newCardCom);
-		if(!i_newCardCom)
-		{
-			pComInit->CloseNewCardComm(pErrInfo);
-		}
-		else
-		{
-			pComInit->CloseNewCardComm(pErrInfo);
-			if(pComInit->OpenNewCardComm(i_newCardCom,pErrInfo) != 0)
-			{
-				MessageBox(_T("´ò¿ªÐ¾Æ¬¿¨Ë¢¿¨Æ÷¶Ë¿ÚÊ§°Ü"),_T("×¢Òâ"),MB_OK | MB_ICONINFORMATION);
-			}
-		}
-	}
+	pComInit->OpenNewCardComm(newCardCom);
+
 	pComInit->SetNewCardComm(newCardCom);
-	delete [] pErrInfo;
 }

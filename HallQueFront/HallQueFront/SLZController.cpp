@@ -16,6 +16,8 @@
 #include "UDPServer.h"
 #include "UDPBrodcast.h"
 #include "SLZCardReader.h"
+#include "mtx_32.h"
+#pragma comment (lib,"Mtx_32.lib")
 
 extern  void MyWriteConsole(CString str); 
 

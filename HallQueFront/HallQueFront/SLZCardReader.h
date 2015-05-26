@@ -28,7 +28,14 @@ private:
 	CMutex m_CardReaderMutex; //线程锁
 	HANDLE  m_hReadTread;//线程句柄
 	HANDLE m_hReadCard;//线程句柄
-	HANDLE m_hReadNewCard;//芯片卡线程句柄
+
+	
+//	HANDLE m_hReadNewCard;//芯片卡线程句柄
+	
+	HANDLE m_hReadICCard;//读非接触式芯片卡二合一线程句柄
+//	HANDLE m_hReadIDCard;//读身份证线程(二合一刷卡器)
+	HANDLE m_hICCardDev;//读身份证和非接触式芯片卡二合一设备句柄
+
 	CList<CARDINFO,CARDINFO&> m_CardInfoList; //缓冲区
 	//读身份证函数
 	int (_stdcall *SDT_StartFindIDCard)(int iPort,unsigned char* pucManaInfo,int iIfOpen);
@@ -36,7 +43,9 @@ private:
 	int (_stdcall *SDT_ReadBaseMsg)(int iPort,unsigned char* pucCHMsg,unsigned int* puiCHMsgLen,unsigned char* pucPHMsg,unsigned int* puiPHMsgLen,int iIfOpen);
 	static DWORD WINAPI ReadThread(LPVOID pParam); //读身份证线程
 	static DWORD WINAPI ReadCard(LPVOID pParam); //读磁卡线程
-	static DWORD WINAPI ReadNewCard(LPVOID pParam);//芯片卡线程
+//	static DWORD WINAPI ReadNewCard(LPVOID pParam);//芯片卡线程
+	static DWORD WINAPI ReadICCard(LPVOID pParam);//非接触式芯片卡二合一
+//	static DWORD WINAPI ReadIDCard(LPVOID pParam);//身份证芯片卡二合一
 private:
 	BOOL OpenReadCard();
 	CString m_cardcofinfo_path;//卡识别信息文件路径
@@ -64,41 +73,17 @@ private:
 	string m_strCardNum;
 
 private:
-	/**************************新刷卡器（二合一）***************************/
-	BOOL MultiReadCard(int nPort,int nWaitTime,char* pErrInfo,CString& cCardNum); //二合一刷卡器
-	//打开端口
-	typedef int (CALLBACK* lpOpenPort)(int,char,char*);
-	//读IC卡函数
-	typedef int (CALLBACK* lpICC_getIcInfo)(int,char,char,char*,int,char*,char*);
-	//读磁卡函数
-	typedef int (CALLBACK* lpMsrRead)(int,char,int,char*,char*,int,char*);
-	//关闭端口
-	typedef int (CALLBACK* lpClosePort)(char* );
-	//卡片在位判断(判断接触式芯片卡是否在位)
-	typedef int  (CALLBACK* lpCardPresent)(  int *,  char * );
-	//IC卡上电
-	typedef int  (CALLBACK* lpPowerOn)(  unsigned char *,   int *,   int ,   char *,   int );
-	//IC卡下电
-	typedef int  (CALLBACK* lpPowerOff)(  char *,  int );
+	/**************************新刷卡器 身份证和芯片卡二合一***************************/
 
-	lpICC_getIcInfo m_pGetIcInfo;
-	lpMsrRead m_pMsrRead;
-	lpCardPresent m_pCardPresent;
-	lpPowerOn m_pPowerOn;
-	lpPowerOff m_pPowerOff;
+	void DealCardInfo(CARDINFO* pCardinfo);
 
-	//新刷卡（二合一）初始化动态库
-	BOOL Init_ICLibrary();
+	void DealIDCardInof(CARDINFO* pCardinfo);
 
-	void DealCardInfo(CARDINFO* cardinfo);
-
-	CString GetCardNum(const char* buf);//得到卡号
-
-	BOOL OpenNewReadCard();//芯片卡
-	BOOL CloseNewReadCard();//关闭芯片卡端口
+//	CString GetCardNum(const char* buf);//得到卡号
 private:
 	CString m_strCurrentCardNum;//用于判断当前接触式卡卡号是否重复刷
+//	CMutex m_mtReadICLock;
 public:
-	lpOpenPort m_pOpenPort;//打开端口
-	lpClosePort m_pClosePort;//关闭端口
+	BOOL OpenICCard(CString ICCardComm);//打开芯片卡
+	BOOL CloseICCard();//关闭芯片卡端口
 };

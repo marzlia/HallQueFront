@@ -254,14 +254,14 @@ void CComInit::SetNewCardComm(const CString& strNewCardComm)
 	m_cNewCardComm = strNewCardComm;
 }
 
-int CComInit::OpenNewCardComm(int nCom,char* psOpenErrInfo)
+int CComInit::OpenNewCardComm(CString ICCardComm)
 {
 	SLZCardReader* pCardReader = SLZCardReader::GetInstance();
-	return pCardReader->m_pOpenPort(nCom,'9', psOpenErrInfo);
+	return pCardReader->OpenICCard(ICCardComm);
 }
 
-int CComInit::CloseNewCardComm(char* psCloseErrInfo)
+int CComInit::CloseNewCardComm()
 {
 	SLZCardReader* pCardReader = SLZCardReader::GetInstance();
-	return pCardReader->m_pClosePort(psCloseErrInfo);
+	return pCardReader->CloseICCard();
 }

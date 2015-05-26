@@ -796,6 +796,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\mtx_32.h"
+				>
+			</File>
+			<File
 				RelativePath=".\MyCommon.h"
 				>
 			</File>
