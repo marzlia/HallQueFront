@@ -4,9 +4,10 @@
 #include "afxwin.h"
 #include "ListCtrlCl.h"
 #include "SLZWindow.h"
-// #include <list>
-// using namespace std;
+#include <list>
+using namespace std;
 
+class CStbContent;
 // CWndContentDlg ¶Ô»°¿ò
 
 class CWndContentDlg : public CDialog
@@ -41,15 +42,22 @@ private:
 	void ShowContent();
 	BOOL ModifyListWndInfo(SLZWindow& slzWindow);
 	void ShowEditBoxInfo();
+	void ShowStbComboInfo();
 //	list<CThroughWndScreenInfo> m_list_wndScreenInfo;
 public:
 	afx_msg void OnLvnItemchangedListWndcontent(NMHDR *pNMHDR, LRESULT *pResult);
 private:
 	int m_nCurrentSelectItem;
+	BOOL ReadStbInfo();
+	list<CStbContent*> m_list_stdContent;
+	void ClearStbInfo();
+	CStbContent* GetSelectStbContent(int nIndex);
 public:
 	afx_msg void OnEnChangeEditWndscrid();
 	afx_msg void OnEnChangeEditComscrid();
 	afx_msg void OnEnChangeEditLedphyid();
 	afx_msg void OnEnChangeEditLedipid();
 	afx_msg void OnEnChangeEditLedpipe();
+	CComboBox m_combo_stb;
+	afx_msg void OnCbnSelchangeComboStb();
 };

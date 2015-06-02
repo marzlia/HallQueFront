@@ -26,6 +26,7 @@ SoundPlay::SoundPlay(SLZWindowQueryView& windowTable)
 	{
 		ShowAdven();				//开机显示广告
 	}
+	GetReplayTimes();
 }
 
 SoundPlay::~SoundPlay()
@@ -628,11 +629,12 @@ UINT SoundPlay::PlayVoiceThread(LPVOID pParam)
 			{
 				WndScreenInfo = PlayStr.ScreenWndInfoArray.GetAt(i);
 				if (WndScreenInfo.GetWndScreenId() != 0 || (WndScreenInfo.GetPhyId() != 0 && WndScreenInfo.GetPipeId() !=0 ) 
-					|| WndScreenInfo.GetComScreenId() != 0)
+					|| WndScreenInfo.GetComScreenId() != 0 )
 				{
 					ShowMsgTime showtime={0};   //初始化计时结构体
 					showtime.iWndid = PlayStr.iWndid;
 					showtime.strAd = PlayStr.strAd;
+					///////////////////////////////////窗口屏
 					if (WndScreenInfo.GetWndScreenId() != 0)
 					{
 					
@@ -640,6 +642,13 @@ UINT SoundPlay::PlayVoiceThread(LPVOID pParam)
 						showtime.address = WndScreenInfo.GetWndScreenId();
 
 					}
+					/////////////////////////////////机顶盒
+					if(WndScreenInfo.GetStbID() != 0 && pThis->m_strLastStbMsg != PlayStr.strDisplayStr)
+					{
+						pThis->m_strLastStbMsg = PlayStr.strDisplayStr;
+						pWndScreen->AddStbScreenMsg(PlayStr.strDisplayStr,WndScreenInfo.GetStbID());
+					}
+					/////////////////////////////////通屏
 					if (WndScreenInfo.GetPhyId() != 0 && WndScreenInfo.GetPipeId() != 0)
 					{
 						
@@ -648,6 +657,7 @@ UINT SoundPlay::PlayVoiceThread(LPVOID pParam)
 						showtime.LedPipe = WndScreenInfo.GetPipeId();
 						showtime.localIP = WndScreenInfo.GetLocalIp();
 					}
+					///////////////////////////////综合屏
 					if (WndScreenInfo.GetComScreenId() != 0)
 					{
 						
@@ -674,17 +684,19 @@ UINT SoundPlay::PlayVoiceThread(LPVOID pParam)
 //////////////////////声音播放//////////////////////////
 			if (!PlayStr.strVoiceStr.IsEmpty())
 			{
-				if (theApp.m_logicVariables.IsUseJtts)
+				for(int i=0;i<pThis->m_iSoundReplayTimes;i++)
 				{
+					if (theApp.m_logicVariables.IsUseJtts)
+					{
 						CStringArray soundarray;
 						CommonStrMethod::StrSplit(PlayStr.strVoiceStr,soundarray,_T("#"));
 						for (int i=0;i< soundarray.GetCount();i++)
 						{
 							pThis->PlayJtts(soundarray.GetAt(i));
 						}
-				}
-				else
-				{
+					}
+					else
+					{
 						CStringArray soundarray;
 						CommonStrMethod::StrSplit(PlayStr.strVoiceStr,soundarray,_T("#"));
 						for (int j=0;j<soundarray.GetCount();j++)
@@ -692,7 +704,9 @@ UINT SoundPlay::PlayVoiceThread(LPVOID pParam)
 							CString strjts = soundarray.GetAt(j);
 							pThis->PlayTheVoice(strjts,pThis->m_WavList);
 						}
+					}
 				}
+				//////////////////////////
 			}
 		}
 		//pThis->m_mtThreadPlayVoice.Unlock();

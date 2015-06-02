@@ -271,7 +271,7 @@ BOOL CDealInterMsg::AnaSendInterMsg(const string& retSendMsg,CString& queManNum,
 	return TRUE;
 }
 
-void CDealInterMsg::ProduceSendCallMsg(const CStringArray& queManNumArray,string& retCallMsg,const CString& organId)
+void CDealInterMsg::ProduceSendCallMsg(const CStringArray& queManNumArray,string& retCallMsg,const CString& organId,BOOL bIsUsePower)
 {
 	CString msg = _T("<?xml version=\"1.0\" encoding=\"UTF-8\"?><dataPacket version=\"1.0\">");
 	msg.Append(_T("<headCode>sendCallMsg</headCode>"));
@@ -286,6 +286,7 @@ void CDealInterMsg::ProduceSendCallMsg(const CStringArray& queManNumArray,string
 		}
 	}
 	msg.Append(_T("</queManNum>"));
+	msg.AppendFormat(_T("<usePower>%d</usePower>"),bIsUsePower);
 	msg.AppendFormat(_T("<organId>%s</organId>"),organId);
 	msg.Append(_T("</dataPacket>"));
 
@@ -295,7 +296,7 @@ void CDealInterMsg::ProduceSendCallMsg(const CStringArray& queManNumArray,string
 	a_retPacket.ReleaseBuffer(0);
 }
 
-BOOL CDealInterMsg::AnaSendCallMsg(const string& retSendMsg,CStringArray& queManNumArray,CString& organId)
+BOOL CDealInterMsg::AnaSendCallMsg(const string& retSendMsg,CStringArray& queManNumArray,CString& organId,BOOL* pIsUsePower)
 {
 	string::size_type pos1 = retSendMsg.find("<headCode>");
 	string::size_type pos2 = retSendMsg.find("</headCode>");
@@ -343,6 +344,21 @@ BOOL CDealInterMsg::AnaSendCallMsg(const string& retSendMsg,CStringArray& queMan
 
 	string aOrganId = retSendMsg.substr(pos1 + strlen("<organId>"),pos2 - pos1 - strlen("<organId>"));
 	organId = aOrganId.c_str();
+
+	pos1 = retSendMsg.find("<usePower>");
+	pos2 = retSendMsg.find("</usePower>");
+	if(pos1 == retSendMsg.npos || pos2 == retSendMsg.npos)
+		return FALSE;
+
+	string aUsePower = retSendMsg.substr(pos1 + strlen("<usePower>"),pos2 - pos1 - strlen("<usePower>"));
+	if(aUsePower == "0")
+	{
+		*pIsUsePower = FALSE;
+	}
+	else
+	{
+		*pIsUsePower = TRUE;
+	}
 	return TRUE;
 }
 

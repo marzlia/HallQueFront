@@ -6,8 +6,9 @@
 #include "ComputeFuncationTime.h"
 #include "DoComInOut.h"
 //#include "ComplSocketClient.h"
-#include "UDPBrodcast.h"
 #include "MySocketUDP.h"
+#include "StbContent.h"
+#include "StbDisplay.h"
 
 //SLZCWndScreen* SLZCWndScreen::m_pInstance=NULL;//new SLZCWndScreen;
 extern void MyWriteConsole(CString str);
@@ -15,7 +16,10 @@ extern void MyWriteConsole(CString str);
 SLZCWndScreen::SLZCWndScreen(void) : 
 m_hDoWndScreenMsgThread(NULL)
 , m_ThrWndMutex(NULL)
+, m_hDoStbScreenThread(NULL)
+, m_pStbDisplay(NULL)
 {
+	m_pStbDisplay = new StbDisplay;
 	StartHardScreen();
 	////////////////////////窗口屏
 	///初始化通屏通道，获取通道的信息最大255块通屏
@@ -42,6 +46,20 @@ SLZCWndScreen::~SLZCWndScreen(void)
 		CloseHandle(m_hDoThrWndMsgThread);
 		m_hDoThrWndMsgThread = NULL;
 	}
+	TerminateThread(m_hDoStbScreenThread,0);
+	if(m_hDoStbScreenThread)
+	{
+		CloseHandle(m_hDoStbScreenThread);
+		m_hDoStbScreenThread = NULL;
+	}
+	ClearStbContentInfo();
+
+	if(m_pStbDisplay)
+	{
+		delete m_pStbDisplay;
+		m_pStbDisplay = NULL;
+	}
+	ClearMapStbcallMsg();
 }
 
 int SLZCWndScreen::DoScreenMsg(CString& msg,
@@ -330,6 +348,31 @@ void SLZCWndScreen::StartHardScreen()
 		m_hDoThrWndMsgThread = CreateThread(NULL,0,DoThrWndMsgThread,
 			this,NULL,0);
 	}
+	if(!m_hDoStbScreenThread)
+	{
+		m_hDoStbScreenThread = CreateThread(NULL,0,DoStbScreenMsgThread,this,NULL,0);
+	}
+
+	CDoFile doFile;
+	m_pStbDisplay->Start();
+	ReadStbContentInfo();
+	CString strtitle,strstbid,strnotice,strtitlepic,strnewfile;
+	strnewfile = doFile.GetExeFullFilePath();
+	strnewfile += _T("\\webRoot\\img\\hspt.jpg");
+	list<CStbContent*>::const_iterator itera = m_list_stbcontent.begin();
+	for(itera;itera!=m_list_stbcontent.end();++itera)
+	{
+		strtitle = (*itera)->GetStbTitle();
+		strnotice = (*itera)->GetStbNotice();
+		strstbid = (*itera)->GetStbNum();
+		strtitlepic = (*itera)->GetStbTitlePicPath();
+// 		if(!doFile.IsFileExit(strtitlepic) && !strtitlepic.IsEmpty())
+// 		{
+			::CopyFile(strtitlepic,strnewfile,FALSE);
+//		}
+		m_pStbDisplay->StbUpdateTitleHtml(strtitle,strstbid);
+		m_pStbDisplay->StbUpdateNoticeHtml(strnotice,strstbid);
+	}
 }
 /*
 void SLZCWndScreen::InitThroughScreen(const int address)
@@ -574,7 +617,6 @@ BOOL SLZCWndScreen::SendDataToThroughScreen(const CString& str,int address,int c
 	BOOL flag = FALSE;
 	if(!localIp.IsEmpty())//UDP发送
 	{
-//		CUDPBrodcast Client;
 		MySocketUDP Client;
 		Client.StartSocket(1024);
 		flag = Client.SendTo(buf,length,localIp,1024);
@@ -688,4 +730,205 @@ string::size_type SLZCWndScreen::GetIpPos(const string& msg)
 	if(i_next3>=0 && i_next3<=9)
 		resultPos = thirdPoint+3;
 	return resultPos+1;
+}
+
+DWORD WINAPI SLZCWndScreen::DoStbScreenMsgThread(LPVOID pParam)
+{
+	SLZCWndScreen* pThis = (SLZCWndScreen*)pParam;
+	while(TRUE)
+	{
+		if(pThis->m_list_stdscreenmsg.empty())
+		{
+			Sleep(5);
+		}
+		else
+		{
+			StbScreenMsg stbScreenMsg;
+			pThis->m_mtStbScreenMsg.Lock();
+			list<StbScreenMsg>::const_iterator itera = pThis->m_list_stdscreenmsg.begin();
+			stbScreenMsg = *itera;
+			pThis->m_list_stdscreenmsg.pop_front();
+			pThis->m_mtStbScreenMsg.Unlock();
+
+			CString strStbNum;
+			CString strRetMsg = pThis->ProduceStbMsg(strStbNum,stbScreenMsg.uStbID);
+#ifdef _DEBUG
+			MyWriteConsole(_T("retmsg:") + strRetMsg);
+#endif
+
+			if(pThis->m_pStbDisplay && !strRetMsg.IsEmpty())
+			{
+				pThis->m_pStbDisplay->StbUpdateCallMsg(strRetMsg,strStbNum);
+			}
+		}
+	}
+	return 0;
+}
+
+void SLZCWndScreen::AddStbScreenMsg(const CString& msg, UINT uStbID)
+{
+	if(msg.IsEmpty() || uStbID == 0)
+		return;
+	StbScreenMsg stb;
+	stb.strMsg = msg;
+	stb.uStbID = uStbID;
+
+	m_mtStbmapcallmsg.Lock();
+	map<UINT,CStringArray*>::const_iterator itera;
+	itera = m_map_stbcallMsg.find(uStbID);
+	if(itera != m_map_stbcallMsg.end())
+	{
+		if(itera->second->GetCount() > 50)
+		{
+			itera->second->RemoveAt(0,10);
+		}
+		itera->second->Add(msg);
+	}
+	else
+	{
+		CStringArray* pStrMsgArray = new CStringArray;
+		pStrMsgArray->Add(msg);
+		m_map_stbcallMsg[uStbID] = pStrMsgArray;
+	}
+	m_mtStbmapcallmsg.Unlock();
+
+
+	m_mtStbScreenMsg.Lock();
+	m_list_stdscreenmsg.push_back(stb);
+	m_mtStbScreenMsg.Unlock();
+}
+
+BOOL SLZCWndScreen::ReadStbContentInfo()
+{
+	CDoFile doFile;
+	CString strExePath = doFile.GetExeFullFilePath();
+	strExePath += _T("\\StbBasicInfo\\StbInfo.dat");
+	CFile file;
+	CFileException e;
+	if (file.Open(strExePath,CFile::modeRead,&e))
+	{
+		CStbContent* pStb=NULL;
+		CArchive ar(&file,CArchive::load);
+		if (file.GetLength()) 
+			do
+			{
+				ar>>pStb;
+				if (pStb)
+				{
+					m_list_stbcontent.push_back(pStb);
+				}
+			}while(!ar.IsBufferEmpty());
+			ar.Close();
+			file.Close();
+			return TRUE;
+	}
+	return FALSE;
+}
+
+void SLZCWndScreen::ClearStbContentInfo()
+{
+	CStbContent* pStb = NULL;
+	list<CStbContent*>::const_iterator itera = m_list_stbcontent.begin();
+	for(itera;itera!=m_list_stbcontent.end();++itera)
+	{
+		pStb = *itera;
+		if(pStb)
+			delete pStb;
+	}
+
+	m_list_stbcontent.clear();
+}
+
+BOOL SLZCWndScreen::ReFlushStbContentInfo()
+{
+	ClearStbContentInfo();
+	return ReadStbContentInfo();
+}
+
+void SLZCWndScreen::UpdateStbTitleAndNotice()
+{
+	CDoFile doFile;
+	CString strtitle,strstbid,strnotice,strtitlepic,strnewfile;
+	strnewfile = doFile.GetExeFullFilePath();
+	strnewfile += _T("\\webRoot\\img\\hspt.jpg");
+
+	list<CStbContent*>::const_iterator itera = m_list_stbcontent.begin();
+	for(itera;itera!=m_list_stbcontent.end();++itera)
+	{
+		strtitle = (*itera)->GetStbTitle();
+		strnotice = (*itera)->GetStbNotice();
+		strstbid = (*itera)->GetStbNum();
+		strtitlepic = (*itera)->GetStbTitlePicPath();
+//		if(doFile.IsFileExit() && !strtitlepic.IsEmpty())
+//		{
+		::CopyFile(strtitlepic,strnewfile,FALSE);
+//		}
+		m_pStbDisplay->StbUpdateTitleHtml(strtitle,strstbid);
+		m_pStbDisplay->StbUpdateNoticeHtml(strnotice,strstbid);
+	}
+}
+
+void SLZCWndScreen::ClearMapStbcallMsg()
+{
+	map<UINT,CStringArray*>::const_iterator itera = m_map_stbcallMsg.begin();
+	for(itera;itera!=m_map_stbcallMsg.end();++itera)
+	{
+		if(itera->second)
+		{
+			delete itera->second;
+		}
+	}
+	m_map_stbcallMsg.clear();
+}
+
+CString SLZCWndScreen::ProduceStbMsg(CString& strStbNum,UINT uStbID)
+{
+	CString strRetMsg;
+	CStbContent* pStb = NULL;
+	list<CStbContent*>::const_iterator itera = m_list_stbcontent.begin();
+	for(itera;itera!=m_list_stbcontent.end();++itera)
+	{
+		if((*itera)->GetSerialID() == uStbID)
+		{
+			pStb = (*itera);
+			strStbNum = pStb->GetStbNum();
+			break;
+		}
+	}
+
+	if(pStb)
+	{
+		int nLineNum = pStb->GetStbLineNum();
+		CStringArray* pStrArray = NULL;
+		m_mtStbmapcallmsg.Lock();
+		map<UINT,CStringArray*>::const_iterator itera;
+		itera = m_map_stbcallMsg.find(uStbID);
+		if(itera != m_map_stbcallMsg.end())
+		{
+			pStrArray = itera->second;
+		}
+		m_mtStbmapcallmsg.Unlock();
+		if(pStrArray)
+		{
+			int count = pStrArray->GetCount();
+			if(nLineNum <= count)
+			{
+				int temp = count - nLineNum;
+				for(temp;temp<count;temp++)
+				{
+					strRetMsg += pStrArray->GetAt(temp);
+					strRetMsg += _T("<br/> ");
+				}
+			}
+			else
+			{
+				for(int i=0;i<pStrArray->GetCount();i++)
+				{
+					strRetMsg += pStrArray->GetAt(i);
+					strRetMsg += _T("<br/> ");
+				}
+			}
+		}
+	}
+	return strRetMsg;
 }

@@ -15,6 +15,7 @@ SLZWindow::SLZWindow(void) : m_iCallerId(0)
 , m_iEvaTimeOut(15)
 //, m_iLEDPhyId(0)
 , m_iShowWndId(0)
+, m_bIsUsePower(FALSE)
 //, m_iLEDPipeId(0)
 {
 	
@@ -57,6 +58,8 @@ SLZWindow::SLZWindow(const SLZWindow& obj)
 	{
 		m_throughscreen_array.Add(obj.m_throughscreen_array.GetAt(i));
 	}
+
+	m_bIsUsePower = obj.m_bIsUsePower;
 }
 
 SLZWindow& SLZWindow::operator =(const SLZWindow& obj)
@@ -88,7 +91,8 @@ SLZWindow& SLZWindow::operator =(const SLZWindow& obj)
 	{
 		m_throughscreen_array.Add(obj.m_throughscreen_array.GetAt(i));
 	}
-
+	
+	m_bIsUsePower = obj.m_bIsUsePower;
 	return *this;
 }
 
@@ -100,7 +104,7 @@ void SLZWindow::Serialize( CArchive& ar)
 		ar << m_iWindowId << m_strWindowName << m_strWindowCallName << m_iCallerId 
 			<< m_iEvaluatorId << m_strStbId << m_staffDefaultId << m_CalledMsg << m_WaitCalledMsg
 			<< m_ShowMsg << m_WaitShowMsg << m_iMsgShowTime << m_strAdMsg 
-			<< m_iEvaTimeOut<<m_iShowWndId;
+			<< m_iEvaTimeOut<<m_iShowWndId<<m_bIsUsePower;
 		m_ArraySize = m_arrBussId.GetCount();
 		ar << m_ArraySize;
 		for(int i = 0; i < m_ArraySize; i++)
@@ -117,7 +121,7 @@ void SLZWindow::Serialize( CArchive& ar)
 			throughWndInfo = m_throughscreen_array.GetAt(i);
 			ar << throughWndInfo.GetThroughWndScreenId() << throughWndInfo.GetLocalIp()
 				<< throughWndInfo.GetPhyId() << throughWndInfo.GetPipeId() << throughWndInfo.GetWndScreenId()
-				<< throughWndInfo.GetComScreenId();
+				<< throughWndInfo.GetComScreenId()<<throughWndInfo.GetStbID();
 		}
 	}
 	else
@@ -125,7 +129,7 @@ void SLZWindow::Serialize( CArchive& ar)
 		ar >> m_iWindowId >> m_strWindowName >> m_strWindowCallName >> m_iCallerId 
 			>> m_iEvaluatorId  >> m_strStbId >> m_staffDefaultId >> m_CalledMsg >> m_WaitCalledMsg
 			>> m_ShowMsg >> m_WaitShowMsg >> m_iMsgShowTime >> m_strAdMsg 
-			>> m_iEvaTimeOut>>m_iShowWndId;
+			>> m_iEvaTimeOut>>m_iShowWndId>>m_bIsUsePower;
 		
 		ar >> m_ArraySize;
 		for(int i = 0; i < m_ArraySize; i++)
@@ -139,6 +143,7 @@ void SLZWindow::Serialize( CArchive& ar)
 		ar >> ArraySize;
 
 		CString strLocalIp;
+		UINT  nStbID;
 		int nPhyId = 0;
 		int nPipeId = 0;
 		int nWndScreenId = 0;
@@ -148,7 +153,7 @@ void SLZWindow::Serialize( CArchive& ar)
 
 		for(int i=0;i<ArraySize;i++)
 		{
-			ar >>nThroughWndScreenId >> strLocalIp >> nPhyId >> nPipeId >> nWndScreenId >> nComScreenId;
+			ar >>nThroughWndScreenId >> strLocalIp >> nPhyId >> nPipeId >> nWndScreenId >> nComScreenId >> nStbID;
 
 			g_throughWndScreenId = g_throughWndScreenId > nThroughWndScreenId ? g_throughWndScreenId : nThroughWndScreenId;
 
@@ -158,6 +163,7 @@ void SLZWindow::Serialize( CArchive& ar)
 			throughWndInfo.SetPipeId(nPipeId);
 			throughWndInfo.SetWndScreenId(nWndScreenId);
 			throughWndInfo.SetComScreenId(nComScreenId);
+			throughWndInfo.SetStbID(nStbID);
 
 			m_throughscreen_array.Add(throughWndInfo);
 		}

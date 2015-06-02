@@ -6,6 +6,7 @@ CThroughWndScreenInfo::CThroughWndScreenInfo(void) : m_nPhyId(0)
 ,m_nPipeId(0)
 ,m_nScreenId(0)
 ,m_nComScreenId(0)
+,m_nStbID(0)
 {
 	g_throughWndScreenId++;
 	m_nThroughWndScreenId = g_throughWndScreenId;
@@ -23,6 +24,7 @@ CThroughWndScreenInfo::CThroughWndScreenInfo(const CThroughWndScreenInfo& obj)
 	m_nPipeId = obj.m_nPipeId;
 	m_nComScreenId = obj.m_nComScreenId;
 	m_nScreenId = obj.m_nScreenId;
+	m_nStbID = obj.m_nStbID;
 }
 
 CThroughWndScreenInfo& CThroughWndScreenInfo::operator =(const CThroughWndScreenInfo& obj)
@@ -35,7 +37,7 @@ CThroughWndScreenInfo& CThroughWndScreenInfo::operator =(const CThroughWndScreen
 	m_nPipeId = obj.m_nPipeId;
 	m_nComScreenId = obj.m_nComScreenId;
 	m_nScreenId = obj.m_nScreenId;
-
+	m_nStbID = obj.m_nStbID;
 	return *this;
 }
 
@@ -97,4 +99,14 @@ int CThroughWndScreenInfo::GetComScreenId() const
 void CThroughWndScreenInfo::SetComScreenId(int nComScreenId)
 {
 	m_nComScreenId = nComScreenId;
+}
+
+void CThroughWndScreenInfo::SetStbID(UINT StbID)
+{
+	m_nStbID = StbID;
+}
+
+UINT CThroughWndScreenInfo::GetStbID() const
+{
+	return m_nStbID;
 }

@@ -153,4 +153,6 @@ private:
 	CString Getthesame(CString strSrc);						//////提取字符串中和第一个字符类型相同的字符串（汉字或非汉字）
 	BOOL PlayTheVoice(CString strVoice,const CStringList& WavList);			
 	CString PlayTheVoiceFromRight(CString strVoice,const CStringList& WavList);			////////从字符串的右侧循环发声
+private:
+	CString m_strLastStbMsg;//上一条机顶盒信息
 };

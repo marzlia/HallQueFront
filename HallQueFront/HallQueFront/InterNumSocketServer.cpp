@@ -336,7 +336,8 @@ void CInterNumSocketServer::DealMsg(const string& recvPacket,string& retPacket)
 	{
 		CStringArray queManNumArray,queserial_id_array;
 		CString organId,queserial_id;
-		CDealInterMsg::AnaSendCallMsg(recvPacket,queManNumArray,organId);
+		BOOL bIsUsePower = FALSE;
+		CDealInterMsg::AnaSendCallMsg(recvPacket,queManNumArray,organId,&bIsUsePower);
 		
 		for(int i=0;i<queManNumArray.GetCount();++i)
 		{
@@ -346,7 +347,7 @@ void CInterNumSocketServer::DealMsg(const string& recvPacket,string& retPacket)
 		
 		//////
 		SLZData data;
-		BOOL isSucced = m_pInlineQueData->DeleteInlineClientData(queserial_id_array,organId,&data);
+		BOOL isSucced = m_pInlineQueData->DeleteInlineClientData(bIsUsePower,queserial_id_array,organId,&data);
 
 		CDealInterMsg::ProduceRetCallMsg(isSucced,retPacket,&data);
 		

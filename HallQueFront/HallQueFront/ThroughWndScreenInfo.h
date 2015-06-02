@@ -25,6 +25,9 @@ public:
 
 	int GetComScreenId()const;
 	void SetComScreenId(int nComScreenId);
+
+	UINT GetStbID()const;
+	void SetStbID(UINT StbID);
 private:
 	CString m_strLocalIP;//通屏IP
 	int m_nPhyId;//通屏物理地址id
@@ -34,4 +37,6 @@ private:
 	int m_nComScreenId;//综合屏id
 
 	UINT m_nThroughWndScreenId;//唯一编号
+
+	UINT m_nStbID;//机顶盒
 };
