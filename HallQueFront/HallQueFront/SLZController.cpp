@@ -1005,15 +1005,31 @@ BOOL SLZController::ClearSystemData()
 		CTime clearTime = theApp.m_logicVariables.ClearDataTime;
 		CTime newTime(currTime.GetYear(),currTime.GetMonth(),currTime.GetDay(),
 			clearTime.GetHour(),clearTime.GetMinute(),clearTime.GetSecond());
-		if(currTime>=newTime)
+		if(currTime==newTime)
 		{
 			m_pInlineQueData->RemoveAllData();
 			//清空保存的最大号码
 			CDoFile doFile;
-			CString path = doFile.GetExeFullFilePath();
-			path+=_T("\\MapQue.dat");
+			CString exepath = doFile.GetExeFullFilePath();
+			CString path = exepath + _T("\\MapQue.dat");
 			CFile file;
 			if(file.Open(path,CFile::modeCreate|CFile::modeWrite))
+			{
+				file.SetLength(0);
+				file.Close();
+			}
+			CString datapath = exepath + _T("\\Data\\InlineData.dat");
+			if(file.Open(datapath,CFile::modeCreate | CFile::modeWrite))
+			{
+				file.SetLength(0);
+				file.Close();
+			}
+			
+			CString temp;
+			temp.Format(_T("%d%02d%02d.dat"),
+				currTime.GetYear(),currTime.GetMonth(),currTime.GetDay());
+			CString recrodPath = exepath + _T("\\record\\") + temp;
+			if(file.Open(recrodPath,CFile::modeCreate | CFile::modeWrite))
 			{
 				file.SetLength(0);
 				file.Close();
