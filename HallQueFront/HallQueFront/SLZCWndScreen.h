@@ -3,11 +3,13 @@
 #include <afxmt.h>
 #include <list>
 #include <map>
+#include <string>
+using namespace std;
 
 class CStbContent;
 class StbDisplay;
 
-using namespace std;
+
 class SLZCWndScreen
 {
 private:
@@ -91,9 +93,11 @@ public:
 //	BOOL DoThroughInitMsg();
 //	void AddThroughInitStr(const char* buf,const DWORD count);
 	void AddThroughScreenMsg(const CString& msg,int address,int channel,const CString& localIp = _T(""));//向缓冲区里添加通屏数据
+
 	void AddStbScreenMsg(const CString& msg,UINT uStbID);
 
 	BOOL ReFlushStbContentInfo();
 
 	void UpdateStbTitleAndNotice();
+
 };

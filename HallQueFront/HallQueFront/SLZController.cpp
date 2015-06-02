@@ -289,11 +289,16 @@ BOOL SLZController::InitInterNumServer()
 	}
 	else
 	{
+
 		if(m_pInterNumServer)
 		{
 			delete m_pInterNumServer;
 			m_pInterNumServer = NULL;
 		}
+
+	//	if(throughID[i]>0)
+		//	pWndScreen->InitThroughScreen(throughID[i]);
+
 	}
 	return TRUE;
 }
