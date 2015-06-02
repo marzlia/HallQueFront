@@ -107,8 +107,8 @@ DWORD WINAPI CDoComInOut::ReadCallerThread(LPVOID pParam)
 // #ifdef _DEBUG
 // 						MyWriteConsole(_T("Í¬ÆµÊý¾Ý"));
 // #endif
-						SLZCWndScreen* pWindowScreen = SLZCWndScreen::GetInstance();
-						pWindowScreen->AddThroughInitStr(buf,dwReaded);
+// 						SLZCWndScreen* pWindowScreen = SLZCWndScreen::GetInstance();
+// 						pWindowScreen->AddThroughInitStr(buf,dwReaded);
 					}
 				}
 				else

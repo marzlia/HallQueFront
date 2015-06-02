@@ -12,7 +12,6 @@ extern void MyWriteConsole(CString str);
 
 SLZCWndScreen::SLZCWndScreen(void) : 
 m_hDoWndScreenMsgThread(NULL)
-, m_ThrWndMutex(NULL)
 {
 	StartHardScreen();
 	////////////////////////窗口屏
@@ -329,7 +328,7 @@ void SLZCWndScreen::StartHardScreen()
 			this,NULL,0);
 	}
 }
-
+/*
 void SLZCWndScreen::InitThroughScreen(const int address)
 {
 	ThroughScreenHead head;
@@ -357,7 +356,8 @@ void SLZCWndScreen::InitThroughScreen(const int address)
 	CDoComInOut* pComInOut = CDoComInOut::GetInstance();
 	pComInOut->AddWriteComMsg(pMsg);
 }
-
+*/
+/*
 void SLZCWndScreen::InitThroughScreen(const CString IP,USHORT port)
 {
 	ThroughScreenHead head;
@@ -382,7 +382,7 @@ void SLZCWndScreen::InitThroughScreen(const CString IP,USHORT port)
 // 			AddThroughInitStr(recvBuf,actRecvSize);
 // 	}
 }
-
+*/
 CString SLZCWndScreen::FlushCstringToFitWndScreen(const CString& str,const int length,int height)
 {
 	if(height==1)return str;
@@ -459,85 +459,85 @@ CString SLZCWndScreen::FlushCstringToFitWndScreen(const CString& str,const int l
 	return temp;
 }
 
-void SLZCWndScreen::AddThroughInitStr(const char* buf,const DWORD count)
-{
-	m_recvThroughInitStr.append(buf,count);
-}
+// void SLZCWndScreen::AddThroughInitStr(const char* buf,const DWORD count)
+// {
+// 	m_recvThroughInitStr.append(buf,count);
+// }
 
-BOOL SLZCWndScreen::DoThroughInitMsg()
-{
-	CDoComInOut* pComInOut = CDoComInOut::GetInstance();
-	pComInOut->SetThroughInitDone(TRUE);
-	if(m_recvThroughInitStr.empty())return FALSE;
-	string::size_type position,oldPosition;
-	position = m_recvThroughInitStr.find("Get_Data");
-	while(position!=m_recvThroughInitStr.npos)
-	{
-		oldPosition = position;
-		position = m_recvThroughInitStr.find("Get_Data",position+1);
-		string temp = m_recvThroughInitStr.substr(oldPosition,position-oldPosition-1);
-		m_list_recvString.push_back(temp);
-	}
-	string recvMsg;
-	if(!m_list_recvString.empty())
-	{
-		std::list<string>::const_iterator itera = m_list_recvString.begin();
-		for(itera;itera!=m_list_recvString.end();itera++)
-		{
-			recvMsg= *itera;
-			if(!recvMsg.empty())
-			{
-				string::size_type first_pos = GetIpPos(recvMsg);
-				while(first_pos!=recvMsg.npos)//找到了
-				{
-					/////////////////////////////通屏基本信息如:屏地址
-					string::size_type last_Pos = first_pos;
-					ThrScreenBasicMsg ThrScreenMsg;
-					memset(&ThrScreenMsg,0,sizeof(ThrScreenMsg));
-					string basicInfo = recvMsg.substr(first_pos,10);
-					ThrScreenMsg.address = basicInfo[7];
-					
-					recvMsg = recvMsg.substr(first_pos+10);
-					first_pos = GetIpPos(recvMsg);
-					string temp = recvMsg.substr(0,first_pos);
-					
-					for(int i=0;i<(int)temp.size();i+=34)
-					{
-						string channel = temp.substr(i,34);
-						ThrScreenMsg.channel = channel[0];//通道号
-						ThrScreenMsg.fone = channel[8];//字体
-						memcpy(&ThrScreenMsg.width,&channel[4],2);
-						memcpy(&ThrScreenMsg.height,&channel[6],2);
-						AddThrBasicMsg(ThrScreenMsg);
-					}
-					
-					/*
-					string throughMsg = recvMsg.substr(first_pos+1,32);
-					ThrScreenMsg.address = throughMsg[29];
-					///////////////////////////////////////////
-					string temp = recvMsg.substr(first_pos+33);
-					for(int i=0;i<(int)temp.size();i+=34)
-					{
-						/////////////////通道信息
-						string channel = temp.substr(i,34);
-						ThrScreenMsg.channel = channel[0];//通道号
-						ThrScreenMsg.fone = channel[8];//字体
-						memcpy(&ThrScreenMsg.width,&channel[4],2);
-						memcpy(&ThrScreenMsg.height,&channel[6],2);
-						/////////////////////
-						AddThrBasicMsg(ThrScreenMsg);
-					}
-					*/
-					////////////
-				}
-			}
-//			m_list_recvString.pop_front();
-		}
-		m_list_recvString.clear();//删除
-	}
-	m_recvThroughInitStr.clear();
-	return TRUE;
-}
+// BOOL SLZCWndScreen::DoThroughInitMsg()
+// {
+// 	CDoComInOut* pComInOut = CDoComInOut::GetInstance();
+// 	pComInOut->SetThroughInitDone(TRUE);
+// 	if(m_recvThroughInitStr.empty())return FALSE;
+// 	string::size_type position,oldPosition;
+// 	position = m_recvThroughInitStr.find("Get_Data");
+// 	while(position!=m_recvThroughInitStr.npos)
+// 	{
+// 		oldPosition = position;
+// 		position = m_recvThroughInitStr.find("Get_Data",position+1);
+// 		string temp = m_recvThroughInitStr.substr(oldPosition,position-oldPosition-1);
+// 		m_list_recvString.push_back(temp);
+// 	}
+// 	string recvMsg;
+// 	if(!m_list_recvString.empty())
+// 	{
+// 		std::list<string>::const_iterator itera = m_list_recvString.begin();
+// 		for(itera;itera!=m_list_recvString.end();itera++)
+// 		{
+// 			recvMsg= *itera;
+// 			if(!recvMsg.empty())
+// 			{
+// 				string::size_type first_pos = GetIpPos(recvMsg);
+// 				while(first_pos!=recvMsg.npos)//找到了
+// 				{
+// 					/////////////////////////////通屏基本信息如:屏地址
+// 					string::size_type last_Pos = first_pos;
+// 					ThrScreenBasicMsg ThrScreenMsg;
+// 					memset(&ThrScreenMsg,0,sizeof(ThrScreenMsg));
+// 					string basicInfo = recvMsg.substr(first_pos,10);
+// 					ThrScreenMsg.address = basicInfo[7];
+// 					
+// 					recvMsg = recvMsg.substr(first_pos+10);
+// 					first_pos = GetIpPos(recvMsg);
+// 					string temp = recvMsg.substr(0,first_pos);
+// 					
+// 					for(int i=0;i<(int)temp.size();i+=34)
+// 					{
+// 						string channel = temp.substr(i,34);
+// 						ThrScreenMsg.channel = channel[0];//通道号
+// 						ThrScreenMsg.fone = channel[8];//字体
+// 						memcpy(&ThrScreenMsg.width,&channel[4],2);
+// 						memcpy(&ThrScreenMsg.height,&channel[6],2);
+// 						AddThrBasicMsg(ThrScreenMsg);
+// 					}
+// 					
+// 					/*
+// 					string throughMsg = recvMsg.substr(first_pos+1,32);
+// 					ThrScreenMsg.address = throughMsg[29];
+// 					///////////////////////////////////////////
+// 					string temp = recvMsg.substr(first_pos+33);
+// 					for(int i=0;i<(int)temp.size();i+=34)
+// 					{
+// 						/////////////////通道信息
+// 						string channel = temp.substr(i,34);
+// 						ThrScreenMsg.channel = channel[0];//通道号
+// 						ThrScreenMsg.fone = channel[8];//字体
+// 						memcpy(&ThrScreenMsg.width,&channel[4],2);
+// 						memcpy(&ThrScreenMsg.height,&channel[6],2);
+// 						/////////////////////
+// 						AddThrBasicMsg(ThrScreenMsg);
+// 					}
+// 					*/
+// 					////////////
+// 				}
+// 			}
+// //			m_list_recvString.pop_front();
+// 		}
+// 		m_list_recvString.clear();//删除
+// 	}
+// 	m_recvThroughInitStr.clear();
+// 	return TRUE;
+// }
 
 void SLZCWndScreen::AddThrBasicMsg(ThrScreenBasicMsg msg)
 {
@@ -558,101 +558,10 @@ void SLZCWndScreen::AddThrBasicMsg(ThrScreenBasicMsg msg)
 		m_list_thrBasicMsg.push_back(msg);
 }
 
-BOOL SLZCWndScreen::SendDataToThroughScreen(const CString& str,int address,int channel)
+BOOL SLZCWndScreen::SendDataToThroughScreen(const CString& str,int address,int channel,const CString& localIp)
 {
-//	CString str =_T("123");
-	/*
-	ThroughScreenHead head;memset(&head,0,sizeof(head));
-	head.address=1;head.flagFirst=HARDWARE_THROUGH_FLAG1;
-	head.flagSecond = HARDWARE_THROUGH_FLAG2;
-	head.type = 0;//命令
-	head.length = 11;//第一包长度
-	
-	
-	char firstPacket[19]={0};
-	memcpy(firstPacket,&head,sizeof(head));
-	const char cmd[8] = "qtdata ";
-	memcpy(&firstPacket[7],cmd,7);
-	firstPacket[14] = 0;
-	firstPacket[15] = ' ';
-	short int length = 29;
-	memcpy(&firstPacket[16],&length,sizeof(length));
-	DWORD dwWrite = 0;
-	CComInit* pComInit = CComInit::GetInstance();
-	Sleep(3);
-	int res=WriteFile(pComInit->m_hComWndScreen,
-		firstPacket,19,&dwWrite,NULL);//发送第一包协议头 + qtdata┗┛实时数据窗口号┗┛数据文件总长度
-	char secondPacket[512]={0};
-	head.type=0x10;
-	head.length = 3;
-	memcpy(secondPacket,&head,sizeof(head));
-	secondPacket[7]='1';
-	secondPacket[8]='2';
-	secondPacket[9]='3';
-	secondPacket[10]='\0';
-	res = WriteFile(pComInit->m_hComWndScreen,
-		secondPacket,11,&dwWrite,NULL);
-		*/
-	/*
-	//格式化字符串
-	int width = FindChannelWidth(address,channel);
-	if(width==-1)return FALSE;
-	CString FitStr = FlushCstringToFitWndScreen(str,width);
-#ifdef _DEBUG
-	MyWriteConsole(FitStr);
-#endif
-	///////////////
-	CCommonConvert convert;
-	int length = convert.CStringToChar(FitStr,NULL);
-	short int dataLength = (short int)length;//强转
-	///数据文件总长度
-	memcpy(&firstPacket[16],&dataLength,sizeof(dataLength));
-	DWORD dwWrite = 0;
-	CComInit* pComInit = CComInit::GetInstance();
-	Sleep(3);
-	int res=WriteFile(pComInit->m_hComWndScreen,
-		firstPacket,19,&dwWrite,NULL);//发送第一包协议头 + qtdata┗┛实时数据窗口号┗┛数据文件总长度
-	///////////////////////////////////////////////
-	char* buf = new char[length+1];//数据
-	memset(buf,0,sizeof(buf));
-	length = convert.CStringToChar(FitStr,buf);
-	if(length<512)
-	{
-		head.type = 0x10;//数据类
-		head.length = length;
-		char seconedPacket[512]={0};
-		memcpy(seconedPacket,&head,sizeof(head));
-		memcpy(&seconedPacket[7],buf,length+1);
-		Sleep(3);
-		int res=WriteFile(pComInit->m_hComWndScreen,
-			seconedPacket,8+length,&dwWrite,NULL);
-		///发送第二包协议头 + 512字节数据 +[CRC];返回send@
-	}
-	else
-	{
-		for(int i=0;i<length/512;i++)
-		{
-			
-		}
-	}
-//	head.length = length;
-	///////////////////
-	delete [] buf;
-	*/
-	///自己公司协议
-	int height = 0;
-	int width = FindChannelWidth(address,channel,height);
 	CString msg = str;
-// #ifdef _DEBUG
-//  	CString test;
-// 	test.Format(_T("through wnd:address:%d,channel:%d,width:%d"),address,channel,width);
-//  	MyWriteConsole(test);
-// 	MyWriteConsole(str);
-// #endif
- 	if(width>0 && width<=128)//注意小于128是因为同屏卡最多显示128个汉字
- 	{
- 		msg = FlushCstringToFitWndScreen(msg,width,height);
- 	}
+
 	char buf[512]={0};
 	int length = DoScreenMsg(msg,address+channel,buf);
 	WriteComMsg *pMsg = new WriteComMsg;
@@ -685,7 +594,7 @@ int SLZCWndScreen::FindChannelWidth(int address,int channel,int& height)
 	return width;
 }
 
-void SLZCWndScreen::AddThroughScreenMsg(const CString& msg,int address,int channel)
+void SLZCWndScreen::AddThroughScreenMsg(const CString& msg,int address,int channel,const CString& localIp)
 {
 	if(address<=0||msg.IsEmpty())return;
 	SendThrScreenMsg sendMsg;
@@ -716,7 +625,7 @@ DWORD WINAPI SLZCWndScreen::DoThrWndMsgThread(LPVOID pParam)
 			pThis->m_ThrWndMutex.Unlock();
 //			WaitForSingleObject(pThis->m_hDoWndScreenMsgThread,3);
 
-			pThis->SendDataToThroughScreen(msg.msg,msg.address,msg.channel);
+			pThis->SendDataToThroughScreen(msg.msg,msg.address,msg.channel,msg.localIp);
 		}
 	}
 	return 0;

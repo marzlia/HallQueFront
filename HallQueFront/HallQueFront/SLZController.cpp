@@ -255,8 +255,8 @@ void SLZController::InitThroughScreen()
 	int size = m_windowTable.GetAllThroughID(throughID);
 	for(int i=0;i<size;i++)
 	{
-		if(throughID[i]>0)
-			pWndScreen->InitThroughScreen(throughID[i]);
+	//	if(throughID[i]>0)
+		//	pWndScreen->InitThroughScreen(throughID[i]);
 	}
 }
 
