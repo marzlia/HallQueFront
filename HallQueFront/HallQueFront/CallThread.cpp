@@ -346,7 +346,8 @@ void CCallThread::OnCall(CallerCmd& callerCmd)
 			for(int i=0;i<queSerialIDArray.GetCount();i++)
 			{
 				theApp.m_Controller.GetManQueNumByQueSerialID(queSerialIDArray.GetAt(i),queManNum);
-				queManNumArray.Add(queManNum);
+				if(!queManNum.IsEmpty())
+					queManNumArray.Add(queManNum);
 			}
 
 			string sendMsg,recvMsg;
