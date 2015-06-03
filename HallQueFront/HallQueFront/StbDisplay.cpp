@@ -2,6 +2,8 @@
 #include "StbDisplay.h"
 #include "MyString.h"
 #include "MyCommon.h"
+#include <list>
+using namespace std;
 
 StbDisplay::StbDisplay(void)
 	: m_strModuleDir(_T(""))
@@ -29,7 +31,7 @@ void StbDisplay::LoadDisplayConf()
 {
 	CString strStbKeshiPath = m_strModuleDir + _T("sys\\stb_keshi.ini");
 
-	m_strHtmlTitleBegin = _T("<!DOCTYPE HTML><html><head><meta http-equiv=\"Content-Type\" content=\"text/html; charset=utf-8\" /><style type=\"text/css\">body{text-align: left; color: #ffffcc; float:left; font:  bold 120px/120px Verdana, Geneva, sans-serif;}#center{ margin-left: auto; margin-right: auto; vertical-align: middle; }</style><title>医院标题</title></head><body><div style=\"textalign:left\"><img src=\"../img/hspt.jpg\" width=\"120\" height=\"120\" style=\"float:left\">");
+	m_strHtmlTitleBegin = _T("<!DOCTYPE HTML><html><head><meta http-equiv=\"Content-Type\" content=\"text/html; charset=utf-8\" /><style type=\"text/css\">body{text-align: left; color: #0000ff; float:left; font:  bold 120px/120px Verdana, Geneva, sans-serif;}#center{ margin-left: auto; margin-right: auto; vertical-align: middle; }</style><title>医院标题</title></head><body><div style=\"textalign:left\"><img src=\"../img/hspt.jpg\" width=\"120\" height=\"120\" style=\"float:left\">");
 	m_strHtmlTitleBegin = MyCommon::GetProfileString(
 		_T("sys"),_T("TITLEBEGIN"), m_strHtmlTitleBegin, strStbKeshiPath);
 	m_strHtmlTitleEnd = _T("</div></body></html>");
@@ -43,7 +45,7 @@ void StbDisplay::LoadDisplayConf()
 	m_strHtmlNoticeEnd = MyCommon::GetProfileString(
 		_T("sys"),_T("NOTICEEND"), m_strHtmlNoticeEnd, strStbKeshiPath);
 
-	m_strHtmlInstMsgBegin = _T("<!DOCTYPE HTML><html><head><meta http-equiv=\"Content-Type\" content=\"text/html; charset=utf-8\" /><style type=\"text/css\">body{text-align: center; color: #ff0000; font:bold 80px/80px Verdana, Geneva, sans-serif;}#center{ margin-left: auto; margin-right: auto; vertical-align: middle; }#customers{font-family:\"Trebuchet MS\", Arial, Helvetica, sans-serif;width:100%%;border-collapse:collapse;}</style><title>呼叫信息</title></head><body><div style=\"width: 1920px; margin-left: 0%%; margin-right: auto; margin-top: 0px;\">");
+	m_strHtmlInstMsgBegin = _T("<!DOCTYPE HTML><html><head><meta http-equiv=\"Content-Type\" content=\"text/html; charset=utf-8\" /><style type=\"text/css\">body{text-align: center; color: #ff0000; font:bold 130px/130px Verdana, Geneva, sans-serif;}#center{ margin-left: auto; margin-right: auto; vertical-align: middle; }#customers{font-family:\"Trebuchet MS\", Arial, Helvetica, sans-serif;width:100%%;border-collapse:collapse;}</style><title>呼叫信息</title></head><body><div style=\"width: 1920px; margin-left: 0%%; margin-right: auto; margin-top: 0px;\">");
 	m_strHtmlInstMsgBegin = MyCommon::GetProfileString(
 		_T("sys"),_T("INSTMSGBEGIN"), m_strHtmlInstMsgBegin, strStbKeshiPath);
 	m_strHtmlInstMsgEnd = _T("</div></body></html>");
@@ -84,12 +86,18 @@ BOOL StbDisplay::InitDisplay()
 	{
 		AfxMessageBox(_T("fdfile_tp.xml文件缺失！"));
 	}
-	strFileStr = MyString::Replace(
-		strFileStr, _T("%webRoot%"), m_strWebRootDir);
+	strFileStr = MyString::Replace(strFileStr, _T("%webRoot%"), m_strWebRootDir);
+
+	
+	CStringA a_strFileStr(strFileStr.GetBuffer(0));
+	strFileStr.ReleaseBuffer(0);
+	string s_strFileStr = a_strFileStr.GetBuffer(0);
+	a_strFileStr.ReleaseBuffer(0);
+	
 	strFilePath = m_strModuleDir + _T("fdfile.xml");
 	if(file.Open(strFilePath, CFile::modeCreate|CFile::modeWrite|CFile::typeText))
 	{
-		file.WriteString(strFileStr);
+		file.Write(s_strFileStr.c_str(),s_strFileStr.size());
 		file.Close();
 	}
 
