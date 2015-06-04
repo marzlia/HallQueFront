@@ -198,6 +198,16 @@ public:
 	{
 		m_iEvaTimeOut = iEvaTimeOut;
 	}
+
+	BOOL GetIsUsePower()
+	{
+		return m_bIsUsePower;
+	}
+
+	void SetIsUsePower(BOOL bUse)
+	{
+		m_bIsUsePower = bUse;
+	}
 	virtual void Serialize( CArchive& ar );
 	DECLARE_SERIAL(SLZWindow)
 
@@ -226,6 +236,7 @@ private:
 	CString m_strAdMsg;				//广告信息
 	
 	UINT m_iEvaTimeOut;			//评价超时秒数
+	BOOL m_bIsUsePower; //是否有优先级
 public:
 	CArray<CThroughWndScreenInfo> m_throughscreen_array;//屏数组
 };

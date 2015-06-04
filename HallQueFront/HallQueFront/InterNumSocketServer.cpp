@@ -336,17 +336,19 @@ void CInterNumSocketServer::DealMsg(const string& recvPacket,string& retPacket)
 	{
 		CStringArray queManNumArray,queserial_id_array;
 		CString organId,queserial_id;
-		CDealInterMsg::AnaSendCallMsg(recvPacket,queManNumArray,organId);
+		BOOL bIsUsePower = FALSE;
+		CDealInterMsg::AnaSendCallMsg(recvPacket,queManNumArray,organId,&bIsUsePower);
 		
 		for(int i=0;i<queManNumArray.GetCount();++i)
 		{
 			theApp.m_Controller.GetQueSerialIDByManQueNum(queserial_id,queManNumArray.GetAt(i));//得到queid
-			queserial_id_array.Add(queserial_id);
+			if(!queserial_id.IsEmpty())
+				queserial_id_array.Add(queserial_id);
 		}
 		
 		//////
 		SLZData data;
-		BOOL isSucced = m_pInlineQueData->DeleteInlineClientData(queserial_id_array,organId,&data);
+		BOOL isSucced = m_pInlineQueData->DeleteInlineClientData(bIsUsePower,queserial_id_array,organId,&data);
 
 		CDealInterMsg::ProduceRetCallMsg(isSucced,retPacket,&data);
 		
@@ -357,5 +359,9 @@ void CInterNumSocketServer::DealMsg(const string& recvPacket,string& retPacket)
 		}
 		if(isSucced)
 			theApp.m_pView->ShowWaitNum(data.GetBussinessType(),nWaitNum);///界面显示等待人数
+
+		if(theApp.IsLocal())
+			///重新写file，保存没处理（呼叫）的数据
+			theApp.m_Controller.WriteInlineDataToFile();
 	}
 }
