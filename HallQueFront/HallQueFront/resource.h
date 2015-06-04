@@ -287,6 +287,7 @@
 #define IDC_DATE_CLOSE                  1139
 #define IDC_CHECK2                      1140
 #define IDC_CHECK_CLEARDATA             1140
+#define IDC_CHECK_USEPOWER              1140
 #define IDC_DATETIMEPICKER3             1141
 #define IDC_DATE_CLEARDATA              1141
 #define IDC_CHECK3                      1142

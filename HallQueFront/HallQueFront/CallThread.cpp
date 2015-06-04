@@ -328,7 +328,8 @@ void CCallThread::OnCall(CallerCmd& callerCmd)
 			CComplSocketClient client;
 			CStringArray queSerialIDArray,queManNumArray;
 			CString callStaffID,queManNum;
-			m_rInlineQueData.GetWindowCanDoQue(callerCmd.GetWindowId(),queSerialIDArray,callStaffID);
+			BOOL bIsUsePower = FALSE;
+			m_rInlineQueData.GetWindowCanDoQue(callerCmd.GetWindowId(),queSerialIDArray,callStaffID,&bIsUsePower);
 			
 			for(int i=0;i<queSerialIDArray.GetCount();i++)
 			{
@@ -338,7 +339,7 @@ void CCallThread::OnCall(CallerCmd& callerCmd)
 
 			string sendMsg,recvMsg;
 			int actRecvSize = 0;
-			CDealInterMsg::ProduceSendCallMsg(queManNumArray,sendMsg,theApp.m_logicVariables.strOrganID);
+			CDealInterMsg::ProduceSendCallMsg(queManNumArray,sendMsg,theApp.m_logicVariables.strOrganID,bIsUsePower);
 			if(client.SendData(INTERPORT,theApp.m_logicVariables.strInterIP,
 				sendMsg,sendMsg.size(),recvMsg,actRecvSize) && actRecvSize)
 			{

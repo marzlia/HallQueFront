@@ -33,6 +33,7 @@ BOOL CInlineQueData::GetInlineQueData(const UINT iWinId,
 	SLZWindow Window;
 	BOOL flag = m_rWindowTable.QueryWindowById(iWinId,Window);
 	if(!flag)return FALSE;
+	BOOL bIsUserPower = Window.GetIsUsePower();//是否使用优先级
 	Window.GetArrayQueId(arrStrQueId);//获取可处理队列及优先级
 	CString staffID = theApp.m_Controller.m_mapLoginList[Window.GetWindowId()];//获取登录STAFFID
 	if(staffID.IsEmpty())return FALSE;
@@ -40,11 +41,62 @@ BOOL CInlineQueData::GetInlineQueData(const UINT iWinId,
 	{
 		return FALSE;
 	}
-	BOOL bFind = FALSE;
 	///////////////////////
+	BOOL bFind = FALSE;
 	m_mtInlineQue.Lock();
-	for(int i = 0; i < arrStrQueId.GetCount(); i++)
+	if(bIsUserPower)//使用优先级
 	{
+		int count = arrStrQueId.GetCount();
+		for(int i = 0; i < count; i++)
+		{
+			POSITION pos = m_lstInlineQue.GetHeadPosition();
+			while(pos)
+			{
+				SLZData data;
+				POSITION posLast = pos;
+				data = m_lstInlineQue.GetNext(pos);
+				if(data.GetWindowId()==0)//如果没设置指定窗口
+				{
+					if(arrStrQueId[i].Compare(data.GetBussinessType()) == 0)
+					{
+						bFind = TRUE;
+						rdata = data;
+						m_lstInlineQue.RemoveAt(posLast);
+						break;
+					}
+				}
+				else//设置了指定窗口优先呼叫
+				{
+					if(iWinId == data.GetWindowId())
+					{
+						rdata = data;
+						m_lstInlineQue.RemoveAt(posLast);
+						bFind = TRUE;
+						break;
+					}
+				}
+			}
+			if(bFind)
+			{
+				break;
+			}
+		}
+	}
+	else//不使用优先级
+	{
+		/////////////////////////////////////////首先找到可处理队列中哪几个队列有数据
+		CStringArray haveDataArray;
+		GetCandoQueHaveData(haveDataArray,arrStrQueId,iWinId);
+		if(haveDataArray.GetCount() == 0)
+		{
+			return FALSE;
+		}
+		/////////////////////////////////////////随机取数
+		int count = haveDataArray.GetCount();
+		time_t t;	
+		srand((unsigned) time(&t));	
+		int nRand = rand() % count;
+		CString strQueID = haveDataArray[nRand];
 		POSITION pos = m_lstInlineQue.GetHeadPosition();
 		while(pos)
 		{
@@ -53,46 +105,15 @@ BOOL CInlineQueData::GetInlineQueData(const UINT iWinId,
 			data = m_lstInlineQue.GetNext(pos);
 			if(data.GetWindowId()==0)//如果没设置指定窗口
 			{
-				if(arrStrQueId[i].Compare(data.GetBussinessType()) == 0)
+				if(strQueID.Compare(data.GetBussinessType()) == 0)
 				{
-					/*
-					if(!data.GetIsLocalData())//客户机产生的数据
-					{
-						if( theApp.IsLocal())//主机
-						{
-							continue;
-						}
-						else //客户机
-						{
-							bFind = TRUE;
-							rdata = data;
-							m_lstInlineQue.RemoveAt(posLast);
-							break;
-						}
-					}
-					else//本机数据
-					{
-						if( theApp.IsLocal() )//主机
-						{
-							bFind = TRUE;
-							rdata = data;
-							m_lstInlineQue.RemoveAt(posLast);
-							break;
-						}
-						else//客户机
-						{
-							continue;
-						}
-						
-					}
-					*/
-					bFind = TRUE;
 					rdata = data;
 					m_lstInlineQue.RemoveAt(posLast);
+					bFind = TRUE;
 					break;
 				}
 			}
-			else//设置了指定窗口优先呼叫
+			else//指定了窗口
 			{
 				if(iWinId == data.GetWindowId())
 				{
@@ -103,10 +124,6 @@ BOOL CInlineQueData::GetInlineQueData(const UINT iWinId,
 				}
 			}
 		}
-		if(bFind)
-		{
-			break;
-		}
 	}
 	CTime currTime = CTime::GetCurrentTime();
 	rdata.SetCallTime(currTime);//设置呼叫时间
@@ -116,6 +133,39 @@ BOOL CInlineQueData::GetInlineQueData(const UINT iWinId,
 	m_mtInlineQue.Unlock();
 	return bFind;
 }
+
+void CInlineQueData::GetCandoQueHaveData(CStringArray& queIDArray,const CStringArray& canDoQueIDArray,UINT uWndID)
+{
+	int count = canDoQueIDArray.GetCount();
+	for(int i = 0; i < count; i++)
+	{
+		CString candoQueID = canDoQueIDArray[i];
+		POSITION pos = m_lstInlineQue.GetHeadPosition();
+		while(pos)
+		{
+			SLZData data;
+			POSITION posLast = pos;
+			data = m_lstInlineQue.GetNext(pos);
+			if(data.GetWindowId()==0)//如果没设置指定窗口
+			{
+				if(candoQueID.Compare(data.GetBussinessType()) == 0)
+				{
+					queIDArray.Add(candoQueID);
+					break;
+				}
+			}
+			else//设置了指定窗口
+			{
+				if(uWndID == data.GetWindowId())
+				{
+					queIDArray.Add(data.GetBussinessType());
+					break;
+				}
+			}
+		}
+	}
+}
+
 
 void CInlineQueData::Add(SLZData& data)
 {
@@ -359,17 +409,19 @@ void CInlineQueData::GetAllBussCount(const CString& strBussid,UINT* pWaitNum)
 	*pWaitNum = iCount;
 }
 
-BOOL CInlineQueData::DeleteInlineClientData(const CStringArray& queIDArray,const CString& organId,SLZData* pData)
+BOOL CInlineQueData::DeleteInlineClientData(BOOL bIsUsePower,const CStringArray& queIDArray,const CString& organId,SLZData* pData)
 {
 	m_mtInlineQue.Lock();
 	BOOL flag = FALSE;
-	POSITION pos = m_lstInlineQue.GetHeadPosition();
-	POSITION poslast;
-	SLZData data;
-	for(; pos; )
+	if(bIsUsePower)
 	{
-		poslast = pos;
-		data = m_lstInlineQue.GetNext(pos);
+		POSITION pos = m_lstInlineQue.GetHeadPosition();
+		POSITION poslast;
+		SLZData data;
+		for(; pos; )
+		{
+			poslast = pos;
+			data = m_lstInlineQue.GetNext(pos);
 //		if(data.GetOrganId() == organId)
 //		{
 			for(int i=0;i<queIDArray.GetCount();i++)
@@ -383,16 +435,50 @@ BOOL CInlineQueData::DeleteInlineClientData(const CStringArray& queIDArray,const
 				}
 			}
 //		}
-		if(flag)
+			if(flag)
+			{
+				break;
+			}
+		}
+	}
+	else
+	{
+		/////////////////////////////////////////首先找到可处理队列中哪几个队列有数据
+		CStringArray haveDataArray;
+		GetCandoQueHaveData(haveDataArray,queIDArray);
+		if(haveDataArray.GetCount() == 0)
 		{
-			break;
+			return FALSE;
+		}
+		/////////////////////////////////////////随机取数
+		int count = haveDataArray.GetCount();
+		time_t t;	
+		srand((unsigned) time(&t));	
+		int nRand = rand() % count;
+		CString strQueID = haveDataArray[nRand];
+		POSITION pos = m_lstInlineQue.GetHeadPosition();
+		while(pos)
+		{
+			SLZData data;
+			POSITION posLast = pos;
+			data = m_lstInlineQue.GetNext(pos);
+			if(data.GetWindowId()==0)//如果没设置指定窗口
+			{
+				if(strQueID.Compare(data.GetBussinessType()) == 0)
+				{
+					*pData = data;
+					m_lstInlineQue.RemoveAt(posLast);
+					flag = TRUE;
+					break;
+				}
+			}
 		}
 	}
 	m_mtInlineQue.Unlock();
 	return flag;
 }
 
-BOOL CInlineQueData::GetWindowCanDoQue(UINT nWindowID,CStringArray& queerial_id_array,CString& callStaffID)
+BOOL CInlineQueData::GetWindowCanDoQue(UINT nWindowID,CStringArray& queerial_id_array,CString& callStaffID,BOOL* pIsUsePower)
 {
 // 	if(m_lstInlineQue.GetCount() < 1)
 // 	{
@@ -411,5 +497,6 @@ BOOL CInlineQueData::GetWindowCanDoQue(UINT nWindowID,CStringArray& queerial_id_
 	}
 	queerial_id_array.Copy(arrStrQueId);
 	callStaffID = staffID;
+	*pIsUsePower = Window.GetIsUsePower();
 	return TRUE;
 }
