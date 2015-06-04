@@ -4,8 +4,9 @@
 
 CComInit::CComInit(void) :
 m_hComReadCard(INVALID_HANDLE_VALUE)
-,m_hComWndScreen(INVALID_HANDLE_VALUE)
+,m_hCaller(INVALID_HANDLE_VALUE)
 ,m_hComMsg(INVALID_HANDLE_VALUE)
+,m_hWndScr(INVALID_HANDLE_VALUE)
 {
 	InitCom();
 	for(int i=0;i<10;i++)
@@ -19,7 +20,7 @@ CComInit::~CComInit(void)
 {
 	CloseHandle(m_read_os.hEvent);
 	CloseHandle(m_write_os.hEvent);
-	CloseHandle(m_hComWndScreen);
+	CloseHandle(m_hCaller);
 	CloseHandle(m_hComReadCard);
 	CloseHandle(m_hComMsg);
 }
@@ -29,10 +30,10 @@ CComInit::~CComInit(void)
 int CComInit::TryCom(int nCom)
 {
 	if(nCom<0) return -1;
-	if(m_hComWndScreen != INVALID_HANDLE_VALUE)
+	if(m_hCaller != INVALID_HANDLE_VALUE)
 	{
-		CloseHandle(m_hComWndScreen);
-		m_hComWndScreen=INVALID_HANDLE_VALUE;
+		CloseHandle(m_hCaller);
+		m_hCaller=INVALID_HANDLE_VALUE;
 	}
 	CString strWndCom;
 	strWndCom.Format(_T("COM%d"),nCom);
@@ -134,14 +135,14 @@ HANDLE CComInit::OpenComm(int ncom)
 int CComInit::OpenWndScreen(int ncom)
 {
 	m_cWndComm.Format(_T("%d"),ncom);
-	if(m_hComWndScreen != INVALID_HANDLE_VALUE)
+	if(m_hWndScr != INVALID_HANDLE_VALUE)
 	{
-		CloseHandle(m_hComWndScreen);
-		m_hComWndScreen=INVALID_HANDLE_VALUE;
+		CloseHandle(m_hWndScr);
+		m_hWndScr=INVALID_HANDLE_VALUE;
 	}
 	if(ncom== 0) return 0;
-	m_hComWndScreen = OpenComm(ncom);
-	if(m_hComWndScreen != INVALID_HANDLE_VALUE)
+	m_hWndScr = OpenComm(ncom);
+	if(m_hWndScr != INVALID_HANDLE_VALUE)
 	{
 		return 1;
 	}
@@ -175,7 +176,26 @@ int CComInit::OpenCardComm(int ncom)
 	}
 }
 
-
+int CComInit::OpenCaller(int ncom)
+{
+	m_cCallerComm.Format(_T("%d"),ncom);
+	if(m_hCaller!=INVALID_HANDLE_VALUE)
+	{
+		CloseHandle(m_hCaller);
+		m_hCaller = INVALID_HANDLE_VALUE;
+	}
+	if(ncom==0)return 0;
+	m_hCaller = OpenComm(ncom);
+	if(m_hCaller != INVALID_HANDLE_VALUE)
+	{
+		return 1;
+	}
+	else
+	{
+		m_cCallerComm = L"0";
+		return -1;
+	}
+}
 
 /*
 保存上次打开串口如:com1到文件
@@ -185,6 +205,7 @@ void CComInit::SaveComm()
 	WritePrivateProfileString(_T("com"),_T("CARDCOM"),m_cCardComm,m_strPath);
 	WritePrivateProfileString(_T("com"),_T("WNDCOM"),m_cWndComm,m_strPath);
 	WritePrivateProfileString(_T("com"),_T("MSGCOM"),m_cMsgComm,m_strPath);
+	WritePrivateProfileString(_T("com"),_T("CALLERCOM"),m_cCallerComm,m_strPath);
 }
 /*
 读取刷卡器COM口
@@ -216,4 +237,13 @@ CString CComInit::GetMsgComm()
 	GetPrivateProfileString(_T("com"),_T("MSGCOM"),NULL,wbuf,255,m_strPath);
 	m_cMsgComm.Format(_T("%s"),wbuf);
 	return m_cMsgComm; 
+}
+
+CString CComInit::GetCallerComm()
+{
+	wchar_t wbuf[255];
+	ZeroMemory(wbuf,255);
+	GetPrivateProfileString(_T("com"),_T("CALLERCOM"),NULL,wbuf,255,m_strPath);
+	m_cCallerComm.Format(_T("%s"),wbuf);
+	return m_cCallerComm;
 }

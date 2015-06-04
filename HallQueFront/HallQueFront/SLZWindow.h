@@ -1,7 +1,6 @@
 #pragma once
 #include "SLZStaff.h"
-#include "CommonConvert.h"
-
+#include "ThroughWndScreenInfo.h"
 
 class SLZWindow:public CObject
 {
@@ -71,58 +70,27 @@ public:
 	{
 		m_iEvaluatorId = iEvaluatorId;
 	}
-	//获取窗口屏地址
-	int GetWndScreenId()const
-	{
-		return m_iWndScreenId;
-	}
-	//设置窗口屏地址
-	void SetWndScreenId(int iWndScreenId)
-	{
-		m_iWndScreenId=iWndScreenId;
-	}
-	//获取综合屏地址
-	int GetComScreenId() const
-	{
-		return m_iComScreenId;	 
-	}
-	//设置综合屏地址
-	void SetComScreenId(int iComScreenId) 
-	{
-		m_iComScreenId=iComScreenId;
-	}
+// 	获取窗口屏地址
+// 	CStringArray& GetWndScreenId()//const
+// 	{
+// 		return m_sWndScreenIdArray;
+// 	}
+// 	//设置窗口屏地址
+// 	void SetWndScreenId(const CStringArray& sWndScreenIdArray)
+// 	{
+// 		m_sWndScreenIdArray.Copy(sWndScreenIdArray);
+// 	}
+// 	//获取综合屏地址
+// 	CStringArray& GetComScreenId() //const
+// 	{
+// 		return m_sComScreenIdArray;	 
+// 	}
+// 	//设置综合屏地址
+// 	void SetComScreenId(const CStringArray& sComScreenIdArray) 
+// 	{
+// 		m_sComScreenIdArray.Copy(sComScreenIdArray);
+// 	}
 
-	//获取通屏IP地址
-	CString GetLEDIPId()
-	{
-		return m_strLEDIPId;
-	}
-
-	void SetLEDIPId(const CString& LEDIPId)
-	{
-		m_strLEDIPId=LEDIPId;
-	}
-	
-	//获取通屏物理地址
-	int GetLEDPhyId()
-	{
-		return m_iLEDPhyId;
-	}
-
-	void SetLEDPhyId(const int LEDPhyId)
-	{
-		m_iLEDPhyId=LEDPhyId;
-	}
-
-	int GetLEDPipeId()
-	{
-		return m_iLEDPipeId;
-	}
-
-	void SetLEDPipeId(const int LEDPipeId)
-	{
-		m_iLEDPipeId = LEDPipeId;
-	}
 
 	CString GetStbId()const 
 	{
@@ -133,17 +101,6 @@ public:
 	{
 		m_strStbId=stbid;
 	}
-
-	////获取登录员工
-	//CString GetCurLoginStaff() 
-	//{
-	//	return m_staffLoginId;
-	//}
-	////设置登录员工
-	//void SetCurLoginStaff(CString& staff)
-	//{
-	//	m_staffLoginId=staff;
-	//}
 
 	//获取预设员工
 	CString GetLoginStaff() 
@@ -158,22 +115,6 @@ public:
 		m_staffDefaultId = staff;
 	}
 
-	//CString GetCurStaffName()
-	//{
-	//	return m_StrCurStaffName;
-	//}
-	//void SetCurStaffName(const CString& CurStaffName )
-	//{
-	//	m_StrCurStaffName=CurStaffName;
-	//}
-	//CString GetDefStaffName()
-	//{
-	//	return m_StrDefStaffName;
-	//}
-	//void SetDefStaffName(const CString& DefStaffName)
-	//{
-	//	m_StrDefStaffName=DefStaffName;
-	//}
 	void GetArrayQueId(CStringArray& arrQueId)
 	{
 		arrQueId.Copy(m_arrBussId);
@@ -248,14 +189,7 @@ public:
 		m_strAdMsg=AdMsg;
 	}
 
-	//BOOL GetFlagMustEval()
-	//{
-	//	return m_FlagMustEval;
-	//}
-	//void SetFlagMustEval(const BOOL& FlagMustEval)
-	//{
-	//	m_FlagMustEval=FlagMustEval;
-	//}
+	
 	UINT GetEvaTimeOut() const
 	{
 		return m_iEvaTimeOut;
@@ -263,6 +197,16 @@ public:
 	void SetEvaTimeOut(UINT iEvaTimeOut)
 	{
 		m_iEvaTimeOut = iEvaTimeOut;
+	}
+
+	BOOL GetIsUsePower()
+	{
+		return m_bIsUsePower;
+	}
+
+	void SetIsUsePower(BOOL bUse)
+	{
+		m_bIsUsePower = bUse;
 	}
 	virtual void Serialize( CArchive& ar );
 	DECLARE_SERIAL(SLZWindow)
@@ -274,27 +218,26 @@ private:
 	CString m_strWindowCallName;	//呼叫名称
 	int m_iCallerId;				//呼叫器地址
 	int m_iEvaluatorId;				//评价器地址
-	int m_iWndScreenId;				//窗口屏地址
-	int m_iComScreenId;				//综合屏地址
-	CString m_strLEDIPId;			//通屏IP地址
-	int m_iLEDPhyId;				//通屏物理地址
-	int m_iLEDPipeId;				//通屏通道号
+//	CStringArray m_sWndScreenIdArray;	//窗口屏地址
+//	CStringArray m_sComScreenIdArray;	//综合屏地址
+
 	CString m_strStbId;				//机顶盒编号
 	//CString m_staffLoginId;			//当前登录员工
 	CString m_staffDefaultId;		//自动登录时预设员工
-	//CString m_StrCurStaffName;
-	//CString m_StrDefStaffName;
-	//CString m_strAbleQueId;			//可处理队列
+									//可处理队列
 	int m_ArraySize;				//队列数组大小
 	CStringArray m_arrBussId;		//可处理业务队列数组
-	//CString	m_AbleQueName;			//可处理业务名称
+	
 	CString m_CalledMsg;			//呼叫信息
 	CString m_WaitCalledMsg;		//等待呼叫信息
 	CString m_ShowMsg;				//显示信息
 	CString m_WaitShowMsg;			//等待显示信息
 	unsigned int m_iMsgShowTime;		//信息显示时间
 	CString m_strAdMsg;				//广告信息
-	//BOOL m_FlagMustEval;			//是否强制评价
+	
 	UINT m_iEvaTimeOut;			//评价超时秒数
+	BOOL m_bIsUsePower; //是否有优先级
+public:
+	CArray<CThroughWndScreenInfo> m_throughscreen_array;//屏数组
 };
 

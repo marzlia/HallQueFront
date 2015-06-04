@@ -7,6 +7,8 @@
 
 #define MYBUFLEN 256
 #define DATABUFLEN 2048
+
+#define INTERPORT 10036
 /*指令类别枚举*/
 typedef enum _tagCmdType
 {
@@ -30,7 +32,8 @@ typedef enum _tagCmdType
 	callerCmdShowSuc	= 16,		//显示成功(即处理成功)
 	callerCmdShowFail	= 17,		//显示失败
 	callerCmdShowNum	= 18,		//显示剩余人数
-	callerCmdShowAlarm	= 19		//发出滴滴声
+	callerCmdShowAlarm	= 19,		//发出滴滴声
+	callerCmdCountTime = 20       //倒计时
 } CmdType;
 
 //typedef enum _tagCtlCmdType
@@ -103,6 +106,10 @@ typedef struct _tagLogicVariables//系统综合逻辑变量
 	UINT iNumberCallType;	//数字播放格式 
 	BOOL IsAutoChangePage;	//按钮选择以后自动跳回主界面
 	BOOL IsOpenJudgeShortMsg;//是否开启评价器（出现差评时）发送短信到手机
+	BOOL IsOpenInterNum;//是否开启联机取号
+	WCHAR strInterIP[MYBUFLEN];//联机取号服务器ip
+	BOOL IsOpenCountTime;//是否开启倒计时
+	int nTimeMintue;//倒计时时间（分钟）
 }LogicVariables,*pLogicVariables;
 /*
 显示缺纸还是显示等候
@@ -128,7 +135,9 @@ public:
 	_tagWriteComMsg(){
 		memset(buf,0,DATABUFLEN);
 		length = 0;
+		messagetype = 0;
 	}
+	int messagetype;//0为屏数据1为呼叫器数据
 	int length;
 	char buf[DATABUFLEN];
 }WriteComMsg;

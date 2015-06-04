@@ -26,6 +26,7 @@ SoundPlay::SoundPlay(SLZWindowQueryView& windowTable)
 	{
 		ShowAdven();				//开机显示广告
 	}
+	GetReplayTimes();
 }
 
 SoundPlay::~SoundPlay()
@@ -90,24 +91,36 @@ BOOL SoundPlay::ShowAdven()
 			CString strAdmsg = itera->GetAdMsg();
 			if (!strAdmsg.IsEmpty())
 			{
-				int wndaddress = itera->GetWndScreenId();
-				if (wndaddress!=0)
+
+				SLZCWndScreen* WndScreen = SLZCWndScreen::GetInstance();
+
+				int count = itera->m_throughscreen_array.GetCount();
+				
+				int nLedPhyId = 0;
+				int nLedPipeId = 0;
+				int nWndScreenId = 0;
+				int nComScreenId = 0;
+				for(int i=0;i<count;i++)
 				{
-					SLZCWndScreen* WndScreen = SLZCWndScreen::GetInstance();
-					WndScreen->AddScreenMsg(strAdmsg,wndaddress);
-				}
-				int ledphyid = itera->GetLEDPhyId();
-				int ledpipeid = itera->GetLEDPipeId();
-				if (ledphyid!=0&&ledpipeid!=0)
-				{
-					SLZCWndScreen* WndScreen = SLZCWndScreen::GetInstance();
-					WndScreen->AddThroughScreenMsg(strAdmsg,ledphyid,ledpipeid);
-				}
-				int wndcomid = itera->GetComScreenId();
-				if (wndcomid!=0)
-				{
-					SLZCWndScreen* WndScreen = SLZCWndScreen::GetInstance();
-					WndScreen->AddScreenMsg(strAdmsg,wndcomid);
+					nLedPhyId = itera->m_throughscreen_array.GetAt(i).GetPhyId();
+					nLedPipeId = itera->m_throughscreen_array.GetAt(i).GetPipeId();
+					nWndScreenId = itera->m_throughscreen_array.GetAt(i).GetWndScreenId();
+					nComScreenId = itera->m_throughscreen_array.GetAt(i).GetComScreenId();
+
+					if (nLedPhyId != 0 && nLedPipeId != 0)
+					{
+						WndScreen->AddThroughScreenMsg(strAdmsg,nLedPhyId,nLedPipeId,itera->m_throughscreen_array.GetAt(i).GetLocalIp());
+					}
+
+					if(nWndScreenId != 0)
+					{
+						WndScreen->AddScreenMsg(strAdmsg,nWndScreenId);
+					}
+
+					if(nComScreenId != 0)
+					{
+						WndScreen->AddScreenMsg(strAdmsg,nComScreenId);
+					}
 				}
 			}
 		}
@@ -145,7 +158,7 @@ BOOL SoundPlay::ReadWindowInfo()
 
 BOOL SoundPlay::DataPlay(const SLZData& Data,BOOL bWait)
 {
-	VOICEDISPLAYSTR vst = {0};
+	VOICEDISPLAYSTR vst;
 	UINT uWindowId = Data.GetWindowId();    //获取窗口ID
 	vst.iWndid = uWindowId;
 	SLZWindow WindowInfo;
@@ -163,13 +176,22 @@ BOOL SoundPlay::DataPlay(const SLZData& Data,BOOL bWait)
 			vst.strDisplayStr = ChangeShowStr(Data,&WindowInfo);
 		}
 		/////获取不同屏幕地址////
-		vst.iLEDPhyId = WindowInfo.GetLEDPhyId();
-		vst.iLEDPipeId = WindowInfo.GetLEDPipeId();
-		vst.iWndScreenId = WindowInfo.GetWndScreenId();
-		vst.iWndComId = WindowInfo.GetComScreenId();
+//		vst.iLEDPhyId = WindowInfo.GetLEDPhyId();
+//		vst.iLEDPipeId = WindowInfo.GetLEDPipeId();
+//		vst.iWndScreenId = WindowInfo.GetWndScreenId();
+//		vst.iWndComId = WindowInfo.GetComScreenId();
 		vst.strAd = WindowInfo.GetAdMsg();
 		vst.iShowTime = WindowInfo.GetMsgShowTime();
-		AddPlayText(vst);				//加入播放队列
+
+		int count = WindowInfo.m_throughscreen_array.GetCount();
+		for(int i=0;i<count;i++)
+		{
+			vst.ScreenWndInfoArray.Add(WindowInfo.m_throughscreen_array.GetAt(i));
+//			AddPlayText(vst);
+		}
+		
+		AddPlayText(vst);
+
 		return TRUE;
 	}
 	else
@@ -183,7 +205,7 @@ BOOL SoundPlay::DataPlay(const CString strPlay)
 
 	if (!strPlay.IsEmpty())
 	{
-		VOICEDISPLAYSTR vst = {0};
+		VOICEDISPLAYSTR vst;
 		vst.strVoiceStr = strPlay;
 		AddPlayText(vst);
 		return TRUE;
@@ -574,7 +596,7 @@ void CALLBACK SoundPlay::MyDoOutTimerMsg(HWND hwnd, UINT uMsg, UINT idEvent, DWO
 			}
 			if (ShowTime.LedAddress!=0&&ShowTime.LedPipe!=0)
 			{
-				pWndScreen->AddThroughScreenMsg(ShowTime.strAd,ShowTime.LedAddress,ShowTime.LedPipe);
+				pWndScreen->AddThroughScreenMsg(ShowTime.strAd,ShowTime.LedAddress,ShowTime.LedPipe,ShowTime.localIP);
 			}
 			playsound->m_MsgShowList.RemoveAt(pos);
 		}
@@ -598,61 +620,83 @@ UINT SoundPlay::PlayVoiceThread(LPVOID pParam)
 			VOICEDISPLAYSTR PlayStr = pThis->m_PlayDataList.GetHead();
 			pThis->m_PlayDataList.RemoveHead();
 			pThis->m_mtPlayStrList.Unlock();
-			if (PlayStr.iWndScreenId!=0||(PlayStr.iLEDPhyId!=0&&PlayStr.iLEDPipeId!=0)||PlayStr.iWndComId!=0)
-			{
-				ShowMsgTime showtime={0};   //初始化计时结构体
-				showtime.iWndid = PlayStr.iWndid;
-				showtime.strAd = PlayStr.strAd;
-				if (PlayStr.iWndScreenId!=0)
-				{
-					SLZCWndScreen* WndScreen = SLZCWndScreen::GetInstance();
-					WndScreen->AddScreenMsg(PlayStr.strDisplayStr,PlayStr.iWndScreenId);
-					showtime.address = PlayStr.iWndScreenId;
+			
 
-				}
-				if (PlayStr.iLEDPhyId!=0&&PlayStr.iLEDPipeId!=0)
+			SLZCWndScreen* pWndScreen = SLZCWndScreen::GetInstance();
+			int count = PlayStr.ScreenWndInfoArray.GetCount();
+			CThroughWndScreenInfo WndScreenInfo;
+			for(int i=0;i<count;i++)
+			{
+				WndScreenInfo = PlayStr.ScreenWndInfoArray.GetAt(i);
+				if (WndScreenInfo.GetWndScreenId() != 0 || (WndScreenInfo.GetPhyId() != 0 && WndScreenInfo.GetPipeId() !=0 ) 
+					|| WndScreenInfo.GetComScreenId() != 0 )
 				{
-					SLZCWndScreen* WndScreen = SLZCWndScreen::GetInstance();
-					WndScreen->AddThroughScreenMsg(PlayStr.strDisplayStr,PlayStr.iLEDPhyId,PlayStr.iLEDPipeId);
-					showtime.LedAddress = PlayStr.iLEDPhyId;
-					showtime.LedPipe = PlayStr.iLEDPipeId;
-				}
-				if (PlayStr.iWndComId!=0)
-				{
-					SLZCWndScreen* WndScreen = SLZCWndScreen::GetInstance();
-					WndScreen->AddScreenMsg(PlayStr.strDisplayStr,PlayStr.iWndComId);
-					showtime.ComId = PlayStr.iWndComId;
-				}
-				ShowMsgTime checkshow={0};		//检查结构体
-				pThis->m_mtShowMsgList.Lock();
-				int length = pThis->m_MsgShowList.GetCount();
-				for (int i =0;i<length;i++)
-				{
-					POSITION posFind = pThis->m_MsgShowList.FindIndex(i);
-					if(!posFind)break;
-					checkshow = pThis->m_MsgShowList.GetAt(posFind);
-					if (checkshow.iWndid==showtime.iWndid)
+					ShowMsgTime showtime={0};   //初始化计时结构体
+					showtime.iWndid = PlayStr.iWndid;
+					showtime.strAd = PlayStr.strAd;
+					///////////////////////////////////窗口屏
+					if (WndScreenInfo.GetWndScreenId() != 0)
 					{
-						pThis->m_MsgShowList.RemoveAt(posFind);			//如果
+					
+						pWndScreen->AddScreenMsg(PlayStr.strDisplayStr,WndScreenInfo.GetWndScreenId());
+						showtime.address = WndScreenInfo.GetWndScreenId();
+
 					}
+					/////////////////////////////////机顶盒
+					if(WndScreenInfo.GetStbID() != 0 && pThis->m_strLastStbMsg != PlayStr.strDisplayStr)
+					{
+						pThis->m_strLastStbMsg = PlayStr.strDisplayStr;
+						pWndScreen->AddStbScreenMsg(PlayStr.strDisplayStr,WndScreenInfo.GetStbID());
+					}
+					/////////////////////////////////通屏
+					if (WndScreenInfo.GetPhyId() != 0 && WndScreenInfo.GetPipeId() != 0)
+					{
+						
+						pWndScreen->AddThroughScreenMsg(PlayStr.strDisplayStr,WndScreenInfo.GetPhyId(),WndScreenInfo.GetPipeId(),WndScreenInfo.GetLocalIp());
+						showtime.LedAddress = WndScreenInfo.GetPhyId();
+						showtime.LedPipe = WndScreenInfo.GetPipeId();
+						showtime.localIP = WndScreenInfo.GetLocalIp();
+					}
+					///////////////////////////////综合屏
+					if (WndScreenInfo.GetComScreenId() != 0)
+					{
+						
+						pWndScreen->AddScreenMsg(PlayStr.strDisplayStr,WndScreenInfo.GetComScreenId());
+						showtime.ComId = WndScreenInfo.GetComScreenId();
+					}
+					ShowMsgTime checkshow={0};		//检查结构体
+					pThis->m_mtShowMsgList.Lock();
+					int length = pThis->m_MsgShowList.GetCount();
+					for (int i =0;i<length;i++)
+					{
+						POSITION posFind = pThis->m_MsgShowList.FindIndex(i);
+						if(!posFind)break;
+						checkshow = pThis->m_MsgShowList.GetAt(posFind);
+						if (checkshow.iWndid==showtime.iWndid)
+						{
+							pThis->m_MsgShowList.RemoveAt(posFind);			//如果
+						}
+					}
+					pThis->m_MsgShowList.AddTail(showtime);
+					pThis->m_mtShowMsgList.Unlock();
 				}
-				pThis->m_MsgShowList.AddTail(showtime);
-				pThis->m_mtShowMsgList.Unlock();
 			}
 //////////////////////声音播放//////////////////////////
 			if (!PlayStr.strVoiceStr.IsEmpty())
 			{
-				if (theApp.m_logicVariables.IsUseJtts)
+				for(int i=0;i<pThis->m_iSoundReplayTimes;i++)
 				{
+					if (theApp.m_logicVariables.IsUseJtts)
+					{
 						CStringArray soundarray;
 						CommonStrMethod::StrSplit(PlayStr.strVoiceStr,soundarray,_T("#"));
 						for (int i=0;i< soundarray.GetCount();i++)
 						{
 							pThis->PlayJtts(soundarray.GetAt(i));
 						}
-				}
-				else
-				{
+					}
+					else
+					{
 						CStringArray soundarray;
 						CommonStrMethod::StrSplit(PlayStr.strVoiceStr,soundarray,_T("#"));
 						for (int j=0;j<soundarray.GetCount();j++)
@@ -660,7 +704,9 @@ UINT SoundPlay::PlayVoiceThread(LPVOID pParam)
 							CString strjts = soundarray.GetAt(j);
 							pThis->PlayTheVoice(strjts,pThis->m_WavList);
 						}
+					}
 				}
+				//////////////////////////
 			}
 		}
 		//pThis->m_mtThreadPlayVoice.Unlock();

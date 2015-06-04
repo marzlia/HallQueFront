@@ -46,6 +46,7 @@
 				Name="VCCLCompilerTool"
 				Optimization="0"
 				PreprocessorDefinitions="WIN32;_WINDOWS;_DEBUG"
+				StringPooling="false"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="3"
@@ -257,6 +258,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\DealInterMsg.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\DiscardQueData.cpp"
 				>
 			</File>
@@ -302,6 +307,10 @@
 			</File>
 			<File
 				RelativePath=".\InlineQueData.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\InterNumSocketServer.cpp"
 				>
 			</File>
 			<File
@@ -437,6 +446,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\PropSTDSetDlg.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\QueSetDlg.cpp"
 				>
 			</File>
@@ -489,10 +502,6 @@
 				>
 			</File>
 			<File
-				RelativePath=".\SLZDataManager.cpp"
-				>
-			</File>
-			<File
 				RelativePath=".\SLZPrinter.cpp"
 				>
 			</File>
@@ -525,7 +534,11 @@
 				>
 			</File>
 			<File
-				RelativePath=".\StbSetDlg.cpp"
+				RelativePath=".\StbContent.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\StbDisplay.cpp"
 				>
 			</File>
 			<File
@@ -557,6 +570,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\ThroughWndScreenInfo.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\TrackContrl.cpp"
 				>
 			</File>
@@ -569,11 +586,23 @@
 				>
 			</File>
 			<File
+				RelativePath=".\UDPBrodcast.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\UDPServer.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\WaitQueData.cpp"
 				>
 			</File>
 			<File
 				RelativePath=".\WaringDlg.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\WndContentDlg.cpp"
 				>
 			</File>
 			<File
@@ -675,6 +704,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\DealInterMsg.h"
+				>
+			</File>
+			<File
 				RelativePath=".\DiscardQueData.h"
 				>
 			</File>
@@ -724,6 +757,10 @@
 			</File>
 			<File
 				RelativePath=".\InlineQueData.h"
+				>
+			</File>
+			<File
+				RelativePath=".\InterNumSocketServer.h"
 				>
 			</File>
 			<File
@@ -871,6 +908,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\PropSTDSetDlg.h"
+				>
+			</File>
+			<File
 				RelativePath=".\QueSetDlg.h"
 				>
 			</File>
@@ -939,10 +980,6 @@
 				>
 			</File>
 			<File
-				RelativePath=".\SLZDataManager.h"
-				>
-			</File>
-			<File
 				RelativePath=".\SLZEvaData.h"
 				>
 			</File>
@@ -987,7 +1024,11 @@
 				>
 			</File>
 			<File
-				RelativePath=".\StbSetDlg.h"
+				RelativePath=".\StbContent.h"
+				>
+			</File>
+			<File
+				RelativePath=".\StbDisplay.h"
 				>
 			</File>
 			<File
@@ -1007,6 +1048,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\ThroughWndScreenInfo.h"
+				>
+			</File>
+			<File
 				RelativePath=".\TrackContrl.h"
 				>
 			</File>
@@ -1023,11 +1068,23 @@
 				>
 			</File>
 			<File
+				RelativePath=".\UDPBrodcast.h"
+				>
+			</File>
+			<File
+				RelativePath=".\UDPServer.h"
+				>
+			</File>
+			<File
 				RelativePath=".\WaitQueData.h"
 				>
 			</File>
 			<File
 				RelativePath=".\WaringDlg.h"
+				>
+			</File>
+			<File
+				RelativePath=".\WndContentDlg.h"
 				>
 			</File>
 			<File

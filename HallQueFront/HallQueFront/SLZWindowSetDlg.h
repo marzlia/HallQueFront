@@ -2,7 +2,7 @@
 #include "SLZWindow.h"
 #include "ListCtrlCl.h"
 #include "QueueInfo.h"
-#include "SLZWindowManager.h"
+//#include "SLZWindowManager.h"
 // SLZWindowSetDlg 对话框
 
 
@@ -26,30 +26,30 @@ public:
 	CList<SLZWindow,SLZWindow&> m_List_WindowInfo;
 //	virtual BOOL OnApply();
 	CListCtrlCl m_ListCtr_Window;
-	CDoFile m_WindowFile;
+//	CDoFile m_WindowFile;
 	CStatic m_cs_AbleQue;
 	CString m_cs_WindowId;
 	CString m_cs_WindowName;
 	CString m_cs_WndCallName;
 	CString m_cs_CallerID;
 	CString m_cs_EvalId;
-	CString m_cs_WndScrName;
-	CString m_cs_ComScrName;
-	CString m_cs_LEDPhyId;
-	CString m_cs_LEDIPId;
-	CString m_cs_LEDPipeId;
+//	CString m_cs_WndScrName;
+//	CString m_cs_ComScrName;
+// 	CString m_cs_LEDPhyId;
+// 	CString m_cs_LEDIPId;
+// 	CString m_cs_LEDPipeId;
 	CString m_LogStaffName;
 	CString m_cs_EvalTimeOut;
 	CComboBox m_cs_LogStaff;
 	int m_ReadMaxSerialID;
-	CComputeFuncationTime m_ComputerTime;
+//	CComputeFuncationTime m_ComputerTime;
 	BOOL WriteWindowBasicIntoFile();
 	BOOL ReadWindowBasicIntoFile();
 	BOOL RefrushWindowInfo();		//刷新信息
 	int QueIdStringToArray(CString strSrc,CArray<CString,CString&>& arrStr);
 	CString ArrayToQueIdString(CStringArray& arrStr);
 private:
-	CCommonConvert convert;
+//	CCommonConvert convert;
 	CString m_infofile_path;
 	CString m_staffinfo_path;
 	CString m_Queinfo_path;
@@ -63,7 +63,7 @@ private:
 	BOOL ReadMaxIdFromFile();		//读最大数从文件
 	CString GetStaffNameFromMap(CString StaffId);
 	CString GetQueNameFromMap(CString QueId);
-	SLZWindowManager WindowManage;
+//	SLZWindowManager WindowManage;
 	int GetNumFromString(CString strNum);
 public:
 	afx_msg void OnBnClickedAddwnd();
@@ -72,8 +72,8 @@ public:
 	afx_msg void OnEnChangeEditWndcallname();
 	afx_msg void OnEnChangeEditCallid();
 	afx_msg void OnEnChangeEditEvaid();
-	afx_msg void OnEnChangeEditWndscrid();
-	afx_msg void OnEnChangeEditComscrid();
+//	afx_msg void OnEnChangeEditWndscrid();
+//	afx_msg void OnEnChangeEditComscrid();
 	//afx_msg void OnBnClickedAutologin();
 	afx_msg void OnCbnSelchangeComboLogstaff();
 	afx_msg void OnNMClickWndlist(NMHDR *pNMHDR, LRESULT *pResult);
@@ -87,9 +87,12 @@ public:
 	afx_msg void OnBnClickedBtnWaitshow();
 	afx_msg void OnEnChangeEditWndid();
 	afx_msg void OnEnChangeEditEvaltimeout();
-	afx_msg void OnEnChangeEditLedphyid();
-	afx_msg void OnEnChangeEditLedipid();
-	afx_msg void OnEnChangeEditLedpipe();
+//	afx_msg void OnEnChangeEditLedphyid();
+//	afx_msg void OnEnChangeEditLedipid();
+//	afx_msg void OnEnChangeEditLedpipe();
 	afx_msg void OnBnClickedAutologin();
 	afx_msg void OnBnClickedCancelautologin();
+	afx_msg void OnBnClickedBnWndscrset();
+public:
+	int m_nCurSelectItem;
 };

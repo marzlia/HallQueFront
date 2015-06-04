@@ -2,8 +2,9 @@
 #include "SLZPrinter.h"
 #include "DoFile.h"
 #include "ComputeFuncationTime.h"
+#include "HallQueFront.h"
 
-extern void MyWriteConsole(CString str);
+
 
 SLZPrinter::SLZPrinter(void) : m_hPrintThread(NULL)
 {
@@ -382,7 +383,7 @@ void SLZPrinter::SetPrintStyle(CDC* pDC,const WINDOWCTRINFO& info,const SLZData&
 	rect.bottom = info.rectBottom - m_printRect.top;
 	if(info.IsForPrintChangeObjec)
 	{
-		pt.x = rect.left;pt.y = rect.top;
+//		pt.x = rect.left;pt.y = rect.top;
 		switch(info.printObject)
 		{
 		case enumPrintType://业务类型(队列)
@@ -399,6 +400,9 @@ void SLZPrinter::SetPrintStyle(CDC* pDC,const WINDOWCTRINFO& info,const SLZData&
 			break;//客户姓名
 		case 	enumPrintClientLevel: //客户星级
 			DrawStarsForClientLev(pDC,7,rect,data.GetCustomerLevel());
+			break;
+		case enumPrintClientWndNum://哪些些窗口可以处理
+			content = GetCanDoWndName(data);
 			break;
 		}
 		if(!content.IsEmpty())
@@ -563,4 +567,10 @@ int SLZPrinter::FlushCStringData(CDC* pDC,const CString& content,const CRect& re
 	pDC->SelectObject(def_font);
 	font.DeleteObject();
 	return col;
+}
+
+CString SLZPrinter::GetCanDoWndName(const SLZData& data)
+{
+	CString wndName = theApp.m_Controller.GetCandoWndName(data);
+	return wndName;
 }

@@ -74,4 +74,5 @@ public:
 	virtual BOOL PreTranslateMessage(MSG* pMsg);
 	afx_msg void OnBnClickedBnOk();
 	afx_msg void OnBnClickedBnCancel();
+	afx_msg void OnBnClickedWndNum();
 };

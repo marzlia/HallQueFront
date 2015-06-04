@@ -86,4 +86,10 @@ public:
 	afx_msg void OnBnClickedBnSavecon();
 	afx_msg void OnBnClickedButtonMsgset();
 	afx_msg void OnCbnSelchangeComboMsg();
+	afx_msg void OnBnClickedBnTestinternet();
+	CEdit m_ed_interIP;
+//	CEdit m_ed_interPort;
+	CButton m_check_inter;
+	CEdit m_ed_countdown;
+	CButton m_check_countdown;
 };

@@ -8,9 +8,11 @@ public:
 	~CComInit(void);
 	//打开窗口屏、呼叫器串口
 	int OpenWndScreen(int ncom);
+	int OpenCaller(int ncom);
 	int m_canUse[10];//保存本机上所有的可用串口号
-	HANDLE m_hComWndScreen;//条屏串口(呼叫器)
+	HANDLE m_hCaller;//(呼叫器)串口
 	HANDLE m_hComReadCard;//刷卡器串口
+	HANDLE m_hWndScr;//窗口屏串口
 	HANDLE m_hComMsg;//短信猫串口
 	HANDLE OpenComm(int ncom);//打开串口
 	///try本机所有的可用的串口
@@ -24,6 +26,7 @@ public:
 	CString GetCardComm();
 	CString GetWndComm();
 	CString GetMsgComm();
+	CString GetCallerComm();
 	void SetMsgComm(const CString strCom)
 	{
 		m_cMsgComm = strCom;
@@ -34,6 +37,7 @@ private:
 	CString m_cCardComm;
 	CString m_cWndComm;
 	CString m_cMsgComm;
+	CString m_cCallerComm;
 	CString m_strPath;
 public:
 	OVERLAPPED m_write_os,m_read_os;

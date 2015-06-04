@@ -7,6 +7,8 @@
 #include "CommonStrMethod.h"
 #include "DoFile.h"
 #include "PropertyShortMsg.h"
+#include "ComplSocketClient.h"
+#include "DealInterMsg.h"
 
 
 
@@ -54,6 +56,11 @@ void CPropConnectInfo::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX, IDC_RADIO_TYPE2, m_Sel_CallType2);
 	DDX_Control(pDX, IDC_CHECK4, m_check_changePage);
 	DDX_Control(pDX, IDC_COM_PARENTORG, m_combox_parentOrg);
+	DDX_Control(pDX, IDC_ED_INTERIP, m_ed_interIP);
+	//	DDX_Control(pDX, IDC_ED_INTERPORT, m_ed_interPort);
+	DDX_Control(pDX, IDC_CHECK_INTER, m_check_inter);
+	DDX_Control(pDX, IDC_EDIT_TIMELEFT, m_ed_countdown);
+	DDX_Control(pDX, IDC_CHECK_OPENTIMELEFT, m_check_countdown);
 }
 
 
@@ -71,6 +78,7 @@ ON_BN_CLICKED(IDC_BN_FLUSHORG, &CPropConnectInfo::OnBnClickedBnFlushorg)
 ON_BN_CLICKED(IDC_BN_SAVECON, &CPropConnectInfo::OnBnClickedBnSavecon)
 ON_BN_CLICKED(IDC_BUTTON_MSGSET, &CPropConnectInfo::OnBnClickedButtonMsgset)
 ON_CBN_SELCHANGE(IDC_COMBO_MSG, &CPropConnectInfo::OnCbnSelchangeComboMsg)
+ON_BN_CLICKED(IDC_BN_TESTINTERNET, &CPropConnectInfo::OnBnClickedBnTestinternet)
 END_MESSAGE_MAP()
 
 
@@ -158,9 +166,10 @@ BOOL CPropConnectInfo::OnInitDialog()
 	m_ed_timeOut.SetWindowText(cTimeOut);
 
 	///////////////////////////////////////////
-	CString readCardCom = m_pComInit->GetCardComm();
-	CString callerCom = m_pComInit->GetWndComm();
+	CString WndCom = m_pComInit->GetWndComm();
+	CString callerCom = m_pComInit->GetCallerComm();
 	CString MsgCom = m_pComInit->GetMsgComm();
+
 	m_com_caller.AddString(_T("0"));
 	m_com_readcard.AddString(_T("0"));
 	m_com_msg.AddString(_T("0"));
@@ -191,7 +200,7 @@ BOOL CPropConnectInfo::OnInitDialog()
 	{
 		CString content;
 		m_com_readcard.GetLBText(i,content);
-		if(readCardCom == content)
+		if(WndCom == content)
 		{
 			m_com_readcard.SetCurSel(i);
 			break;
@@ -277,6 +286,29 @@ BOOL CPropConnectInfo::OnInitDialog()
 			ASSERT(pButton);
 			pButton->SetCheck(BST_UNCHECKED);
 		}
+		if(m_logicVariables.IsOpenInterNum)
+		{
+			m_check_inter.SetCheck(BST_CHECKED);
+		}
+		else
+		{
+			m_check_inter.SetCheck(BST_UNCHECKED);
+		}
+
+		if(m_logicVariables.IsOpenCountTime)
+		{
+			m_check_countdown.SetCheck(BST_CHECKED);
+		}
+		else
+		{
+			m_check_countdown.SetCheck(BST_UNCHECKED);
+		}
+
+		CString strTimeMintue;
+		CCommonConvert::intToCString(m_logicVariables.nTimeMintue,strTimeMintue);
+		m_ed_countdown.SetWindowText(strTimeMintue);
+
+		m_ed_interIP.SetWindowText(m_logicVariables.strInterIP);
 		m_ed_organID.SetWindowText(m_logicVariables.strOrganID);
 		m_ed_organName.SetWindowText(m_logicVariables.strOrganNmae);
 	}
@@ -319,12 +351,12 @@ void CPropConnectInfo::OnCbnSelchangeComCaller()
 	{
 		return;
 	}
-	CString wndScreenCom=_T("");
-	m_com_caller.GetLBText(index,wndScreenCom);
-	int i_wndsScreenCom=0;
-	convert.CStringToint(i_wndsScreenCom,wndScreenCom);
+	CString strCallerCom=_T("");
+	m_com_caller.GetLBText(index,strCallerCom);
+	int i_CallerCom=0;
+	convert.CStringToint(i_CallerCom,strCallerCom);
 
-	if(m_pComInit->OpenWndScreen(i_wndsScreenCom) == -1)
+	if(m_pComInit->OpenCaller(i_CallerCom) == -1)
 	{
 		m_com_caller.SetCurSel(0);		
 		MessageBox(_T("呼叫器串口打开失败或被占用"),_T("注意"),MB_OK|MB_ICONINFORMATION);
@@ -342,15 +374,15 @@ void CPropConnectInfo::OnCbnSelchangeComReadcard()
 	{
 		return;
 	}
-	CString readCardCom=_T("");
-	m_com_readcard.GetLBText(index,readCardCom);
-	int i_readCardCom=0;
-	convert.CStringToint(i_readCardCom,readCardCom);
+	CString wndScreenCom=_T("");
+	m_com_readcard.GetLBText(index,wndScreenCom);
+	int i_wndCom=0;
+	convert.CStringToint(i_wndCom,wndScreenCom);
 
-	if(m_pComInit->OpenCardComm(i_readCardCom) == -1)
+	if(m_pComInit->OpenWndScreen(i_wndCom) == -1)
 	{
 		m_com_readcard.SetCurSel(0);
-		MessageBox(_T("刷卡串口打开失败或被占用"),_T("注意"),MB_OK|MB_ICONINFORMATION);
+		MessageBox(_T("屏串口打开失败或被占用"),_T("注意"),MB_OK|MB_ICONINFORMATION);
 	}
 }
 
@@ -501,16 +533,29 @@ BOOL CPropConnectInfo::WriteSysLogicVaribiles()
 	{
 		m_logicVariables.IsAutoChangePage = FALSE;
 	}
+	if(BST_CHECKED == m_check_inter.GetCheck())
+	{
+		m_logicVariables.IsOpenInterNum = TRUE;
+	}
+	else
+	{
+		m_logicVariables.IsOpenInterNum = FALSE;
+	}
 	CString wstrOrganID;
 	m_ed_organID.GetWindowText(wstrOrganID);
 	CString wstrOrganName;
 	m_ed_organName.GetWindowText(wstrOrganName);
-	wcscpy_s(m_logicVariables.strOrganID,addNum,
+	wcscpy_s(m_logicVariables.strOrganID,MYBUFLEN,
 		wstrOrganID.GetBuffer(0));
 	wstrOrganID.ReleaseBuffer(0);
-	wcscpy_s(m_logicVariables.strOrganNmae,addNum,
+	wcscpy_s(m_logicVariables.strOrganNmae,MYBUFLEN,
 		wstrOrganName.GetBuffer(0));
 	wstrOrganName.ReleaseBuffer(0);
+	CString wstrInterIP;
+	m_ed_interIP.GetWindowText(wstrInterIP);
+	wcscpy_s(m_logicVariables.strInterIP,MYBUFLEN,
+		wstrInterIP.GetBuffer(0));
+	wstrInterIP.ReleaseBuffer(0);
 
 	int nSpeed = m_slider_speed.GetPos();
 	m_logicVariables.playSpeed = nSpeed;
@@ -523,15 +568,28 @@ BOOL CPropConnectInfo::WriteSysLogicVaribiles()
 	{
 		m_logicVariables.iNumberCallType = 2;
 	}
+
+	if(m_check_countdown.GetCheck() == BST_CHECKED)
+	{
+		m_logicVariables.IsOpenCountTime = TRUE;
+	}
+	else
+	{
+		m_logicVariables.IsOpenCountTime = FALSE;
+	}
+	
+	CString strMintue;
+	m_ed_countdown.GetWindowText(strMintue);
+	CCommonConvert::CStringToint(m_logicVariables.nTimeMintue,strMintue);
 	///////////////////////////////////////////
 	int index = m_combox_parentOrg.GetCurSel();
 	if(index!=CB_ERR)
 	{
 		CString parOrgName(m_map_commDaoOrg[index].curOrgName.c_str());
 		CString parOrgID(m_map_commDaoOrg[index].curOrgID.c_str());
-		wcscpy_s(m_logicVariables.strParOrgID,addNum,parOrgID.GetBuffer(0));
+		wcscpy_s(m_logicVariables.strParOrgID,MYBUFLEN,parOrgID.GetBuffer(0));
 		parOrgID.ReleaseBuffer();
-		wcscpy_s(m_logicVariables.strParOrgName,addNum,parOrgName.GetBuffer(0));
+		wcscpy_s(m_logicVariables.strParOrgName,MYBUFLEN,parOrgName.GetBuffer(0));
 		parOrgID.ReleaseBuffer();
 	}
 	/////////////////////////////////
@@ -660,4 +718,19 @@ void CPropConnectInfo::OnCbnSelchangeComboMsg()
 		}
 	}
 	else m_pComInit->SetMsgComm(L"0");
+}
+
+void CPropConnectInfo::OnBnClickedBnTestinternet()
+{
+	// TODO: 在此添加控件通知处理程序代码
+	CComplSocketClient client;
+	CDealInterMsg dealInterMsg;
+	string retMsg;
+	dealInterMsg.ProduceSendInNumMsg(_T(""),retMsg);
+	int actRecvSize = 0;
+	if(client.SendData(INTERPORT,theApp.m_logicVariables.strInterIP,
+		retMsg,retMsg.size(),retMsg,actRecvSize) && actRecvSize)
+	{
+		AfxMessageBox(_T("连接成功"));
+	}
 }

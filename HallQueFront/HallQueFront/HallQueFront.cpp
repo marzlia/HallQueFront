@@ -290,3 +290,18 @@ BOOL CHallQueFrontApp::AddAutoRun(CString strValueName)
 
 
 
+BOOL CHallQueFrontApp::IsLocal()
+{
+	if(!theApp.m_logicVariables.IsOpenInterNum)
+	{
+		return TRUE;
+	}
+	else
+	{
+		if(theApp.m_logicVariables.strInterIP[0] == '\0')
+		{
+			return TRUE;
+		}
+	}
+	return FALSE;
+}

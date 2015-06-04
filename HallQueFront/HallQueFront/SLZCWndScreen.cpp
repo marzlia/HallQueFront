@@ -5,14 +5,21 @@
 #include "ComplSocketClient.h"
 #include "ComputeFuncationTime.h"
 #include "DoComInOut.h"
-
+//#include "ComplSocketClient.h"
+#include "MySocketUDP.h"
+#include "StbContent.h"
+#include "StbDisplay.h"
 
 //SLZCWndScreen* SLZCWndScreen::m_pInstance=NULL;//new SLZCWndScreen;
 extern void MyWriteConsole(CString str);
 
 SLZCWndScreen::SLZCWndScreen(void) : 
 m_hDoWndScreenMsgThread(NULL)
+, m_ThrWndMutex(NULL)
+, m_hDoStbScreenThread(NULL)
+, m_pStbDisplay(NULL)
 {
+	m_pStbDisplay = new StbDisplay;
 	StartHardScreen();
 	////////////////////////窗口屏
 	///初始化通屏通道，获取通道的信息最大255块通屏
@@ -39,6 +46,20 @@ SLZCWndScreen::~SLZCWndScreen(void)
 		CloseHandle(m_hDoThrWndMsgThread);
 		m_hDoThrWndMsgThread = NULL;
 	}
+	TerminateThread(m_hDoStbScreenThread,0);
+	if(m_hDoStbScreenThread)
+	{
+		CloseHandle(m_hDoStbScreenThread);
+		m_hDoStbScreenThread = NULL;
+	}
+	ClearStbContentInfo();
+
+	if(m_pStbDisplay)
+	{
+		delete m_pStbDisplay;
+		m_pStbDisplay = NULL;
+	}
+	ClearMapStbcallMsg();
 }
 
 int SLZCWndScreen::DoScreenMsg(CString& msg,
@@ -327,6 +348,33 @@ void SLZCWndScreen::StartHardScreen()
 		m_hDoThrWndMsgThread = CreateThread(NULL,0,DoThrWndMsgThread,
 			this,NULL,0);
 	}
+
+	if(!m_hDoStbScreenThread)
+	{
+		m_hDoStbScreenThread = CreateThread(NULL,0,DoStbScreenMsgThread,this,NULL,0);
+	}
+
+	CDoFile doFile;
+	m_pStbDisplay->Start();
+	ReadStbContentInfo();
+	CString strtitle,strstbid,strnotice,strtitlepic,strnewfile;
+	strnewfile = doFile.GetExeFullFilePath();
+	strnewfile += _T("\\webRoot\\img\\hspt.jpg");
+	list<CStbContent*>::const_iterator itera = m_list_stbcontent.begin();
+	for(itera;itera!=m_list_stbcontent.end();++itera)
+	{
+		strtitle = (*itera)->GetStbTitle();
+		strnotice = (*itera)->GetStbNotice();
+		strstbid = (*itera)->GetStbNum();
+		strtitlepic = (*itera)->GetStbTitlePicPath();
+// 		if(!doFile.IsFileExit(strtitlepic) && !strtitlepic.IsEmpty())
+// 		{
+			::CopyFile(strtitlepic,strnewfile,FALSE);
+//		}
+		m_pStbDisplay->StbUpdateTitleHtml(strtitle,strstbid);
+		m_pStbDisplay->StbUpdateNoticeHtml(strnotice,strstbid);
+	}
+
 }
 /*
 void SLZCWndScreen::InitThroughScreen(const int address)
@@ -459,6 +507,7 @@ CString SLZCWndScreen::FlushCstringToFitWndScreen(const CString& str,const int l
 	return temp;
 }
 
+
 // void SLZCWndScreen::AddThroughInitStr(const char* buf,const DWORD count)
 // {
 // 	m_recvThroughInitStr.append(buf,count);
@@ -539,6 +588,72 @@ CString SLZCWndScreen::FlushCstringToFitWndScreen(const CString& str,const int l
 // 	return TRUE;
 // }
 
+/*
+void SLZCWndScreen::AddThroughInitStr(const char* buf,const DWORD count)
+{
+	m_recvThroughInitStr.append(buf,count);
+}
+*/
+
+/*
+BOOL SLZCWndScreen::DoThroughInitMsg()
+{
+	CDoComInOut* pComInOut = CDoComInOut::GetInstance();
+	pComInOut->SetThroughInitDone(TRUE);
+	if(m_recvThroughInitStr.empty())return FALSE;
+	string::size_type position,oldPosition;
+	position = m_recvThroughInitStr.find("Get_Data");
+	while(position!=m_recvThroughInitStr.npos)
+	{
+		oldPosition = position;
+		position = m_recvThroughInitStr.find("Get_Data",position+1);
+		string temp = m_recvThroughInitStr.substr(oldPosition,position-oldPosition-1);
+		m_list_recvString.push_back(temp);
+	}
+	string recvMsg;
+	if(!m_list_recvString.empty())
+	{
+		std::list<string>::const_iterator itera = m_list_recvString.begin();
+		for(itera;itera!=m_list_recvString.end();itera++)
+		{
+			recvMsg= *itera;
+			if(!recvMsg.empty())
+			{
+				string::size_type first_pos = GetIpPos(recvMsg);
+				while(first_pos!=recvMsg.npos)//找到了
+				{
+					/////////////////////////////通屏基本信息如:屏地址
+					string::size_type last_Pos = first_pos;
+					ThrScreenBasicMsg ThrScreenMsg;
+					memset(&ThrScreenMsg,0,sizeof(ThrScreenMsg));
+					string basicInfo = recvMsg.substr(first_pos,10);
+					ThrScreenMsg.address = basicInfo[7];
+					
+					recvMsg = recvMsg.substr(first_pos+10);
+					first_pos = GetIpPos(recvMsg);
+					string temp = recvMsg.substr(0,first_pos);
+					
+					for(int i=0;i<(int)temp.size();i+=34)
+					{
+						string channel = temp.substr(i,34);
+						ThrScreenMsg.channel = channel[0];//通道号
+						ThrScreenMsg.fone = channel[8];//字体
+						memcpy(&ThrScreenMsg.width,&channel[4],2);
+						memcpy(&ThrScreenMsg.height,&channel[6],2);
+						AddThrBasicMsg(ThrScreenMsg);
+					}
+					
+					
+				}
+			}
+		}
+		m_list_recvString.clear();//删除
+	}
+	m_recvThroughInitStr.clear();
+	return TRUE;
+}
+*/
+
 void SLZCWndScreen::AddThrBasicMsg(ThrScreenBasicMsg msg)
 {
 	BOOL flag = FALSE;
@@ -560,8 +675,20 @@ void SLZCWndScreen::AddThrBasicMsg(ThrScreenBasicMsg msg)
 
 BOOL SLZCWndScreen::SendDataToThroughScreen(const CString& str,int address,int channel,const CString& localIp)
 {
+	///自己公司协议
+// 	int height = 0;
+// 	int width = FindChannelWidth(address,channel,height);
 	CString msg = str;
-
+// #ifdef _DEBUG
+//  	CString test;
+// 	test.Format(_T("through wnd:address:%d,channel:%d,width:%d"),address,channel,width);
+//  	MyWriteConsole(test);
+// 	MyWriteConsole(str);
+// #endif
+//  	if(width>0 && width<=128)//注意小于128是因为同屏卡最多显示128个汉字
+//  	{
+//  		msg = FlushCstringToFitWndScreen(msg,width,height);
+//  	}
 	char buf[512]={0};
 	int length = DoScreenMsg(msg,address+channel,buf);
 	WriteComMsg *pMsg = new WriteComMsg;
@@ -570,7 +697,26 @@ BOOL SLZCWndScreen::SendDataToThroughScreen(const CString& str,int address,int c
 	pMsg->length = length;
 	CDoComInOut* pComInOut = CDoComInOut::GetInstance();
 	pComInOut->AddWriteComMsg(pMsg);
-	return TRUE;
+
+	BOOL flag = FALSE;
+	if(!localIp.IsEmpty())//UDP发送
+	{
+		MySocketUDP Client;
+		Client.StartSocket(1024);
+		flag = Client.SendTo(buf,length,localIp,1024);
+		
+#ifdef _DEBUG
+		if(flag)
+		{
+			MyWriteConsole(_T("发送通屏消息成功"));
+		}
+		else
+		{
+			MyWriteConsole(_T("发送同频消息失败"));
+		}
+#endif
+	}
+	return flag;
 }
 
 int SLZCWndScreen::FindChannelWidth(int address,int channel,int& height)
@@ -601,6 +747,7 @@ void SLZCWndScreen::AddThroughScreenMsg(const CString& msg,int address,int chann
 	sendMsg.msg = msg;
 	sendMsg.address = address;
 	sendMsg.channel = channel-1;
+	sendMsg.localIp = localIp;
 	m_ThrWndMutex.Lock();
 	m_list_sendThrMsg.push_back(sendMsg);
 	m_ThrWndMutex.Unlock();
@@ -624,7 +771,15 @@ DWORD WINAPI SLZCWndScreen::DoThrWndMsgThread(LPVOID pParam)
 			pThis->m_list_sendThrMsg.pop_front();
 			pThis->m_ThrWndMutex.Unlock();
 //			WaitForSingleObject(pThis->m_hDoWndScreenMsgThread,3);
+#ifdef _DEBUG
+			CString strAddress;
+			strAddress.Format(_T("%d"),msg.address);
+			CString strChannel;
+			strChannel.Format(_T("%d"),msg.channel);
 
+
+			MyWriteConsole(_T("通屏信息:") + msg.msg + _T("地址:") + strAddress + _T("通道:") + strChannel + _T("ip:") + msg.localIp );
+#endif
 			pThis->SendDataToThroughScreen(msg.msg,msg.address,msg.channel,msg.localIp);
 		}
 	}
@@ -660,4 +815,205 @@ string::size_type SLZCWndScreen::GetIpPos(const string& msg)
 	if(i_next3>=0 && i_next3<=9)
 		resultPos = thirdPoint+3;
 	return resultPos+1;
+}
+
+DWORD WINAPI SLZCWndScreen::DoStbScreenMsgThread(LPVOID pParam)
+{
+	SLZCWndScreen* pThis = (SLZCWndScreen*)pParam;
+	while(TRUE)
+	{
+		if(pThis->m_list_stdscreenmsg.empty())
+		{
+			Sleep(5);
+		}
+		else
+		{
+			StbScreenMsg stbScreenMsg;
+			pThis->m_mtStbScreenMsg.Lock();
+			list<StbScreenMsg>::const_iterator itera = pThis->m_list_stdscreenmsg.begin();
+			stbScreenMsg = *itera;
+			pThis->m_list_stdscreenmsg.pop_front();
+			pThis->m_mtStbScreenMsg.Unlock();
+
+			CString strStbNum;
+			CString strRetMsg = pThis->ProduceStbMsg(strStbNum,stbScreenMsg.uStbID);
+#ifdef _DEBUG
+			MyWriteConsole(_T("retmsg:") + strRetMsg);
+#endif
+
+			if(pThis->m_pStbDisplay && !strRetMsg.IsEmpty())
+			{
+				pThis->m_pStbDisplay->StbUpdateCallMsg(strRetMsg,strStbNum);
+			}
+		}
+	}
+	return 0;
+}
+
+void SLZCWndScreen::AddStbScreenMsg(const CString& msg, UINT uStbID)
+{
+	if(msg.IsEmpty() || uStbID == 0)
+		return;
+	StbScreenMsg stb;
+	stb.strMsg = msg;
+	stb.uStbID = uStbID;
+
+	m_mtStbmapcallmsg.Lock();
+	map<UINT,CStringArray*>::const_iterator itera;
+	itera = m_map_stbcallMsg.find(uStbID);
+	if(itera != m_map_stbcallMsg.end())
+	{
+		if(itera->second->GetCount() > 50)
+		{
+			itera->second->RemoveAt(0,10);
+		}
+		itera->second->Add(msg);
+	}
+	else
+	{
+		CStringArray* pStrMsgArray = new CStringArray;
+		pStrMsgArray->Add(msg);
+		m_map_stbcallMsg[uStbID] = pStrMsgArray;
+	}
+	m_mtStbmapcallmsg.Unlock();
+
+
+	m_mtStbScreenMsg.Lock();
+	m_list_stdscreenmsg.push_back(stb);
+	m_mtStbScreenMsg.Unlock();
+}
+
+BOOL SLZCWndScreen::ReadStbContentInfo()
+{
+	CDoFile doFile;
+	CString strExePath = doFile.GetExeFullFilePath();
+	strExePath += _T("\\StbBasicInfo\\StbInfo.dat");
+	CFile file;
+	CFileException e;
+	if (file.Open(strExePath,CFile::modeRead,&e))
+	{
+		CStbContent* pStb=NULL;
+		CArchive ar(&file,CArchive::load);
+		if (file.GetLength()) 
+			do
+			{
+				ar>>pStb;
+				if (pStb)
+				{
+					m_list_stbcontent.push_back(pStb);
+				}
+			}while(!ar.IsBufferEmpty());
+			ar.Close();
+			file.Close();
+			return TRUE;
+	}
+	return FALSE;
+}
+
+void SLZCWndScreen::ClearStbContentInfo()
+{
+	CStbContent* pStb = NULL;
+	list<CStbContent*>::const_iterator itera = m_list_stbcontent.begin();
+	for(itera;itera!=m_list_stbcontent.end();++itera)
+	{
+		pStb = *itera;
+		if(pStb)
+			delete pStb;
+	}
+
+	m_list_stbcontent.clear();
+}
+
+BOOL SLZCWndScreen::ReFlushStbContentInfo()
+{
+	ClearStbContentInfo();
+	return ReadStbContentInfo();
+}
+
+void SLZCWndScreen::UpdateStbTitleAndNotice()
+{
+	CDoFile doFile;
+	CString strtitle,strstbid,strnotice,strtitlepic,strnewfile;
+	strnewfile = doFile.GetExeFullFilePath();
+	strnewfile += _T("\\webRoot\\img\\hspt.jpg");
+
+	list<CStbContent*>::const_iterator itera = m_list_stbcontent.begin();
+	for(itera;itera!=m_list_stbcontent.end();++itera)
+	{
+		strtitle = (*itera)->GetStbTitle();
+		strnotice = (*itera)->GetStbNotice();
+		strstbid = (*itera)->GetStbNum();
+		strtitlepic = (*itera)->GetStbTitlePicPath();
+//		if(doFile.IsFileExit() && !strtitlepic.IsEmpty())
+//		{
+		::CopyFile(strtitlepic,strnewfile,FALSE);
+//		}
+		m_pStbDisplay->StbUpdateTitleHtml(strtitle,strstbid);
+		m_pStbDisplay->StbUpdateNoticeHtml(strnotice,strstbid);
+	}
+}
+
+void SLZCWndScreen::ClearMapStbcallMsg()
+{
+	map<UINT,CStringArray*>::const_iterator itera = m_map_stbcallMsg.begin();
+	for(itera;itera!=m_map_stbcallMsg.end();++itera)
+	{
+		if(itera->second)
+		{
+			delete itera->second;
+		}
+	}
+	m_map_stbcallMsg.clear();
+}
+
+CString SLZCWndScreen::ProduceStbMsg(CString& strStbNum,UINT uStbID)
+{
+	CString strRetMsg;
+	CStbContent* pStb = NULL;
+	list<CStbContent*>::const_iterator itera = m_list_stbcontent.begin();
+	for(itera;itera!=m_list_stbcontent.end();++itera)
+	{
+		if((*itera)->GetSerialID() == uStbID)
+		{
+			pStb = (*itera);
+			strStbNum = pStb->GetStbNum();
+			break;
+		}
+	}
+
+	if(pStb)
+	{
+		int nLineNum = pStb->GetStbLineNum();
+		CStringArray* pStrArray = NULL;
+		m_mtStbmapcallmsg.Lock();
+		map<UINT,CStringArray*>::const_iterator itera;
+		itera = m_map_stbcallMsg.find(uStbID);
+		if(itera != m_map_stbcallMsg.end())
+		{
+			pStrArray = itera->second;
+		}
+		m_mtStbmapcallmsg.Unlock();
+		if(pStrArray)
+		{
+			int count = pStrArray->GetCount();
+			if(nLineNum <= count)
+			{
+				int temp = count - nLineNum;
+				for(temp;temp<count;temp++)
+				{
+					strRetMsg += pStrArray->GetAt(temp);
+					strRetMsg += _T("<br/> ");
+				}
+			}
+			else
+			{
+				for(int i=0;i<pStrArray->GetCount();i++)
+				{
+					strRetMsg += pStrArray->GetAt(i);
+					strRetMsg += _T("<br/> ");
+				}
+			}
+		}
+	}
+	return strRetMsg;
 }

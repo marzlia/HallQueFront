@@ -7,9 +7,14 @@
 #include "SLZEvaData.h"
 #include "SLZCWndScreen.h"
 #include "ComputeFuncationTime.h"
+#include "ComplSocketClient.h"
+#include "DealInterMsg.h"
+#include "UDPBrodcast.h"
 
 
 extern void MyWriteConsole(CString str);
+
+CCallThread* pCallThread;
 
 CCallThread::CCallThread(CInlineQueData& rInlineQueData,
 						 CCalledQueData& rCalledQueData,
@@ -33,11 +38,14 @@ CCallThread::CCallThread(CInlineQueData& rInlineQueData,
  , m_staffQueryView(staffQueryView)
 {
 	m_pShortMsg = CShortMsgModem::GetInstance();
+	pCallThread = this;
+
+	SetTimer(NULL,0,2000,MyDoCountTimeMsg);
 }
 
 CCallThread::~CCallThread(void)
 {
-	
+	ClearListCountTime();
 }
 
 BOOL CCallThread::OpenMsgQueue()
@@ -79,6 +87,8 @@ void CCallThread::Run()
 	{
 		Sleep(10);
 	}
+
+	
 }
 
 void CCallThread::DoEvaMsg(const MSG& msg)
@@ -224,6 +234,11 @@ void CCallThread::DispatchCallerCmd(CallerCmd& callerCmd)
 			OnExChange(callerCmd);
 		}
 		break;
+	case callerCmdCountTime:
+		{
+			OnCountTime(callerCmd);
+		}
+		break;
 	case callerCmdShowAdd:
 		break;
 	default:
@@ -319,22 +334,63 @@ void CCallThread::OnCall(CallerCmd& callerCmd)
 	else
 	{
 		///得到排队队列的下一个数据
-		if(m_rInlineQueData.GetInlineQueData(callerCmd.GetWindowId(),data))
+		if(!theApp.IsLocal())//客户机
 		{
-			m_rCalledQueData.Add(data);//添加到正在呼叫队列
+			/////如果是客户机呼叫则需要向服务端发送一条请求删除队列中的一条客户机数据
+			CComplSocketClient client;
+			CStringArray queSerialIDArray,queManNumArray;
+			CString callStaffID,queManNum;
+			BOOL bIsUsePower = FALSE;
+			m_rInlineQueData.GetWindowCanDoQue(callerCmd.GetWindowId(),queSerialIDArray,callStaffID,&bIsUsePower);
+			
+			for(int i=0;i<queSerialIDArray.GetCount();i++)
+			{
+				theApp.m_Controller.GetManQueNumByQueSerialID(queSerialIDArray.GetAt(i),queManNum);
+				if(!queManNum.IsEmpty())
+					queManNumArray.Add(queManNum);
+			}
+
+			string sendMsg,recvMsg;
+			int actRecvSize = 0;
+			CDealInterMsg::ProduceSendCallMsg(queManNumArray,sendMsg,theApp.m_logicVariables.strOrganID,bIsUsePower);
+			if(client.SendData(INTERPORT,theApp.m_logicVariables.strInterIP,
+				sendMsg,sendMsg.size(),recvMsg,actRecvSize) && actRecvSize)
+			{
+				BOOL isSucced;
+				CDealInterMsg::AnaRetCallMsg(recvMsg,&isSucced,&data);
+				if(isSucced)
+				{
+					data.SetCallTime(CTime::GetCurrentTime());
+					data.SetStaffId(callStaffID);
+					data.SetWindowId(callerCmd.GetWindowId());
+					CString queSerialID;
+					theApp.m_Controller.GetQueSerialIDByManQueNum(queSerialID,data.GetQueSerialID());
+					data.SetBussinessType(queSerialID);
+				}
+				else
+				{
+					return;
+				}
+			}
+		}
+		else
+		{
+//			if(m_rInlineQueData.GetInlineQueData(callerCmd.GetWindowId(),data))
+			m_rInlineQueData.GetInlineQueData(callerCmd.GetWindowId(),data);
+//			{
+				//添加到正在呼叫队列
+//			}
 		}
 	}
 	if(!data.GetBussinessType().IsEmpty())
 	{
-		//返回，写剩余人数
-//		CString carriedData = data.GetQueueNumber() + _T(" ") + GetQueInlineCount(data.GetBussinessType());
-		CString carriedData = data.GetQueueNumber() + _T(" ") + GetCandoQueInlineCount(callerCmd.GetWindowId());
-		callerCmd.SetCarriedData(carriedData);
+	
+		m_rCalledQueData.Add(data);//添加到正在呼叫队列
+		
 		//界面剩余人数更新
-		if(theApp.m_pView)
-		{
-			theApp.m_pView->ShowWaitNum(data.GetBussinessType(),m_rInlineQueData.GetBussCount(data.GetBussinessType()));
-		}
+			//theApp.m_pView->ShowWaitNum(data.GetBussinessType(),m_rInlineQueData.GetBussCount(data.GetBussinessType()));
+		ShowViewWaitNum(data.GetBussinessType(),data,callerCmd);
+		
 		//playsound,显示
 		theApp.m_Controller.m_pPlaySound->DataPlay(data);
 
@@ -344,9 +400,14 @@ void CCallThread::OnCall(CallerCmd& callerCmd)
  			m_pShortMsg->ClearSendBox();
  			m_pShortMsg->SendMsg(data.GetPhoneNum(),data.GetSendMsg());
  		}
+
+		
 	}
-	///重新写file，保存没处理（呼叫）的数据
-	theApp.m_Controller.WriteInlineDataToFile();
+	if(theApp.IsLocal())
+		///重新写file，保存没处理（呼叫）的数据
+		theApp.m_Controller.WriteInlineDataToFile();
+
+	DeleteCountTimeWindow(callerCmd.GetWindowId());
 }
 
 void CCallThread::OnRecall(CallerCmd& callerCmd)
@@ -363,6 +424,7 @@ void CCallThread::OnRecall(CallerCmd& callerCmd)
 		//playsound,display
 		theApp.m_Controller.m_pPlaySound->DataPlay(data);
 	}
+	DeleteCountTimeWindow(callerCmd.GetWindowId());
 }
 
 void CCallThread::OnDiscard(CallerCmd& callerCmd)
@@ -382,7 +444,8 @@ void CCallThread::OnDiscard(CallerCmd& callerCmd)
 		//界面剩余人数更新
 		if(theApp.m_pView)
 		{
-			theApp.m_pView->ShowWaitNum(data.GetBussinessType(),m_rInlineQueData.GetBussCount(data.GetBussinessType()));
+//			theApp.m_pView->ShowWaitNum(data.GetBussinessType(),m_rInlineQueData.GetBussCount(data.GetBussinessType()));
+			ShowViewWaitNum(data.GetBussinessType(),data,callerCmd);
 		}
 		//playsound,display
 //		theApp.m_Controller.m_pPlaySound->DataPlay(data);
@@ -406,13 +469,14 @@ void CCallThread::OnWait(CallerCmd& callerCmd)
 		CString carriedData = data.GetQueueNumber() + _T(" ") + GetCandoQueInlineCount(callerCmd.GetWindowId());
 		callerCmd.SetCarriedData(carriedData);
 		//界面剩余人数更新
-		if(theApp.m_pView)
-		{
-			theApp.m_pView->ShowWaitNum(data.GetBussinessType(),m_rInlineQueData.GetBussCount(data.GetBussinessType()));
-		}
+// 		if(theApp.m_pView)
+// 		{
+// 			theApp.m_pView->ShowWaitNum(data.GetBussinessType(),m_rInlineQueData.GetBussCount(data.GetBussinessType()));
+// 		}
 		//playsound,display
 		theApp.m_Controller.m_pPlaySound->DataPlay(data,TRUE);
 	}
+	DeleteCountTimeWindow(callerCmd.GetWindowId());
 }
 /*
 接收到开启评价命令
@@ -442,14 +506,84 @@ void CCallThread::OnPause(CallerCmd& callerCmd)
 	BOOL flag = m_rInlineQueData.m_rWindowTable.QueryWindowById(winID,Window);
 	if(flag)
 	{
-		pWnd->AddScreenMsg(msg,Window.GetWndScreenId());	
+		
+		CThroughWndScreenInfo wndScreenInfo;
+		for(int i=0;i<Window.m_throughscreen_array.GetCount();i++)
+		{
+			
+			wndScreenInfo = Window.m_throughscreen_array.GetAt(i);
+					
+			pWnd->AddScreenMsg(msg,wndScreenInfo.GetWndScreenId());
+			pWnd->AddScreenMsg(msg,wndScreenInfo.GetComScreenId());
+			pWnd->AddThroughScreenMsg(msg,wndScreenInfo.GetPhyId(),wndScreenInfo.GetPipeId(),wndScreenInfo.GetLocalIp());
+		}
+		
 		callerCmd.SetSuccess(TRUE);
 	}
 }
 
+
+void CCallThread::OnCountTime(CallerCmd& callerCmd)
+{
+	UINT winID = callerCmd.GetWindowId();
+
+	//发送暂停服务
+	//playsound,display
+	SLZCWndScreen* pWnd = SLZCWndScreen::GetInstance();
+	SLZWindow Window;
+	BOOL flag = m_rInlineQueData.m_rWindowTable.QueryWindowById(winID,Window);
+	if(flag)
+	{
+		///////倒计时
+		if(theApp.m_logicVariables.IsOpenCountTime)
+		{
+			CountTime* pTime = new CountTime;
+			pTime->nTimeSec = theApp.m_logicVariables.nTimeMintue * 60;
+			pTime->window = Window;
+			AddCountTime(pTime);
+			callerCmd.SetSuccess(TRUE);
+		}
+	}
+}
+
+void CCallThread::AddCountTime(CountTime* pTime)
+{
+	if(pTime == NULL)return;
+
+	if(ModifyCountTimeWindow(pTime))
+		return;
+	m_mtCountTime.Lock();
+	m_list_CountTime.push_back(pTime);
+	m_mtCountTime.Unlock();
+}
+
 void CCallThread::OnResume(CallerCmd& callerCmd)
 {
+	UINT winID = callerCmd.GetWindowId();
 
+	//发送暂停服务
+	//playsound,display
+	SLZCWndScreen* pWnd = SLZCWndScreen::GetInstance();
+	CString msg = _T("                   ");
+	SLZWindow Window;
+	BOOL flag = m_rInlineQueData.m_rWindowTable.QueryWindowById(winID,Window);
+	if(flag)
+	{
+		CThroughWndScreenInfo wndScreenInfo;
+		for(int i=0;i<Window.m_throughscreen_array.GetCount();i++)
+		{
+
+			wndScreenInfo = Window.m_throughscreen_array.GetAt(i);
+
+			pWnd->AddScreenMsg(msg,wndScreenInfo.GetWndScreenId());
+			pWnd->AddScreenMsg(msg,wndScreenInfo.GetComScreenId());
+			pWnd->AddThroughScreenMsg(msg,wndScreenInfo.GetPhyId(),wndScreenInfo.GetPipeId(),wndScreenInfo.GetLocalIp());
+		}
+		callerCmd.SetSuccess(TRUE);
+	}
+
+	
+	DeleteCountTimeWindow(callerCmd.GetWindowId());
 }
 /*
 呼叫特定号码
@@ -464,6 +598,8 @@ void CCallThread::OnCallNum(CallerCmd& callerCmd)
 	data.SetWindowId(winID);
 	data.SetQueueNumber(callNum);
 	theApp.m_Controller.m_pPlaySound->DataPlay(data);
+
+	DeleteCountTimeWindow(callerCmd.GetWindowId());
 }
 /*
 呼叫保安
@@ -483,6 +619,8 @@ void CCallThread::OnCallSec(CallerCmd& callerCmd)
 	callName.Remove(_T('口'));
 	strMsg.Format(_T("#请#保安#到#%s#号窗口"),callName);
 	theApp.m_Controller.m_pPlaySound->DataPlay(strMsg);
+
+	DeleteCountTimeWindow(callerCmd.GetWindowId());
 }
 /*
 呼叫大堂经理
@@ -502,6 +640,8 @@ void CCallThread::OnCallMana(CallerCmd& callerCmd)
 	callName.Remove(_T('口'));
 	strMsg.Format(_T("#请#大堂经理#到#%s#号窗口"),callName);
 	theApp.m_Controller.m_pPlaySound->DataPlay(strMsg);
+
+	DeleteCountTimeWindow(callerCmd.GetWindowId());
 }
 /*
 呼叫业务顾问
@@ -521,6 +661,8 @@ void CCallThread::OnCallBusc(CallerCmd& callerCmd)
 	callName.Remove(_T('口'));
 	strMsg.Format(_T("#请#业务顾问#到#%s#号窗口"),callName);
 	theApp.m_Controller.m_pPlaySound->DataPlay(strMsg);
+
+	DeleteCountTimeWindow(callerCmd.GetWindowId());
 }
 /*
 转移队列/窗口
@@ -637,8 +779,14 @@ void CCallThread::ReturnToCaller(CallerCmd& callerCmd)
 	case cmdExChange:
 		data.SetCmdType(callerCmd.GetSuccess() ? callerCmdShowSuc : callerCmdShowFail);
 		break;
+	case cmdResume:
+		data.SetCmdType(callerCmd.GetSuccess() ? callerCmdShowSuc : callerCmdShowFail);
+		break;
 	case callerCmdShowAdd:
 		data.SetCmdType(callerCmdShowAdd);
+		break;
+	case callerCmdCountTime:
+		data.SetCmdType(callerCmd.GetSuccess() ? callerCmdShowSuc : callerCmdShowFail);
 		break;
 	default:
 		break;
@@ -760,4 +908,204 @@ BOOL CCallThread::ShowCallerWaitNum(const CString& queID)
 		}
 	}
 	return TRUE;
+}
+
+BOOL CCallThread::ShowCallerWaitNum(const CString& queID,int nWaitNum)
+{
+	if(queID.IsEmpty())return FALSE;
+	std::map<UINT,SLZWindow>::const_iterator itera = m_rInlineQueData.m_rWindowTable.m_mapIdWindow.begin();
+	for(itera;itera!=m_rInlineQueData.m_rWindowTable.m_mapIdWindow.end();itera++)
+	{
+		SLZWindow Window = itera->second;
+		CStringArray ArrayQueID;
+		Window.GetArrayQueId(ArrayQueID);
+		for(int i=0;i<ArrayQueID.GetCount();i++)
+		{
+			CString wStrQueID = ArrayQueID.GetAt(i);
+			if(wStrQueID == queID)
+			{
+				SLZData data;
+				m_rCalledQueData.GetCalledQueData(Window.GetWindowId(),data);
+				CString wStrWaitNum;
+				wStrWaitNum.Format(_T("%d"),nWaitNum);
+				CString carriedData = data.GetQueueNumber() + _T(" ") + wStrWaitNum;
+				CallerCmd callerCmd;
+				callerCmd.SetCmdType(callerCmdShowNum);
+				callerCmd.SetWindowId(Window.GetWindowId());
+				callerCmd.SetCarriedData(carriedData);
+				ReturnToCaller(callerCmd);
+				break;
+			}
+		}
+	}
+	return TRUE;
+}
+
+BOOL CCallThread::ShowViewWaitNum(const CString& queserial_id,const SLZData& data,CallerCmd& callerCmd)
+{
+	CString queManNum;
+	theApp.m_Controller.GetManQueNumByQueSerialID(queserial_id,queManNum);
+	if(theApp.m_logicVariables.IsOpenInterNum)
+	{
+		if(theApp.m_logicVariables.strInterIP[0] == '\0')//主机
+		{
+			goto Normal;		
+		}
+		else//客户机
+		{
+			CComplSocketClient client;
+			
+			string sendMsg,recvMsg;
+			int actRecvSize = 0;
+			CDealInterMsg::ProduceSendInNumMsg(queManNum,sendMsg);
+			if(client.SendData(INTERPORT,theApp.m_logicVariables.strInterIP,
+				sendMsg,sendMsg.size(),recvMsg,actRecvSize) && actRecvSize)
+			{
+				//CDealInterMsg::AnaRetInterMsg(recvMsg,&iQueNum,pInlineNum);
+				UINT waitNum = 0;
+				CDealInterMsg::AnaRetInNumMsg(recvMsg,&waitNum);
+
+				theApp.m_pView->ShowWaitNum(queserial_id,waitNum);
+
+				//返回，写剩余人数
+				CString wStrWaitNum;
+				wStrWaitNum.Format(_T("%d"),waitNum);
+				CString carriedData = data.GetQueueNumber() + _T(" ") + wStrWaitNum;
+				callerCmd.SetCarriedData(carriedData);
+				return TRUE;
+			}
+			else
+			{
+				goto Normal;
+			}
+		}
+	}
+	else
+	{
+Normal:
+		UINT nWaitNum = 0;
+		m_rInlineQueData.GetAllBussCount(queserial_id,&nWaitNum);//获取当前队列人数
+		theApp.m_pView->ShowWaitNum(queserial_id,nWaitNum);//m_rInlineQueData.GetBussCount(queserial_id));
+		
+		//返回，写剩余人数
+		CString wStrWaitNum;
+		wStrWaitNum.Format(_T("%d"),nWaitNum);
+		CString carriedData = data.GetQueueNumber() + _T(" ") + wStrWaitNum;
+		callerCmd.SetCarriedData(carriedData);
+
+		//广播人数
+		CUDPBrodcast brodcast;
+		string retMsg;
+		CDealInterMsg::ProduceBrodcastRetInNumMsg(queManNum,nWaitNum,retMsg);
+		CString wRetMsg(retMsg.c_str());
+		brodcast.BroadCast(wRetMsg);
+		
+		return TRUE;
+	}
+	return FALSE;
+}
+
+void CALLBACK CCallThread::MyDoCountTimeMsg( HWND hwnd, UINT uMsg, UINT idEvent, DWORD dwTime )
+{
+	SLZCWndScreen* pWnd = SLZCWndScreen::GetInstance();
+	list<CountTime*>::const_iterator itera = pCallThread->m_list_CountTime.begin();
+	for(itera;itera != pCallThread->m_list_CountTime.end();++itera)
+	{
+		CountTime* pTime = *itera;
+		pTime->nTimeSec -= 2;
+		if(pTime->nTimeSec <= 0)
+		{
+			CThroughWndScreenInfo wndScreenInfo;
+			CString strMsg = _T("                     ");
+			for(int i=0;i<pTime->window.m_throughscreen_array.GetCount();i++)
+			{
+				wndScreenInfo = pTime->window.m_throughscreen_array.GetAt(i);
+
+				pWnd->AddScreenMsg(strMsg,wndScreenInfo.GetWndScreenId());
+				pWnd->AddScreenMsg(strMsg,wndScreenInfo.GetComScreenId());
+				pWnd->AddThroughScreenMsg(strMsg,wndScreenInfo.GetPhyId(),wndScreenInfo.GetPipeId(),wndScreenInfo.GetLocalIp());
+			}
+
+			delete pTime;
+			pTime = NULL;
+			pCallThread->m_list_CountTime.erase(itera);
+			break;
+		}
+
+		CString strTime = pCallThread->ChangeTimeToCstring(pTime->nTimeSec);
+		CString strMsg = _T("请稍候 ") + strTime;
+		CThroughWndScreenInfo wndScreenInfo;
+		for(int i=0;i<pTime->window.m_throughscreen_array.GetCount();i++)
+		{
+			wndScreenInfo = pTime->window.m_throughscreen_array.GetAt(i);
+
+			pWnd->AddScreenMsg(strMsg,wndScreenInfo.GetWndScreenId());
+			pWnd->AddScreenMsg(strMsg,wndScreenInfo.GetComScreenId());
+			pWnd->AddThroughScreenMsg(strMsg,wndScreenInfo.GetPhyId(),wndScreenInfo.GetPipeId(),wndScreenInfo.GetLocalIp());
+		}
+	}
+}
+
+
+CString CCallThread::ChangeTimeToCstring(int nTimeSec)
+{
+	CString retStrTime;
+
+	int nMintue = nTimeSec / 60;
+	int nSec = nTimeSec % 60;
+
+	if(nMintue != 0)
+		retStrTime.Format(_T("%d分"),nMintue);
+	if(nSec != 0)
+		retStrTime.AppendFormat(_T("%d秒"),nSec);
+
+	return retStrTime;
+}
+
+void CCallThread::ClearListCountTime()
+{
+	list<CountTime*>::const_iterator itera = m_list_CountTime.begin();
+	for(itera;itera != m_list_CountTime.end();++itera)
+	{
+		CountTime* pTime = *itera;
+		delete pTime;
+		pTime = NULL;
+	}
+
+	m_list_CountTime.clear();
+}
+
+void CCallThread::DeleteCountTimeWindow(UINT uWindowID)
+{
+	list<CountTime*>::const_iterator itera = m_list_CountTime.begin();
+	for(itera;itera != m_list_CountTime.end();++itera)
+	{
+		CountTime* pCountTime = *itera;
+		if(pCountTime->window.GetWindowId() == uWindowID)
+		{
+			m_mtCountTime.Lock();
+			m_list_CountTime.erase(itera);
+			m_mtCountTime.Unlock();
+			break;
+		}
+	}
+}
+
+BOOL CCallThread::ModifyCountTimeWindow(CountTime* pTime)
+{
+	if(pTime == NULL) return FALSE;
+	CountTime* pCountTime = NULL;
+	list<CountTime*>::const_iterator itera = m_list_CountTime.begin();
+	for(itera;itera != m_list_CountTime.end();++itera)
+	{
+		pCountTime = *itera;
+		if(pCountTime->window.GetWindowId() == pTime->window.GetWindowId())
+		{
+			m_mtCountTime.Lock();
+			pCountTime->nTimeSec = pTime->nTimeSec;
+			m_mtCountTime.Unlock();
+			return TRUE;
+		}
+	}
+	return FALSE;
 }

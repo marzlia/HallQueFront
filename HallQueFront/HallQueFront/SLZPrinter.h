@@ -58,4 +58,6 @@ private:
 	CRect m_printRect;
 	BOOL LoadPrintRectFormFile();
 	int FlushCStringData(CDC* pDC,const CString& content,const CRect& rect,const WINDOWCTRINFO& info);
+private:
+	CString GetCanDoWndName(const SLZData& data);
 };
