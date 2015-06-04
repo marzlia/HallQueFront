@@ -21,6 +21,7 @@
 #include "SLZCWndScreen.h"
 #include "CommonStrMethod.h"
 #include "PropSTDSetDlg.h"
+
 #ifdef _DEBUG
 #define new DEBUG_NEW
 #endif
