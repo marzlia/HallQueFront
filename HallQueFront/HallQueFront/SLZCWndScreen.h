@@ -2,8 +2,8 @@
 #include "HardWareDef.h"
 #include <afxmt.h>
 #include <list>
-#include <map>
 #include <string>
+#include <map>
 using namespace std;
 
 class CStbContent;
@@ -99,5 +99,4 @@ public:
 	BOOL ReFlushStbContentInfo();
 
 	void UpdateStbTitleAndNotice();
-
 };
