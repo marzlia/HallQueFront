@@ -591,7 +591,7 @@ BOOL SLZCardReader::OpenICCard(CString ICCardComm)
 	}
 	if(ICCardComm == _T("USB"))
 	{
-		m_hICCardDev = device_open(36,9600);//HID通信时port和baud可以为任意值
+		m_hICCardDev = device_open(36,57600);//HID通信时port和baud可以为任意值
 		if((int)m_hICCardDev > 0)
 		{
 			return TRUE;
@@ -652,6 +652,11 @@ DWORD WINAPI SLZCardReader::ReadICCard(LPVOID pParam)
 	unsigned char uCardNum[256]={0};
 	unsigned char uCardName[256]={0};
 	char strErrMsg[256]={0};
+	unsigned char uCardType;
+	unsigned char uSnrLen;
+	unsigned char uSnr[256]={0};
+	unsigned char urLen;
+	unsigned char recData[256]={0};
 	
 	while(1)
 	{
@@ -660,21 +665,45 @@ DWORD WINAPI SLZCardReader::ReadICCard(LPVOID pParam)
 			memset(uCardNum,0,256);
 			memset(uCardName,0,256);
 			memset(strErrMsg,0,256);
+			memset(uSnr,0,256);
+			memset(recData,0,256);
 //			pThis->m_mtReadICLock.Lock();
-			if(!iReadICCardNoAndName(pThis->m_hICCardDev,0xFF,uCardNum,uCardName,strErrMsg))
+			int nStatus = CLCard_Open(pThis->m_hICCardDev,0,&uCardType,&uSnrLen,uSnr,&urLen,recData) ;
+			if(nStatus == 1)
 			{
-				device_beep(pThis->m_hICCardDev,773,1);//蜂鸣控制
+				//身份证
+				if(IDCard_GetCardInfo(pThis->m_hICCardDev,10,(char*)uCardName) == 0 && IDCard_GetCardInfo(pThis->m_hICCardDev,5,(char*)uCardNum) == 0)
+				{
+					device_beep(pThis->m_hICCardDev,773,1);//蜂鸣控制
+					CARDINFO cardinfo;
+					cardinfo.iCardType = cardIDCard;
+
+					CString strCardName(uCardName);
+					cardinfo.strCustName = strCardName;
+
+					CString strCardNum(uCardNum);
+					cardinfo.strCardNumber = strCardNum;
+
+					pThis->DealIDCardInof(&cardinfo);
+				}
+			}
+			else if(nStatus == 2)
+			{
+				if(!iReadICCardNoAndName(pThis->m_hICCardDev,0xFF,uCardNum,uCardName,strErrMsg))
+				{
+					device_beep(pThis->m_hICCardDev,773,1);//蜂鸣控制
 			 			
-				CARDINFO cardinfo;
-				cardinfo.iCardType = cardMagCard;
+					CARDINFO cardinfo;
+					cardinfo.iCardType = cardMagCard;
 			 
-				CString strCardName(uCardName);
-				cardinfo.strCustName = strCardName;
+					CString strCardName(uCardName);
+					cardinfo.strCustName = strCardName;
 			 				
-				CString strCardNum(uCardNum);
-				cardinfo.strCardNumber = strCardNum;
+					CString strCardNum(uCardNum);
+					cardinfo.strCardNumber = strCardNum;
 			 				
-				pThis->DealCardInfo(&cardinfo);
+					pThis->DealCardInfo(&cardinfo);
+				}
 			}
 //			pThis->m_mtReadICLock.Unlock();
 		}
