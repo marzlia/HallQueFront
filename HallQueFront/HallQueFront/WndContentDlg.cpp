@@ -184,6 +184,7 @@ void CWndContentDlg::ShowContent()
 	CString strSerialId,strScreenId,strPhyId,strPipeId,strComId,strStbName;
 	for(int i=0;i<count;i++)
 	{
+		strStbName.Empty();
 		int nHor = 1;
 		WndScreenInfo = m_slzCurSelectWindow.m_throughscreen_array.GetAt(i);
 		strSerialId.Format(_T("%d"),i+1);

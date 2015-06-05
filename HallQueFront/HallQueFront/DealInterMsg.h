@@ -36,6 +36,8 @@ public:
 	static void ProduceRetCallMsg(BOOL isSucced,string& retMsg,const SLZData* pData);//呼叫联机取号信息返回
 	static void ProduceRetAlertCallerMsg(const CString& queManNum,string& retAlertMsg);//联机取号时，让客户机呼叫器发声
 	static void ProduceBrodcastRetInNumMsg(const CString& queManNum,UINT inlineNum,string& retBrodcastNumMsg);//广播排队人数
+	static void ProduceSendSTBShowMsg(const CString& strStbMsg,const CString& strStbNum,string& retSendStbMsg);//联机取号时将机顶盒显示信息发送到主机上处理数据,同时发送到多个机顶盒
+	static void ProduceRetSTBShowMsg(BOOL bSucced,string& retRetStbMsg);//生成返回的机顶盒信息
 public:
 	static BOOL AnaRetInterMsg(const string& retMsg,SLZData* pData,UINT* pInLineNum=NULL);//分析返回的联机取号报文，得到当前队列的最大号和排队人数
 	static BOOL AnaRetInNumMsg(const string& retMsg,UINT* pInlineNum);//分析返回的当前排队人数的报文,得到当前队列排队人数
@@ -51,6 +53,10 @@ public:
 	static BOOL AnaRetAlterCallerMsg(const string& retAlterMsg,CString& queManNum);//分析返回的呼叫器发声消息
 
 	static BOOL AnaRetBrodcastNumMsg(CString& queManNum,UINT* pInlineNum,string& retBrodcastNumMsg);//分析广播人数数据
+
+	static BOOL AnaSendStbMsg(const string& aRetSendStbMsg,CString& strStbNum,CString& strStbMsg);//分析发送的机顶盒信息，得到机顶盒编号和信息
+	 
+	static BOOL AnaRetStbMsg(const string& aRetRetStbMsg,BOOL* pIsSucced);//分析返回的机顶盒信息
 private:
 	static BOOL GetMsgData(const string& msg,SlzDataType dataType,string& data);
 	static void StringToTime(const string& strTime,CTime& time);

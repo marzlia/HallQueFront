@@ -9,6 +9,8 @@
 #include "MySocketUDP.h"
 #include "StbContent.h"
 #include "StbDisplay.h"
+#include "HallQueFront.h"
+#include "DealInterMsg.h"
 
 //SLZCWndScreen* SLZCWndScreen::m_pInstance=NULL;//new SLZCWndScreen;
 extern void MyWriteConsole(CString str);
@@ -837,14 +839,35 @@ DWORD WINAPI SLZCWndScreen::DoStbScreenMsgThread(LPVOID pParam)
 
 			CString strStbNum;
 			CString strRetMsg = pThis->ProduceStbMsg(strStbNum,stbScreenMsg.uStbID);
-#ifdef _DEBUG
-			MyWriteConsole(_T("retmsg:") + strRetMsg);
-#endif
 
 			if(pThis->m_pStbDisplay && !strRetMsg.IsEmpty())
 			{
 				pThis->m_pStbDisplay->StbUpdateCallMsg(strRetMsg,strStbNum);
 			}
+
+			if(!theApp.IsLocal())//开启了联机取号,客户机发送机顶盒信息到服务端
+			{
+				string aRetSendStbMsg;
+				CDealInterMsg::ProduceSendSTBShowMsg(stbScreenMsg.strMsg,strStbNum,aRetSendStbMsg);
+				CComplSocketClient client;
+				int actRecvSize = 0;
+				string recvMsg;
+				if(client.SendData(INTERPORT,theApp.m_logicVariables.strInterIP,
+					aRetSendStbMsg,aRetSendStbMsg.size(),recvMsg,actRecvSize) && actRecvSize)
+				{
+					BOOL bSucced = FALSE;
+					CDealInterMsg::AnaRetStbMsg(recvMsg,&bSucced);
+#ifdef _DEBUG
+					if(bSucced)
+						MyWriteConsole(_T("stbmsg client send succed"));
+					else
+						MyWriteConsole(_T("stbmsg client send failed"));
+#endif
+				}
+			}
+#ifdef _DEBUG
+			MyWriteConsole(_T("retmsg:") + strRetMsg);
+#endif
 		}
 	}
 	return 0;
@@ -1016,4 +1039,22 @@ CString SLZCWndScreen::ProduceStbMsg(CString& strStbNum,UINT uStbID)
 		}
 	}
 	return strRetMsg;
+}
+
+BOOL SLZCWndScreen::GetStbIDByStbNum(const CString& strStbNum,UINT* pStbID)
+{
+	BOOL flag = FALSE;
+	CStbContent* pStb = NULL;
+	list<CStbContent*>::const_iterator itera = m_list_stbcontent.begin();
+	for(itera;itera!=m_list_stbcontent.end();++itera)
+	{
+		if((*itera)->GetStbNum() == strStbNum)
+		{
+			pStb = (*itera);
+			*pStbID = pStb->GetSerialID();
+			flag = TRUE;
+			break;
+		}
+	}
+	return flag;
 }
