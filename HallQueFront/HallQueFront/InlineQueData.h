@@ -35,6 +35,7 @@ private:
 private:
 	void GetCandoQueHaveData(CStringArray& queIDArray,const CStringArray& canDoQueIDArray,UINT uWndID = 0);
 	BOOL GetFirstTakeNumData(SLZData& data);
+	BOOL RemoveFirstTakeNumData(const SLZData& data);
 };
 
 

@@ -479,6 +479,7 @@ BOOL CInlineQueData::DeleteInlineClientData(BOOL bIsUsePower,const CStringArray&
 		}
 		*/
 		flag = GetFirstTakeNumData(*pData);
+		flag = RemoveFirstTakeNumData(*pData);
 	}
 	m_mtInlineQue.Unlock();
 	return flag;
@@ -523,6 +524,26 @@ BOOL CInlineQueData::GetFirstTakeNumData(SLZData& data)
 		else
 		{
 			data = data.GetTakingNumTime() < tempdata.GetTakingNumTime() ? data : tempdata;
+		}
+	}
+	return flag;
+}
+
+BOOL CInlineQueData::RemoveFirstTakeNumData(const SLZData& data)
+{
+	BOOL flag = FALSE;
+	POSITION pos = m_lstInlineQue.GetHeadPosition();
+	POSITION poslast;
+	SLZData tempdata;
+	while(pos)
+	{
+		poslast = pos;
+		tempdata = m_lstInlineQue.GetNext(pos);
+		if(tempdata.GetSerialId() == data.GetSerialId())
+		{
+			flag = TRUE;
+			m_lstInlineQue.RemoveAt(poslast);
+			break;
 		}
 	}
 	return flag;
