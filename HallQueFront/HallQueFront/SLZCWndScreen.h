@@ -99,4 +99,6 @@ public:
 	BOOL ReFlushStbContentInfo();
 
 	void UpdateStbTitleAndNotice();
+
+	BOOL GetStbIDByStbNum(const CString& strStbNum,UINT* pStbID);//根据机顶盒编号得到机顶盒唯一ID
 };

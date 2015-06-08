@@ -692,3 +692,84 @@ BOOL CDealInterMsg::AnaRetBrodcastNumMsg(CString& queManNum,UINT* pInlineNum,str
 	}
 	return flag;
 }
+
+void CDealInterMsg::ProduceSendSTBShowMsg(const CString& strStbMsg,const CString& strStbNum,string &retSendStbMsg)
+{
+	CString msg = _T("<?xml version=\"1.0\" encoding=\"UTF-8\"?><dataPacket version=\"1.0\">");
+	msg.Append(_T("<headCode>sendStbMsg</headCode>"));
+	msg.AppendFormat(_T("<stbMsg>%s</stbMsg>"),strStbMsg);
+	msg.AppendFormat(_T("<stbNum>%s</stbNum>"),strStbNum);
+	msg.Append(_T("</dataPacket>"));
+
+	CStringA a_retPacket(msg.GetBuffer(0));
+	msg.ReleaseBuffer(0);
+	retSendStbMsg = a_retPacket.GetBuffer(0);
+	a_retPacket.ReleaseBuffer(0);
+}
+
+void CDealInterMsg::ProduceRetSTBShowMsg(BOOL bSucced,string& retRetStbMsg)
+{
+	CString msg = _T("<?xml version=\"1.0\" encoding=\"UTF-8\"?><dataPacket version=\"1.0\">");
+	msg.Append(_T("<headCode>retStbMsg</headCode>"));
+	msg.AppendFormat(_T("<retCode>%d</retCode>"),bSucced);
+	msg.Append(_T("</dataPacket>"));
+
+	CStringA a_retPacket(msg.GetBuffer(0));
+	msg.ReleaseBuffer(0);
+	retRetStbMsg = a_retPacket.GetBuffer(0);
+	a_retPacket.ReleaseBuffer(0);
+}
+
+BOOL CDealInterMsg::AnaSendStbMsg(const string& aRetSendStbMsg,CString& strStbNum,CString& strStbMsg)
+{
+	string::size_type pos1 = aRetSendStbMsg.find("<headCode>");
+	string::size_type pos2 = aRetSendStbMsg.find("</headCode>");
+	if(pos1 == aRetSendStbMsg.npos || pos2 == aRetSendStbMsg.npos)
+		return FALSE;
+
+	string headCode = aRetSendStbMsg.substr(pos1 + strlen("<headCode>"),pos2 - pos1 - strlen("<headCode>"));
+	if(headCode != "sendStbMsg")
+		return FALSE;
+
+
+	pos1 = aRetSendStbMsg.find("<stbMsg>");
+	pos2 = aRetSendStbMsg.find("</stbMsg>");
+	if(pos1 == aRetSendStbMsg.npos || pos2 == aRetSendStbMsg.npos)
+		return FALSE;
+	
+	string aStbMsg = aRetSendStbMsg.substr(pos1 + strlen("<stbMsg>"),pos2 - pos1 - strlen("<stbMsg>"));
+	strStbMsg = aStbMsg.c_str();
+
+	pos1 = aRetSendStbMsg.find("<stbNum>");
+	pos2 = aRetSendStbMsg.find("</stbNum>");
+	if(pos1 == aRetSendStbMsg.npos || pos2 == aRetSendStbMsg.npos)
+		return FALSE;
+
+	string aStbNum = aRetSendStbMsg.substr(pos1 + strlen("<stbNum>"),pos2 - pos1 - strlen("<stbNum>"));
+	strStbNum = aStbNum.c_str();
+	return TRUE;
+}
+
+BOOL CDealInterMsg::AnaRetStbMsg(const string& aRetRetStbMsg,BOOL* pIsSucced)
+{
+	string::size_type pos1 = aRetRetStbMsg.find("<headCode>");
+	string::size_type pos2 = aRetRetStbMsg.find("</headCode>");
+	if(pos1 == aRetRetStbMsg.npos || pos2 == aRetRetStbMsg.npos)
+		return FALSE;
+
+	string headCode = aRetRetStbMsg.substr(pos1 + strlen("<headCode>"),pos2 - pos1 - strlen("<headCode>"));
+	if(headCode != "retStbMsg")
+		return FALSE;
+	
+	pos1 = aRetRetStbMsg.find("<retCode>");
+	pos2 = aRetRetStbMsg.find("</retCode>");
+	if(pos1 == aRetRetStbMsg.npos || pos2 == aRetRetStbMsg.npos)
+		return FALSE;
+
+	string aRetCode = aRetRetStbMsg.substr(pos1 + strlen("<retCode>"),pos2 - pos1 - strlen("<retCode>"));
+	if(aRetCode == "1")
+		*pIsSucced = TRUE;
+	else if(aRetCode == "0")
+		*pIsSucced = FALSE;
+	return TRUE;
+}

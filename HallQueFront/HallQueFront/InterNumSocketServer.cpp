@@ -5,6 +5,7 @@
 #include "DealInterMsg.h"
 #include "HallQueFront.h"
 #include "QueueInfo.h"
+#include "SLZCWndScreen.h"
 
 extern void MyWriteConsole(CString str);
 
@@ -363,5 +364,27 @@ void CInterNumSocketServer::DealMsg(const string& recvPacket,string& retPacket)
 		if(theApp.IsLocal())
 			///重新写file，保存没处理（呼叫）的数据
 			theApp.m_Controller.WriteInlineDataToFile();
+	}
+	else if(headCode == "sendStbMsg")//机顶盒信息
+	{
+		CString stbStrMsg,stbStrNum;
+		if(CDealInterMsg::AnaSendStbMsg(recvPacket,stbStrNum,stbStrMsg))
+		{
+			UINT uStbID = 0;
+			SLZCWndScreen* pSLZWnd = SLZCWndScreen::GetInstance();
+			if(pSLZWnd->GetStbIDByStbNum(stbStrNum,&uStbID))
+			{
+				pSLZWnd->AddStbScreenMsg(stbStrMsg,uStbID);
+				CDealInterMsg::ProduceRetSTBShowMsg(TRUE,retPacket);
+			}
+			else
+			{
+				CDealInterMsg::ProduceRetSTBShowMsg(FALSE,retPacket);
+			}
+		}
+		else
+		{
+			CDealInterMsg::ProduceRetSTBShowMsg(FALSE,retPacket);
+		}
 	}
 }
