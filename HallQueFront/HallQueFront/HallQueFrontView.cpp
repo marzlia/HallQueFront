@@ -16,11 +16,11 @@
 #include "PropConnectInfo.h"
 #include "SLZWindowSetDlg.h"
 #include "CardConfigQue.h"
-#include "StbSetDlg.h"
 #include "PassWordDlg.h"
 #include "ShowWaitingDlg.h"
 #include "SLZCWndScreen.h"
 #include "CommonStrMethod.h"
+
 #ifdef _DEBUG
 #define new DEBUG_NEW
 #endif
@@ -84,7 +84,7 @@ END_MESSAGE_MAP()
 // CHallQueFrontView 构造/析构
 
 CHallQueFrontView::CHallQueFrontView() : 
-m_workTimeOut(_T("工作时间到,停止取票"))
+m_workTimeOut(_T("停止取票"))
 , m_pWaringDlg(NULL)
 , m_pShowPageDlg(NULL)
 , m_pTrackCtrl(NULL)
@@ -1241,8 +1241,13 @@ void CHallQueFrontView::JudgeButtonWorkOut()
 void CHallQueFrontView::OnStbset()
 {
 	// TODO: 在此添加命令处理程序代码
-//	CStbSetDlg StbSetDlg(this);
-//	StbSetDlg.DoModal();
+// 	CPropSTDSetDlg dlg(this);
+// 	if(IDOK == dlg.DoModal())
+// 	{
+// 		SLZCWndScreen* pSLZWnd = SLZCWndScreen::GetInstance();
+// 		pSLZWnd->ReFlushStbContentInfo();
+// 		pSLZWnd->UpdateStbTitleAndNotice();
+// 	}
 }
 
 LRESULT CHallQueFrontView::OnMyShowMessage(WPARAM wParam, LPARAM lParam)
@@ -1254,6 +1259,11 @@ LRESULT CHallQueFrontView::OnMyShowMessage(WPARAM wParam, LPARAM lParam)
 	Sleep(800);
 	m_pWaringDlg->ShowWindow(SW_HIDE);
 	m_pWaringDlg->UpdateWindow();
+	if(pShowVaria)
+	{
+		delete pShowVaria;
+		pShowVaria = NULL;
+	}
 	return 0;
 }
 void CHallQueFrontView::OnViewminsize()

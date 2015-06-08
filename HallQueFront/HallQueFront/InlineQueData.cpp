@@ -84,6 +84,7 @@ BOOL CInlineQueData::GetInlineQueData(const UINT iWinId,
 	}
 	else//不使用优先级
 	{
+		/*
 		/////////////////////////////////////////首先找到可处理队列中哪几个队列有数据
 		CStringArray haveDataArray;
 		GetCandoQueHaveData(haveDataArray,arrStrQueId,iWinId);
@@ -124,6 +125,9 @@ BOOL CInlineQueData::GetInlineQueData(const UINT iWinId,
 				}
 			}
 		}
+		*/
+		bFind = GetFirstTakeNumData(rdata,arrStrQueId);
+		bFind = RemoveFirstTakeNumData(rdata);
 	}
 	CTime currTime = CTime::GetCurrentTime();
 	rdata.SetCallTime(currTime);//设置呼叫时间
@@ -443,6 +447,7 @@ BOOL CInlineQueData::DeleteInlineClientData(BOOL bIsUsePower,const CStringArray&
 	}
 	else
 	{
+		/*
 		/////////////////////////////////////////首先找到可处理队列中哪几个队列有数据
 		CStringArray haveDataArray;
 		GetCandoQueHaveData(haveDataArray,queIDArray);
@@ -473,6 +478,9 @@ BOOL CInlineQueData::DeleteInlineClientData(BOOL bIsUsePower,const CStringArray&
 				}
 			}
 		}
+		*/
+		flag = GetFirstTakeNumData(*pData,queIDArray);
+		flag = RemoveFirstTakeNumData(*pData);
 	}
 	m_mtInlineQue.Unlock();
 	return flag;
@@ -499,4 +507,57 @@ BOOL CInlineQueData::GetWindowCanDoQue(UINT nWindowID,CStringArray& queerial_id_
 	callStaffID = staffID;
 	*pIsUsePower = Window.GetIsUsePower();
 	return TRUE;
+}
+
+BOOL CInlineQueData::GetFirstTakeNumData(SLZData& data,const CStringArray& arrStrQueId)
+{
+	BOOL flag = FALSE;
+	BOOL canDo = FALSE;
+	POSITION pos = m_lstInlineQue.GetHeadPosition();
+	SLZData tempdata;
+	while(pos)
+	{
+		tempdata = m_lstInlineQue.GetNext(pos);
+		for(int i=0;i<arrStrQueId.GetCount();i++)
+		{
+			if(arrStrQueId[i].Compare(tempdata.GetBussinessType()) == 0)
+			{
+				canDo = TRUE;
+				break;
+			}
+		}
+		if(canDo)
+		{
+			if(!flag)
+			{
+				data = tempdata;
+				flag = TRUE;
+			}
+			else
+			{
+				data = data.GetTakingNumTime() < tempdata.GetTakingNumTime() ? data : tempdata;
+			}
+		}
+	}
+	return flag;
+}
+
+BOOL CInlineQueData::RemoveFirstTakeNumData(const SLZData& data)
+{
+	BOOL flag = FALSE;
+	POSITION pos = m_lstInlineQue.GetHeadPosition();
+	POSITION poslast;
+	SLZData tempdata;
+	while(pos)
+	{
+		poslast = pos;
+		tempdata = m_lstInlineQue.GetNext(pos);
+		if(tempdata.GetSerialId() == data.GetSerialId())
+		{
+			flag = TRUE;
+			m_lstInlineQue.RemoveAt(poslast);
+			break;
+		}
+	}
+	return flag;
 }

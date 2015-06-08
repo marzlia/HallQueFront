@@ -34,6 +34,8 @@ private:
 	SLZWindowQueryView& m_rWindowTable;
 private:
 	void GetCandoQueHaveData(CStringArray& queIDArray,const CStringArray& canDoQueIDArray,UINT uWndID = 0);
+	BOOL GetFirstTakeNumData(SLZData& data,const CStringArray& arrStrQueId);
+	BOOL RemoveFirstTakeNumData(const SLZData& data);
 };
 
 
