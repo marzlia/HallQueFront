@@ -58,7 +58,7 @@ void CPropConnectInfo::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX, IDC_ED_INTERIP, m_ed_interIP);
 	//	DDX_Control(pDX, IDC_ED_INTERPORT, m_ed_interPort);
 	DDX_Control(pDX, IDC_CHECK_INTER, m_check_inter);
-	DDX_Control(pDX, IDC_COMBO_NEWCARD, m_combo_newcard);
+//	DDX_Control(pDX, IDC_COMBO_NEWCARD, m_combo_newcard);
 }
 
 
@@ -77,7 +77,7 @@ ON_BN_CLICKED(IDC_BN_SAVECON, &CPropConnectInfo::OnBnClickedBnSavecon)
 ON_BN_CLICKED(IDC_BUTTON_MSGSET, &CPropConnectInfo::OnBnClickedButtonMsgset)
 ON_CBN_SELCHANGE(IDC_COMBO_MSG, &CPropConnectInfo::OnCbnSelchangeComboMsg)
 ON_BN_CLICKED(IDC_BN_TESTINTERNET, &CPropConnectInfo::OnBnClickedBnTestinternet)
-ON_CBN_SELCHANGE(IDC_COMBO_NEWCARD, &CPropConnectInfo::OnCbnSelchangeComboNewcard)
+//ON_CBN_SELCHANGE(IDC_COMBO_NEWCARD, &CPropConnectInfo::OnCbnSelchangeComboNewcard)
 END_MESSAGE_MAP()
 
 
@@ -168,14 +168,14 @@ BOOL CPropConnectInfo::OnInitDialog()
 	CString readCardCom = m_pComInit->GetCardComm();
 	CString callerCom = m_pComInit->GetWndComm();
 	CString MsgCom = m_pComInit->GetMsgComm();
-	CString newCardCom = m_pComInit->GetNewCardComm();
+//	CString newCardCom = m_pComInit->GetNewCardComm();
 
 	m_com_caller.AddString(_T("0"));
 	m_com_readcard.AddString(_T("0"));
 	m_com_msg.AddString(_T("0"));
 
-	m_combo_newcard.AddString(_T("0"));
-	m_combo_newcard.AddString(_T("USB"));
+//	m_combo_newcard.AddString(_T("0"));
+//	m_combo_newcard.AddString(_T("USB"));
 
 	for(int i=0;i<10;i++)
 	{
@@ -186,7 +186,7 @@ BOOL CPropConnectInfo::OnInitDialog()
 			m_com_caller.AddString(comm);
 			m_com_readcard.AddString(comm);
 			m_com_msg.AddString(comm);
-			m_combo_newcard.AddString(comm);
+//			m_combo_newcard.AddString(comm);
 		}
 	}
 	////////////////////////////////////////////
@@ -223,16 +223,16 @@ BOOL CPropConnectInfo::OnInitDialog()
 		}
 	}
 	////////////////////////////////////////
-	for(int i=0;i<m_combo_newcard.GetCount();i++)
-	{
-		CString content;
-		m_combo_newcard.GetLBText(i,content);
-		if(newCardCom == content)
-		{
-			m_combo_newcard.SetCurSel(i);
-			break;
-		}
-	}
+// 	for(int i=0;i<m_combo_newcard.GetCount();i++)
+// 	{
+// 		CString content;
+// 		m_combo_newcard.GetLBText(i,content);
+// 		if(newCardCom == content)
+// 		{
+// 			m_combo_newcard.SetCurSel(i);
+// 			break;
+// 		}
+// 	}
 	///////////////////////////////默认转移队列
 	CButton* pButton = (CButton*)GetDlgItem(IDC_RA_EXQUE);
 	ASSERT(pButton);
@@ -727,23 +727,23 @@ void CPropConnectInfo::OnBnClickedBnTestinternet()
 	}
 }
 
-void CPropConnectInfo::OnCbnSelchangeComboNewcard()
-{
-	// TODO: 在此添加控件通知处理程序代码
-	CCommonConvert convert;
-	int index=m_combo_newcard.GetCurSel();
-	if(index == CB_ERR)
-	{
-		return;
-	}
-
-	CComInit* pComInit = CComInit::GetInstance();
-	CString newCardCom;
-	m_combo_newcard.GetLBText(index,newCardCom);
-
-//	char* pErrInfo = new char[256];
-
-	pComInit->OpenNewCardComm(newCardCom);
-
-	pComInit->SetNewCardComm(newCardCom);
-}
+// void CPropConnectInfo::OnCbnSelchangeComboNewcard()
+// {
+// 	// TODO: 在此添加控件通知处理程序代码
+// 	CCommonConvert convert;
+// 	int index=m_combo_newcard.GetCurSel();
+// 	if(index == CB_ERR)
+// 	{
+// 		return;
+// 	}
+// 
+// 	CComInit* pComInit = CComInit::GetInstance();
+// 	CString newCardCom;
+// 	m_combo_newcard.GetLBText(index,newCardCom);
+// 
+// //	char* pErrInfo = new char[256];
+// 
+// 	pComInit->OpenNewCardComm(newCardCom);
+// 
+// 	pComInit->SetNewCardComm(newCardCom);
+// }

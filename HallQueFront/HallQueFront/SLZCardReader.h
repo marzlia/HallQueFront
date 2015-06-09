@@ -34,7 +34,7 @@ private:
 	
 	HANDLE m_hReadICCard;//读非接触式芯片卡二合一线程句柄
 //	HANDLE m_hReadIDCard;//读身份证线程(二合一刷卡器)
-	HANDLE m_hICCardDev;//读身份证和非接触式芯片卡二合一设备句柄
+//	HANDLE m_hICCardDev;//读身份证和非接触式芯片卡二合一设备句柄
 
 	CList<CARDINFO,CARDINFO&> m_CardInfoList; //缓冲区
 	//读身份证函数
@@ -44,7 +44,7 @@ private:
 	static DWORD WINAPI ReadThread(LPVOID pParam); //读身份证线程
 	static DWORD WINAPI ReadCard(LPVOID pParam); //读磁卡线程
 //	static DWORD WINAPI ReadNewCard(LPVOID pParam);//芯片卡线程
-	static DWORD WINAPI ReadICCard(LPVOID pParam);//非接触式芯片卡二合一
+	static DWORD WINAPI ReadICCard(LPVOID pParam);//非接触式芯片卡
 //	static DWORD WINAPI ReadIDCard(LPVOID pParam);//身份证芯片卡二合一
 private:
 	BOOL OpenReadCard();
@@ -73,7 +73,23 @@ private:
 	string m_strCardNum;
 
 private:
-	/**************************新刷卡器 身份证和芯片卡二合一***************************/
+	/**************************新刷卡器(芯片卡)***************************/
+	typedef int (__stdcall *fpPowerOn)(byte slot, byte* atr, int* atrlen);
+	typedef int (__stdcall *fpPowerOnAscii)(byte slot, char* atrBuff);
+	typedef int (__stdcall *fpApduAscii)(byte slot, const char* sendAscii, char* recvAscii);
+	typedef int (__stdcall *fpPowerOff)(byte slot);
+	typedef int (__stdcall *fpIC_GetCardNumber)(char* cardNumber, char* tr2Buff);
+	typedef int (__stdcall *fpApdu)(byte slot, const byte* sendBcd, int sendlen, byte* recvBcd, int* recvlen);
+
+	fpPowerOn m_fLibPowerOn;
+	fpPowerOnAscii m_fLibPowerOnAscii;
+	fpApduAscii m_fLibApduAscii;
+	fpApdu m_fLibApdu;
+	fpPowerOff m_fLibPowerOff;
+	fpIC_GetCardNumber m_fLibIC_GetCardNumber;
+
+	//新刷卡(芯片卡)初始化动态库
+	BOOL Init_ICLibrary();
 
 	void DealCardInfo(CARDINFO* pCardinfo);
 
@@ -84,6 +100,6 @@ private:
 	CString m_strCurrentCardNum;//用于判断当前接触式卡卡号是否重复刷
 //	CMutex m_mtReadICLock;
 public:
-	BOOL OpenICCard(CString ICCardComm);//打开芯片卡
-	BOOL CloseICCard();//关闭芯片卡端口
+// 	BOOL OpenICCard(CString ICCardComm);//打开芯片卡
+// 	BOOL CloseICCard();//关闭芯片卡端口
 };

@@ -734,67 +734,67 @@ UINT SLZController::GetQueEndNum(const CString& queID)
 
 void SLZController::DoPrintStatus(EnumPrintStaus status,const SLZData& data,const UINT waitNum)
 {
-	ShowVariables showVaria;
-	memset(&showVaria,0,sizeof(showVaria));
+	ShowVariables* pShowVaria = new ShowVariables;
+	memset(pShowVaria,0,sizeof(ShowVariables));
 	switch(status)
 	{
 	case enumPrintNormal://正常
 	case enumPrintPrinting:
 		{
 			m_print.Print(data,waitNum-1);
-			showVaria.bShowWait = TRUE;
-			SendMessage(theApp.m_pView->m_hWnd,WM_SHOWMSG,(WPARAM)&showVaria,0);
+			pShowVaria->bShowWait = TRUE;
+			PostMessage(theApp.m_pView->m_hWnd,WM_SHOWMSG,(WPARAM)pShowVaria,0);
 		}
 		break;
 	case enumPrintErr://打印错误
 		{
-			showVaria.bShowWait = TRUE;
+			pShowVaria->bShowWait = TRUE;
 			if(theApp.m_logicVariables.IsLackPaperAlarm)//报警
 			{
 				//处理缺纸报警发声
 				m_pPlaySound->DataPlay(_T("打印错误,请检查打印机"));
 			}
-			SendMessage(theApp.m_pView->m_hWnd,WM_SHOWMSG,(WPARAM)&showVaria,0);
+			PostMessage(theApp.m_pView->m_hWnd,WM_SHOWMSG,(WPARAM)pShowVaria,0);
 		}
 		break;
 	case enumPrintPaperOut://缺纸
 		{
-			showVaria.bShowNoPage = TRUE;
+			pShowVaria->bShowNoPage = TRUE;
 			if(theApp.m_logicVariables.IsLackPaperAlarm)//缺纸报警
 			{
 				//处理缺纸报警发声
 				m_pPlaySound->DataPlay(_T("打印机缺纸"));
 			}
-			SendMessage(theApp.m_pView->m_hWnd,WM_SHOWMSG,(WPARAM)&showVaria,0);
+			PostMessage(theApp.m_pView->m_hWnd,WM_SHOWMSG,(WPARAM)pShowVaria,0);
 		}
 		break;
 	case enumPrintOffline://掉线
 		{
-			showVaria.bShowWait = TRUE;
+			pShowVaria->bShowWait = TRUE;
 			if(theApp.m_logicVariables.IsLackPaperAlarm)//报警
 			{
 				//处理缺纸报警发声
 				m_pPlaySound->DataPlay(_T("打印机掉线"));
 			}
-			SendMessage(theApp.m_pView->m_hWnd,WM_SHOWMSG,(WPARAM)&showVaria,0);
+			PostMessage(theApp.m_pView->m_hWnd,WM_SHOWMSG,(WPARAM)pShowVaria,0);
 		}
 		break;
 	case enumPrintNoDefPrinter://没有默认打印机
 		{
-			showVaria.bShowWait = TRUE;
-			SendMessage(theApp.m_pView->m_hWnd,WM_SHOWMSG,(WPARAM)&showVaria,0);
+			pShowVaria->bShowWait = TRUE;
+			PostMessage(theApp.m_pView->m_hWnd,WM_SHOWMSG,(WPARAM)pShowVaria,0);
 		}
 		break;
 	case enumPrintFailedJob://获取打印任务失败
 		{
-			showVaria.bShowWait = TRUE;
-			SendMessage(theApp.m_pView->m_hWnd,WM_SHOWMSG,(WPARAM)&showVaria,0);
+			pShowVaria->bShowWait = TRUE;
+			PostMessage(theApp.m_pView->m_hWnd,WM_SHOWMSG,(WPARAM)pShowVaria,0);
 		}
 		break;
 	default:
 		{
-			showVaria.bShowWait = TRUE;
-			SendMessage(theApp.m_pView->m_hWnd,WM_SHOWMSG,(WPARAM)&showVaria,0);
+			pShowVaria->bShowWait = TRUE;
+			PostMessage(theApp.m_pView->m_hWnd,WM_SHOWMSG,(WPARAM)pShowVaria,0);
 		}
 		break;
 	}
