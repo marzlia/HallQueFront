@@ -18,6 +18,7 @@ SoundPlay::SoundPlay(SLZWindowQueryView& windowTable)
 ,m_windowTable(windowTable)
 ,iSpeed(5)
 {
+	GetReplayTimes();
 	SetTimer(NULL,0,1000,MyDoOutTimerMsg);
 	playsound = this;//SoundPlay::GetInstance(windowTable);
 	m_strWavLibPath = CommonStrMethod::GetModuleDir() + _T("wavLib\\");
@@ -672,19 +673,21 @@ UINT SoundPlay::PlayVoiceThread(LPVOID pParam)
 				}
 			}
 //////////////////////…˘“Ù≤•∑≈//////////////////////////
-			if (!PlayStr.strVoiceStr.IsEmpty())
+			for(int i=0;i<pThis->m_iSoundReplayTimes;i++)
 			{
-				if (theApp.m_logicVariables.IsUseJtts)
+				if (!PlayStr.strVoiceStr.IsEmpty())
 				{
+					if (theApp.m_logicVariables.IsUseJtts)
+					{
 						CStringArray soundarray;
 						CommonStrMethod::StrSplit(PlayStr.strVoiceStr,soundarray,_T("#"));
 						for (int i=0;i< soundarray.GetCount();i++)
 						{
 							pThis->PlayJtts(soundarray.GetAt(i));
 						}
-				}
-				else
-				{
+					}
+					else
+					{
 						CStringArray soundarray;
 						CommonStrMethod::StrSplit(PlayStr.strVoiceStr,soundarray,_T("#"));
 						for (int j=0;j<soundarray.GetCount();j++)
@@ -692,6 +695,7 @@ UINT SoundPlay::PlayVoiceThread(LPVOID pParam)
 							CString strjts = soundarray.GetAt(j);
 							pThis->PlayTheVoice(strjts,pThis->m_WavList);
 						}
+					}
 				}
 			}
 		}

@@ -143,7 +143,7 @@ void SLZWindow::Serialize( CArchive& ar)
 		ar >> ArraySize;
 
 		CString strLocalIp;
-		UINT  nStbID;
+//		UINT  nStbID;
 		int nPhyId = 0;
 		int nPipeId = 0;
 		int nWndScreenId = 0;
@@ -153,7 +153,7 @@ void SLZWindow::Serialize( CArchive& ar)
 
 		for(int i=0;i<ArraySize;i++)
 		{
-			ar >>nThroughWndScreenId >> strLocalIp >> nPhyId >> nPipeId >> nWndScreenId >> nComScreenId >> nStbID;
+			ar >>nThroughWndScreenId >> strLocalIp >> nPhyId >> nPipeId >> nWndScreenId >> nComScreenId; //>> nStbID;
 
 			g_throughWndScreenId = g_throughWndScreenId > nThroughWndScreenId ? g_throughWndScreenId : nThroughWndScreenId;
 

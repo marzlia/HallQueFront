@@ -106,7 +106,19 @@ BOOL CHallQueFrontApp::InitInstance()
 	////////////////////	检测注册信息	///////////////////////////////////
 	if(!VerifyLicense())
 	{
-		AfxMessageBox(_T("该软件未注册，请先运行注册程序进行注册"));
+		STARTUPINFO si = { sizeof(si) };   
+		PROCESS_INFORMATION pi;
+		CDoFile doFile;
+		CString strExePath = doFile.GetExeFullFilePath();
+		strExePath += _T("\\QueSystemRegister.exe");
+		BOOL flag = ::CreateProcess(strExePath,NULL,NULL,NULL,FALSE,CREATE_NEW_CONSOLE,NULL,NULL,&si,&pi);
+		if(flag)
+		{
+			WaitForSingleObject(pi.hThread,INFINITE);
+		}	
+	}
+	if(!VerifyLicense())
+	{
 		return FALSE;
 	}
 	//////////////////		End 检测注册信息	///////////////////////////////
