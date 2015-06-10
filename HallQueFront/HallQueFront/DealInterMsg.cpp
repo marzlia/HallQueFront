@@ -30,7 +30,7 @@ void CDealInterMsg::ProduceRetInterMsg(const SLZData* pData, UINT inlineNum,stri
 	
 	CTime takeNumTime = pData->GetTakingNumTime();
 	CString strTime;
-	strTime.Format(_T("%d-%d-%d %d:%d:%d"),takeNumTime.GetYear(),takeNumTime.GetMonth(),takeNumTime.GetDay(),
+	strTime.Format(_T("%d-%0d-%0d %0d:%0d:%0d"),takeNumTime.GetYear(),takeNumTime.GetMonth(),takeNumTime.GetDay(),
 		takeNumTime.GetHour(),takeNumTime.GetMinute(),takeNumTime.GetSecond());
 
 	msg.AppendFormat(_T("<takeNumTime>%s</takeNumTime>"),strTime);
@@ -380,7 +380,7 @@ void CDealInterMsg::ProduceRetCallMsg(BOOL isSucced,string& retMsg,const SLZData
 
 	CTime takeNumTime = pData->GetTakingNumTime();
 	CString strTime;
-	strTime.Format(_T("%d-%d-%d %d:%d:%d"),takeNumTime.GetYear(),takeNumTime.GetMonth(),takeNumTime.GetDay(),
+	strTime.Format(_T("%d-%0d-%0d %0d:%0d:%0d"),takeNumTime.GetYear(),takeNumTime.GetMonth(),takeNumTime.GetDay(),
 		takeNumTime.GetHour(),takeNumTime.GetMinute(),takeNumTime.GetSecond());
 
 	msg.AppendFormat(_T("<takeNumTime>%s</takeNumTime>"),strTime);
