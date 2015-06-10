@@ -481,7 +481,8 @@ BOOL CInlineQueData::DeleteInlineClientData(BOOL bIsUsePower,const CStringArray&
 		}
 		*/
 		flag = GetFirstTakeNumData(*pData,queIDArray);
-		flag = RemoveFirstTakeNumData(*pData);
+		if(flag)
+			flag = RemoveFirstTakeNumData(*pData);
 	}
 	m_mtInlineQue.Unlock();
 	return flag;

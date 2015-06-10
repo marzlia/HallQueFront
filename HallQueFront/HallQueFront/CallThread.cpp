@@ -323,6 +323,7 @@ void CCallThread::OnCall(CallerCmd& callerCmd)
 	//首先判断该窗口下有没有等候的人,如果有呼叫等候队列的那条数据
 	//没有从排队队列中取出新的数据
 	SLZData data;
+	BOOL bFind = FALSE;
 	if(m_rWaitQueData.IsHaveWaitQueData(callerCmd.GetWindowId()))
 	{
 		if(m_rWaitQueData.GetWaitQueData(callerCmd.GetWindowId(),data))
@@ -366,6 +367,7 @@ void CCallThread::OnCall(CallerCmd& callerCmd)
 					CString queSerialID;
 					theApp.m_Controller.GetQueSerialIDByManQueNum(queSerialID,data.GetQueSerialID());
 					data.SetBussinessType(queSerialID);
+					bFind = TRUE;
 				}
 				else
 				{
@@ -376,13 +378,13 @@ void CCallThread::OnCall(CallerCmd& callerCmd)
 		else
 		{
 //			if(m_rInlineQueData.GetInlineQueData(callerCmd.GetWindowId(),data))
-			m_rInlineQueData.GetInlineQueData(callerCmd.GetWindowId(),data);
+			bFind = m_rInlineQueData.GetInlineQueData(callerCmd.GetWindowId(),data);
 //			{
 				//添加到正在呼叫队列
 //			}
 		}
 	}
-	if(!data.GetBussinessType().IsEmpty())
+	if(!data.GetBussinessType().IsEmpty() && bFind)
 	{
 	
 		m_rCalledQueData.Add(data);//添加到正在呼叫队列
