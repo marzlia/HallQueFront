@@ -127,7 +127,8 @@ BOOL CInlineQueData::GetInlineQueData(const UINT iWinId,
 		}
 		*/
 		bFind = GetFirstTakeNumData(rdata,arrStrQueId);
-		bFind = RemoveFirstTakeNumData(rdata);
+		if(bFind)
+			bFind = RemoveFirstTakeNumData(rdata);
 	}
 	CTime currTime = CTime::GetCurrentTime();
 	rdata.SetCallTime(currTime);//…Ë÷√∫ÙΩ– ±º‰
