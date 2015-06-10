@@ -377,11 +377,7 @@ void CCallThread::OnCall(CallerCmd& callerCmd)
 		}
 		else
 		{
-//			if(m_rInlineQueData.GetInlineQueData(callerCmd.GetWindowId(),data))
 			bFind = m_rInlineQueData.GetInlineQueData(callerCmd.GetWindowId(),data);
-//			{
-				//添加到正在呼叫队列
-//			}
 		}
 	}
 	if(!data.GetBussinessType().IsEmpty() && bFind)

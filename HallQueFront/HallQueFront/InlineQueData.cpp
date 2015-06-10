@@ -420,26 +420,31 @@ BOOL CInlineQueData::DeleteInlineClientData(BOOL bIsUsePower,const CStringArray&
 	BOOL flag = FALSE;
 	if(bIsUsePower)
 	{
-		POSITION pos = m_lstInlineQue.GetHeadPosition();
-		POSITION poslast;
-		SLZData data;
-		for(; pos; )
+		if(queIDArray.GetCount() < 1)
 		{
-			poslast = pos;
-			data = m_lstInlineQue.GetNext(pos);
-//		if(data.GetOrganId() == organId)
-//		{
-			for(int i=0;i<queIDArray.GetCount();i++)
+			return FALSE;
+		}
+		
+		int count = queIDArray.GetCount();
+		for(int i = 0; i < count; i++)
+		{
+			POSITION pos = m_lstInlineQue.GetHeadPosition();
+			while(pos)
 			{
-				if(data.GetBussinessType() == queIDArray.GetAt(i))
+				SLZData data;
+				POSITION posLast = pos;
+				data = m_lstInlineQue.GetNext(pos);
+				if(data.GetWindowId()==0)//如果没设置指定窗口
 				{
-					flag = TRUE;
-					m_lstInlineQue.RemoveAt(poslast);
-					*pData = data;
-					break;
+					if(queIDArray[i].Compare(data.GetBussinessType()) == 0)
+					{
+						flag = TRUE;
+						*pData = data;
+						m_lstInlineQue.RemoveAt(posLast);
+						break;
+					}
 				}
 			}
-//		}
 			if(flag)
 			{
 				break;
