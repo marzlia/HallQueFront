@@ -127,7 +127,8 @@ BOOL CInlineQueData::GetInlineQueData(const UINT iWinId,
 		}
 		*/
 		bFind = GetFirstTakeNumData(rdata,arrStrQueId);
-		bFind = RemoveFirstTakeNumData(rdata);
+		if(bFind)
+			bFind = RemoveFirstTakeNumData(rdata);
 	}
 	CTime currTime = CTime::GetCurrentTime();
 	rdata.SetCallTime(currTime);//…Ë÷√∫ÙΩ– ±º‰
@@ -480,7 +481,8 @@ BOOL CInlineQueData::DeleteInlineClientData(BOOL bIsUsePower,const CStringArray&
 		}
 		*/
 		flag = GetFirstTakeNumData(*pData,queIDArray);
-		flag = RemoveFirstTakeNumData(*pData);
+		if(flag)
+			flag = RemoveFirstTakeNumData(*pData);
 	}
 	m_mtInlineQue.Unlock();
 	return flag;
