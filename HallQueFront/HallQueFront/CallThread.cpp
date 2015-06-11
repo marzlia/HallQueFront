@@ -362,11 +362,7 @@ void CCallThread::OnCall(CallerCmd& callerCmd)
 		}
 		else
 		{
-//			if(m_rInlineQueData.GetInlineQueData(callerCmd.GetWindowId(),data))
 			m_rInlineQueData.GetInlineQueData(callerCmd.GetWindowId(),data);
-//			{
-				//添加到正在呼叫队列
-//			}
 		}
 	}
 	if(!data.GetBussinessType().IsEmpty())
@@ -387,8 +383,6 @@ void CCallThread::OnCall(CallerCmd& callerCmd)
  			m_pShortMsg->ClearSendBox();
  			m_pShortMsg->SendMsg(data.GetPhoneNum(),data.GetSendMsg());
  		}
-
-		
 	}
 	if(theApp.IsLocal())
 		///重新写file，保存没处理（呼叫）的数据
