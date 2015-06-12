@@ -348,9 +348,12 @@ void CCallThread::OnCall(CallerCmd& callerCmd)
 		//用于福州发送到银行CRM服务端
 		if(m_cardConnectInfo.IsConnect)
 		{
-			CDoWebService doWebservice;
-			doWebservice.SendDealBusMsg(m_cardConnectInfo.ServerIP,data,m_cardConnectInfo.ServerPort,
-				m_cardConnectInfo.OverTime,data.GetWndLefNum());
+			if(!data.GetCardNumber().IsEmpty())
+			{
+				CDoWebService doWebservice;
+				doWebservice.SendDealBusMsg(m_cardConnectInfo.ServerIP,data,m_cardConnectInfo.ServerPort,
+					m_cardConnectInfo.OverTime,data.GetWndLefNum());
+			}
 		}
 	}
 	///重新写file，保存没处理（呼叫）的数据

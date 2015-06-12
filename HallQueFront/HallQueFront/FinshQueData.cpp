@@ -97,9 +97,12 @@ BOOL CFinshQueData::GetFinshedData()
 	////////////用于福州发送到银行CRM系统//////////
 	if(m_cardConnectInfo.IsConnect)
 	{
-		CDoWebService doWebservice;
-		doWebservice.SendDealBusMsg(m_cardConnectInfo.ServerIP,data,m_cardConnectInfo.ServerPort,
-			m_cardConnectInfo.OverTime,data.GetWndLefNum(),TRUE);
+		if(!data.GetCardNumber().IsEmpty())
+		{
+			CDoWebService doWebservice;
+			doWebservice.SendDealBusMsg(m_cardConnectInfo.ServerIP,data,m_cardConnectInfo.ServerPort,
+				m_cardConnectInfo.OverTime,data.GetWndLefNum(),TRUE);
+		}
 	}
 	return flag;
 }
