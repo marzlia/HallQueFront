@@ -214,7 +214,7 @@ BOOL CComplSocketClient::SendData(USHORT port,CString IP,const std::string& msg,
 
 void CComplSocketClient::DealCache(const CString& msg)
 {
-	if(msg.IsEmpty())return;
+	if(msg.IsEmpty() || IsTheSameMsg(msg))return;
 	theApp.m_list_caCheMsg.push_back(msg);
 #ifdef _DEBUG
 	CString str=_T("cache size:");
@@ -291,7 +291,8 @@ BOOL CComplSocketClient::AppendListMsg()
 			{
 				CString wStrMsg;
 				CCommonConvert::CharToCstring(wStrMsg,msg);
-				theApp.m_list_caCheMsg.push_back(wStrMsg);
+				if(!IsTheSameMsg(wStrMsg))
+					theApp.m_list_caCheMsg.push_back(wStrMsg);
 			}
 		}
 		file.Close();
@@ -413,4 +414,17 @@ BOOL CComplSocketClient::SendData(USHORT port,CString IP,char buf[],int size)
 	
 	closesocket(m_sClient);
 	return TRUE;
+}
+
+BOOL CComplSocketClient::IsTheSameMsg(const CString& msg)
+{
+	list<CString>::const_iterator itera = theApp.m_list_caCheMsg.begin();
+	for(itera;itera != theApp.m_list_caCheMsg.end(); ++itera)
+	{
+		if(*itera == msg)
+		{
+			return TRUE;
+		}
+	}
+	return FALSE;
 }
