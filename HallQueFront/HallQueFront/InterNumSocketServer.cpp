@@ -327,6 +327,8 @@ void CInterNumSocketServer::DealMsg(const string& recvPacket,string& retPacket)
 		}
 
 		theApp.m_pView->ShowWaitNum(queserial_id,nWaitNum);///界面显示等待人数
+		if(theApp.IsLocal())
+			theApp.m_Controller.WriteInlineDataToFile();
 #ifdef _DEBUG
 		CString sendMsg(retPacket.c_str());
 		MyWriteConsole(sendMsg);

@@ -1026,13 +1026,16 @@ BOOL SLZController::ClearSystemData()
 				file.SetLength(0);
 				file.Close();
 			}
+			/////Çå¿Õ
+			map_QueNum.RemoveAll();
+
 			CString datapath = exepath + _T("\\Data\\InlineData.dat");
 			if(file.Open(datapath,CFile::modeCreate | CFile::modeWrite))
 			{
 				file.SetLength(0);
 				file.Close();
 			}
-			
+
 			CString temp;
 			temp.Format(_T("%d%02d%02d.dat"),
 				currTime.GetYear(),currTime.GetMonth(),currTime.GetDay());
@@ -1323,8 +1326,8 @@ BOOL SLZController::ReadCommDaoOrgInfo()
 
 BOOL SLZController::ReadCommDaoQueInfo()
 {
-	//	if(theApp.m_logicVariables.IsAutoSendToServer)
-	//	{
+	if(theApp.m_logicVariables.IsAutoSendToServer)
+	{
 	CProduceClientPacket produce;
 	CString orgID(theApp.m_logicVariables.strOrganID);
 	if(!orgID.IsEmpty())
@@ -1337,11 +1340,11 @@ BOOL SLZController::ReadCommDaoQueInfo()
 		else AnaQuePacket(recvMsg);
 		return flag;
 	}
-	// 		else
-	// 		{
-	// 			return FALSE;
-	// 		}
-	// 	}
+ 	else
+	{
+ 		return FALSE;
+	}
+	}
 	return FALSE;
 }
 
