@@ -371,7 +371,10 @@ UINT SLZController::TakingNumThreadProc(LPVOID pParam)
 				unsigned int CurNum=0;
 				UINT iQueNum;
 				BOOL isClientData = FALSE;
-				iQueNum = pControl->GetQueNum(cardInfo.strAttchQueID,&CurNum,&isClientData,&data);
+				BOOL isConnected = FALSE;
+				iQueNum = pControl->GetQueNum(cardInfo.strAttchQueID,&CurNum,&isClientData,&data,&isConnected);
+				if(isClientData && !isConnected)
+					continue;
 				////排队号码
 				CString QueCount;
 				CString StrQueNum;
@@ -1945,7 +1948,10 @@ void SLZController::TakeViewNum(const CString& queserial_id)
 				UINT inlineNum = 0;
 				//获取当前排队号码
 				BOOL isClientData = FALSE;//是否为客户机产生的数据
-				unsigned int iQueNum = GetQueNum(queserial_id,&inlineNum,&isClientData,&data);
+				BOOL isConnected = FALSE;
+				unsigned int iQueNum = GetQueNum(queserial_id,&inlineNum,&isClientData,&data,&isConnected);
+				if(isClientData && !isConnected)
+					return;
 				
 				if(!isClientData)
 					TakeNumSetData(data,iQueNum);//生成数据
@@ -2035,7 +2041,7 @@ void SLZController::DoPrint(const SLZData& data,UINT inLineNum)
 	DoPrintStatus(status,data,inLineNum);///处理打印
 }
 
-unsigned int SLZController::GetQueNum(const CString& queserial_id,UINT* pInlineNum,BOOL* pIsClientData,SLZData* pData)
+unsigned int SLZController::GetQueNum(const CString& queserial_id,UINT* pInlineNum,BOOL* pIsClientData,SLZData* pData,BOOL *pIsConnected)
 {
 	unsigned int iQueNum = 0;
 	
@@ -2054,9 +2060,11 @@ unsigned int SLZController::GetQueNum(const CString& queserial_id,UINT* pInlineN
 		{
 			CDealInterMsg::AnaRetInterMsg(recvMsg,pData,pInlineNum);
 			pData->SetBussinessType(queserial_id);
+			*pIsConnected = TRUE;
 		}
 		else
 		{
+			*pIsConnected = FALSE;
 			goto Normal;
 		}
 	}

@@ -155,7 +155,7 @@ public:
 private:
 	BOOL ShortMsgNum(const CString& queserial_id);//短信取号操作
 	void TakeViewNum(const CString& queserial_id);//取号操作
-	unsigned int GetQueNum(const CString& queserial_id,UINT* pInlineNum,BOOL* pIsClientData,SLZData* pData);//设置取号时的排队号码
+	unsigned int GetQueNum(const CString& queserial_id,UINT* pInlineNum,BOOL* pIsClientData,SLZData* pData,BOOL *pIsConnected);//设置取号时的排队号码
 
 private:
 	CInterNumSocketServer* m_pInterNumServer;
