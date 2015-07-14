@@ -29,6 +29,7 @@ void CDealInterMsg::ProduceRetInterMsg(const SLZData* pData, UINT inlineNum,stri
 	msg.AppendFormat(_T("<custLevel>%d</custLevel>"),pData->GetCustomerLevel());
 	
 	CTime takeNumTime = pData->GetTakingNumTime();
+
 	CString strTime;
 	strTime.Format(_T("%d-%02d-%02d %02d:%02d:%02d"),takeNumTime.GetYear(),takeNumTime.GetMonth(),takeNumTime.GetDay(),
 		takeNumTime.GetHour(),takeNumTime.GetMinute(),takeNumTime.GetSecond());

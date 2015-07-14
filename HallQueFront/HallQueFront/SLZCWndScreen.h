@@ -4,11 +4,12 @@
 #include <list>
 #include <string>
 #include <map>
+using namespace std;
 
 class CStbContent;
 class StbDisplay;
 
-using namespace std;
+
 class SLZCWndScreen
 {
 private:

@@ -510,6 +510,74 @@ CString SLZCWndScreen::FlushCstringToFitWndScreen(const CString& str,const int l
 }
 
 
+
+/*
+void SLZCWndScreen::AddThroughInitStr(const char* buf,const DWORD count)
+{
+	m_recvThroughInitStr.append(buf,count);
+}
+*/
+
+/*
+BOOL SLZCWndScreen::DoThroughInitMsg()
+{
+	CDoComInOut* pComInOut = CDoComInOut::GetInstance();
+	pComInOut->SetThroughInitDone(TRUE);
+	if(m_recvThroughInitStr.empty())return FALSE;
+	string::size_type position,oldPosition;
+	position = m_recvThroughInitStr.find("Get_Data");
+	while(position!=m_recvThroughInitStr.npos)
+	{
+		oldPosition = position;
+		position = m_recvThroughInitStr.find("Get_Data",position+1);
+		string temp = m_recvThroughInitStr.substr(oldPosition,position-oldPosition-1);
+		m_list_recvString.push_back(temp);
+	}
+	string recvMsg;
+	if(!m_list_recvString.empty())
+	{
+		std::list<string>::const_iterator itera = m_list_recvString.begin();
+		for(itera;itera!=m_list_recvString.end();itera++)
+		{
+			recvMsg= *itera;
+			if(!recvMsg.empty())
+			{
+				string::size_type first_pos = GetIpPos(recvMsg);
+				while(first_pos!=recvMsg.npos)//找到了
+				{
+					/////////////////////////////通屏基本信息如:屏地址
+					string::size_type last_Pos = first_pos;
+					ThrScreenBasicMsg ThrScreenMsg;
+					memset(&ThrScreenMsg,0,sizeof(ThrScreenMsg));
+					string basicInfo = recvMsg.substr(first_pos,10);
+					ThrScreenMsg.address = basicInfo[7];
+					
+					recvMsg = recvMsg.substr(first_pos+10);
+					first_pos = GetIpPos(recvMsg);
+					string temp = recvMsg.substr(0,first_pos);
+					
+					for(int i=0;i<(int)temp.size();i+=34)
+					{
+						string channel = temp.substr(i,34);
+						ThrScreenMsg.channel = channel[0];//通道号
+						ThrScreenMsg.fone = channel[8];//字体
+						memcpy(&ThrScreenMsg.width,&channel[4],2);
+						memcpy(&ThrScreenMsg.height,&channel[6],2);
+						AddThrBasicMsg(ThrScreenMsg);
+					}
+					
+					
+				}
+			}
+		}
+		m_list_recvString.clear();//删除
+	}
+	m_recvThroughInitStr.clear();
+	return TRUE;
+}
+*/
+
+
 // void SLZCWndScreen::AddThroughInitStr(const char* buf,const DWORD count)
 // {
 // 	m_recvThroughInitStr.append(buf,count);
@@ -589,6 +657,7 @@ CString SLZCWndScreen::FlushCstringToFitWndScreen(const CString& str,const int l
 // 	m_recvThroughInitStr.clear();
 // 	return TRUE;
 // }
+
 
 /*
 void SLZCWndScreen::AddThroughInitStr(const char* buf,const DWORD count)
@@ -778,7 +847,6 @@ DWORD WINAPI SLZCWndScreen::DoThrWndMsgThread(LPVOID pParam)
 			strAddress.Format(_T("%d"),msg.address);
 			CString strChannel;
 			strChannel.Format(_T("%d"),msg.channel);
-
 
 			MyWriteConsole(_T("通屏信息:") + msg.msg + _T("地址:") + strAddress + _T("通道:") + strChannel + _T("ip:") + msg.localIp );
 #endif

@@ -293,11 +293,15 @@ BOOL SLZController::InitInterNumServer()
 	}
 	else
 	{
+
 		if(m_pInterNumServer)
 		{
 			delete m_pInterNumServer;
 			m_pInterNumServer = NULL;
 		}
+
+	//	if(throughID[i]>0)
+		//	pWndScreen->InitThroughScreen(throughID[i]);
 	}
 	return TRUE;
 }
@@ -1325,8 +1329,8 @@ BOOL SLZController::ReadCommDaoOrgInfo()
 
 BOOL SLZController::ReadCommDaoQueInfo()
 {
-	//	if(theApp.m_logicVariables.IsAutoSendToServer)
-	//	{
+	if(theApp.m_logicVariables.IsAutoSendToServer)
+	{
 	CProduceClientPacket produce;
 	CString orgID(theApp.m_logicVariables.strOrganID);
 	if(!orgID.IsEmpty())
@@ -1339,11 +1343,11 @@ BOOL SLZController::ReadCommDaoQueInfo()
 		else AnaQuePacket(recvMsg);
 		return flag;
 	}
-	// 		else
-	// 		{
-	// 			return FALSE;
-	// 		}
-	// 	}
+ 	else
+	{
+ 		return FALSE;
+	}
+	}
 	return FALSE;
 }
 
