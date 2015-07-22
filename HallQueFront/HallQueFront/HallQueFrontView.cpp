@@ -1238,7 +1238,6 @@ void CHallQueFrontView::JudgeButtonWorkOut()
 		}
 	}
 }
-
 void CHallQueFrontView::OnStbset()
 {
 	// TODO: 在此添加命令处理程序代码
