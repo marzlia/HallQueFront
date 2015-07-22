@@ -5,7 +5,9 @@
 #include "ComplSocketClient.h"
 #include "ComputeFuncationTime.h"
 #include "DoComInOut.h"
-
+//#include "ComplSocketClient.h"
+//#include "UDPBrodcast.h"
+#include "MySocketUDP.h"
 
 //SLZCWndScreen* SLZCWndScreen::m_pInstance=NULL;//new SLZCWndScreen;
 extern void MyWriteConsole(CString str);
@@ -459,6 +461,7 @@ CString SLZCWndScreen::FlushCstringToFitWndScreen(const CString& str,const int l
 	return temp;
 }
 
+
 // void SLZCWndScreen::AddThroughInitStr(const char* buf,const DWORD count)
 // {
 // 	m_recvThroughInitStr.append(buf,count);
@@ -539,6 +542,73 @@ CString SLZCWndScreen::FlushCstringToFitWndScreen(const CString& str,const int l
 // 	return TRUE;
 // }
 
+
+/*
+void SLZCWndScreen::AddThroughInitStr(const char* buf,const DWORD count)
+{
+	m_recvThroughInitStr.append(buf,count);
+}
+*/
+
+/*
+BOOL SLZCWndScreen::DoThroughInitMsg()
+{
+	CDoComInOut* pComInOut = CDoComInOut::GetInstance();
+	pComInOut->SetThroughInitDone(TRUE);
+	if(m_recvThroughInitStr.empty())return FALSE;
+	string::size_type position,oldPosition;
+	position = m_recvThroughInitStr.find("Get_Data");
+	while(position!=m_recvThroughInitStr.npos)
+	{
+		oldPosition = position;
+		position = m_recvThroughInitStr.find("Get_Data",position+1);
+		string temp = m_recvThroughInitStr.substr(oldPosition,position-oldPosition-1);
+		m_list_recvString.push_back(temp);
+	}
+	string recvMsg;
+	if(!m_list_recvString.empty())
+	{
+		std::list<string>::const_iterator itera = m_list_recvString.begin();
+		for(itera;itera!=m_list_recvString.end();itera++)
+		{
+			recvMsg= *itera;
+			if(!recvMsg.empty())
+			{
+				string::size_type first_pos = GetIpPos(recvMsg);
+				while(first_pos!=recvMsg.npos)//找到了
+				{
+					/////////////////////////////通屏基本信息如:屏地址
+					string::size_type last_Pos = first_pos;
+					ThrScreenBasicMsg ThrScreenMsg;
+					memset(&ThrScreenMsg,0,sizeof(ThrScreenMsg));
+					string basicInfo = recvMsg.substr(first_pos,10);
+					ThrScreenMsg.address = basicInfo[7];
+					
+					recvMsg = recvMsg.substr(first_pos+10);
+					first_pos = GetIpPos(recvMsg);
+					string temp = recvMsg.substr(0,first_pos);
+					
+					for(int i=0;i<(int)temp.size();i+=34)
+					{
+						string channel = temp.substr(i,34);
+						ThrScreenMsg.channel = channel[0];//通道号
+						ThrScreenMsg.fone = channel[8];//字体
+						memcpy(&ThrScreenMsg.width,&channel[4],2);
+						memcpy(&ThrScreenMsg.height,&channel[6],2);
+						AddThrBasicMsg(ThrScreenMsg);
+					}
+					
+					
+				}
+			}
+		}
+		m_list_recvString.clear();//删除
+	}
+	m_recvThroughInitStr.clear();
+	return TRUE;
+}
+*/
+
 void SLZCWndScreen::AddThrBasicMsg(ThrScreenBasicMsg msg)
 {
 	BOOL flag = FALSE;
@@ -560,8 +630,20 @@ void SLZCWndScreen::AddThrBasicMsg(ThrScreenBasicMsg msg)
 
 BOOL SLZCWndScreen::SendDataToThroughScreen(const CString& str,int address,int channel,const CString& localIp)
 {
+	///自己公司协议
+// 	int height = 0;
+// 	int width = FindChannelWidth(address,channel,height);
 	CString msg = str;
-
+// #ifdef _DEBUG
+//  	CString test;
+// 	test.Format(_T("through wnd:address:%d,channel:%d,width:%d"),address,channel,width);
+//  	MyWriteConsole(test);
+// 	MyWriteConsole(str);
+// #endif
+//  	if(width>0 && width<=128)//注意小于128是因为同屏卡最多显示128个汉字
+//  	{
+//  		msg = FlushCstringToFitWndScreen(msg,width,height);
+//  	}
 	char buf[512]={0};
 	int length = DoScreenMsg(msg,address+channel,buf);
 	WriteComMsg *pMsg = new WriteComMsg;
@@ -570,7 +652,25 @@ BOOL SLZCWndScreen::SendDataToThroughScreen(const CString& str,int address,int c
 	pMsg->length = length;
 	CDoComInOut* pComInOut = CDoComInOut::GetInstance();
 	pComInOut->AddWriteComMsg(pMsg);
-	return TRUE;
+
+	BOOL flag = FALSE;
+	if(!localIp.IsEmpty())//UDP发送
+	{
+		MySocketUDP Client;
+		Client.StartSocket();
+		flag = Client.SendTo(buf,length,localIp,1024);
+#ifdef _DEBUG
+		if(flag)
+		{
+			MyWriteConsole(_T("发送通屏消息成功"));
+		}
+		else
+		{
+			MyWriteConsole(_T("发送同频消息失败"));
+		}
+#endif
+	}
+	return flag;
 }
 
 int SLZCWndScreen::FindChannelWidth(int address,int channel,int& height)
@@ -601,6 +701,7 @@ void SLZCWndScreen::AddThroughScreenMsg(const CString& msg,int address,int chann
 	sendMsg.msg = msg;
 	sendMsg.address = address;
 	sendMsg.channel = channel-1;
+	sendMsg.localIp = localIp;
 	m_ThrWndMutex.Lock();
 	m_list_sendThrMsg.push_back(sendMsg);
 	m_ThrWndMutex.Unlock();
@@ -624,7 +725,9 @@ DWORD WINAPI SLZCWndScreen::DoThrWndMsgThread(LPVOID pParam)
 			pThis->m_list_sendThrMsg.pop_front();
 			pThis->m_ThrWndMutex.Unlock();
 //			WaitForSingleObject(pThis->m_hDoWndScreenMsgThread,3);
-
+#ifdef _DEBUG
+			MyWriteConsole(_T("通屏信息") + msg.msg);
+#endif
 			pThis->SendDataToThroughScreen(msg.msg,msg.address,msg.channel,msg.localIp);
 		}
 	}

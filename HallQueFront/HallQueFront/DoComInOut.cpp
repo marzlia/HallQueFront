@@ -1,6 +1,7 @@
 #include "StdAfx.h"
 #include "DoComInOut.h"
 #include "ComInit.h"
+#include "CommonConvert.h"
 extern void MyWriteConsole(CString str); 
 
 CDoComInOut::CDoComInOut(void) :
@@ -109,6 +110,7 @@ DWORD WINAPI CDoComInOut::ReadCallerThread(LPVOID pParam)
 // #endif
 // 						SLZCWndScreen* pWindowScreen = SLZCWndScreen::GetInstance();
 // 						pWindowScreen->AddThroughInitStr(buf,dwReaded);
+
 					}
 				}
 				else

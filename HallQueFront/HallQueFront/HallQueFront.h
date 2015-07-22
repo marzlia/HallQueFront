@@ -42,6 +42,7 @@ public:
 	list<CString> m_list_caCheMsg;//数据缓存cache
 public:
 	BOOL ReadLogicVariablesFromFile();//从文件读出系统逻辑变量
+	BOOL IsLocal();//联机取号中是否为主机
 private:
 	BOOL AddAutoRun(CString strValueName);
 public:

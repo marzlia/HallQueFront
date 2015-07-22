@@ -223,10 +223,15 @@ public:
 	}
 	////设置开启评价
 	void SetIsOpenEva(const BOOL isOpen){m_bIsOpenEva = isOpen;}
-	BOOL GetIsOpenEva(){return m_bIsOpenEva;}
+	BOOL GetIsOpenEva()const{return m_bIsOpenEva;}
 	////设置完成评价
 	void SetIsFinshEva(const BOOL isFinsh){m_bIsFinshEva = isFinsh;}
-	BOOL GetIsFinshEva(){return m_bIsFinshEva;}
+	BOOL GetIsFinshEva()const {return m_bIsFinshEva;}
+	////获取当前数据对应的队列的人数
+// 	void SetCurrWaitNum(int nWaitNum){m_nCurrWaitNum = nWaitNum;}
+// 	int GetCurrWaitNum(void)const{return m_nCurrWaitNum;}
+
+	BOOL GetIsLocalData() const;
 
 	virtual void Serialize( CArchive& ar );//支持序列化
 	DECLARE_SERIAL(SLZData)
@@ -251,20 +256,11 @@ private:
 	EvaLevel m_EvaLevel;	//评价结果
 	BOOL m_bIsOpenEva; //单条信息是否开启了评价
 	BOOL m_bIsFinshEva;//单条信息是否完成了评价
-	CString m_queSerialId;//队列编号，用于与窗口信息管理系统对接
+	CString m_queSerialId;//队列编号，用于联机取号
 	UINT m_iQueNum;    //INT型排队号
 	CString m_strPhoneNum;   //要发送短信的电话号
 	CString m_strMsg; //发送短信的内容
 private:
 	int GetSrand(const int &max);
 	CString GetOnlyId();//取号唯一ID
-//public:
-//	void SetDataEmpty()
-//	{
-//		m_strSerialId=_T("");m_strOrganId=_T("");m_strBType=_T("");
-//		m_strBussName=_T("");m_strQueueNum=_T("");m_CardType=cardNotDefine;
-//		m_strCardNum=_T("");m_CustName=_T("");m_iCusLevel=RegularMember;
-//		m_timeTakingNum=0;m_strStaffId=_T("");m_strWindowId=_T("");
-//		m_timeCall=0;m_timeFinish=0;m_EvaLevel=evaNone;
-//	}
 };

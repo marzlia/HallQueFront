@@ -82,17 +82,17 @@ public:
 		return TRUE;
 	}
 
-	BOOL EditWndScrId(int iWndScrId)
-	{
-		m_arrWindow[m_iIndex].SetWndScreenId(iWndScrId);
-		return TRUE;
-	}
+// 	BOOL EditWndScrId(int iWndScrId)
+// 	{
+// 		m_arrWindow[m_iIndex].SetWndScreenId(iWndScrId);
+// 		return TRUE;
+// 	}
 
-	BOOL EditComScrId(int iComScrId)
-	{
-		m_arrWindow[m_iIndex].SetComScreenId(iComScrId);
-		return TRUE;
-	}
+// 	BOOL EditComScrId(int iComScrId)
+// 	{
+// 		m_arrWindow[m_iIndex].SetComScreenId(iComScrId);
+// 		return TRUE;
+// 	}
 
 	BOOL EditLEDIPId(int iLEDIPId)
 	{
