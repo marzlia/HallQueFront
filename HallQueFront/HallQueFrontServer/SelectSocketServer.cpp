@@ -282,6 +282,7 @@ std::string CSelectSocketServer::DealMsg(const std::string recvPacket)
 	case 33:
 	case 34:
 	case 35:
+	case 36:
 		m_pDealData->AddPacket(recvPacket);
 		break;
 	}

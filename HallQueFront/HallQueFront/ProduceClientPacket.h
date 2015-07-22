@@ -21,6 +21,7 @@ public:
 	CString ProduceDelQue(const CString& queID,const CString& orgID);
 	CString ProduceDelWnd(const CString& wndID,const CString& orgID);
 	CString ProduceDelStaff(const CString& staffID,const CString& orgID);
+	CString ProducePauseTime(const CString& organID,const CString& staffID,int windowID,const CTime& startTime,const CTime& endTime,int nSec);
 private:
 	CString ExChangeTime(const CTime& time);
 };

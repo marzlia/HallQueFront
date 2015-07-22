@@ -63,6 +63,15 @@ private:
 		CString curOrgName;
 //		CString onlyID;
 	};
+	struct CommDaoTime
+	{
+		CString curOrgID;
+		CString staffID;
+		CString windowID;
+		CString startTime;
+		CString endTime;
+		CString overTime;
+	};
 	
 	static UINT AnaPacket(LPVOID lpParam);
 	CWinThread* m_pAnaPecket;
@@ -71,11 +80,13 @@ private:
 	void TranslatePacket(const std::string strPacket,CommDaoStaff& commDaoStaff);
 	void TranslatePacket(const std::string strPacket,CommDaoWnd& commDaoWnd);
 	void TranslatePacket(const std::string strPacket,CommDaoOrg& commDaoOrg);
+	void TranslatePacket(const std::string strPacket,CommDaoTime& commDaoTime);
 	BOOL WriteDataToDB(const CommDao& commDao);
 	BOOL WriteDataToDB(const CommDaoQue& commDaoQue);
 	BOOL WriteDataToDB(const CommDaoStaff& commDaoStaff);
 	BOOL WriteDataToDB(const CommDaoWnd& commDaoWnd);
 	BOOL WriteDataToDB(const CommDaoOrg& commDaoOrg);
+	BOOL WriteDataToDB(const CommDaoTime& commDaoTime);
 	void TranslateDelQue(const std::string strPacket,CommDaoQue& commDaoQue);
 	void TranslateDelWnd(const std::string strPacket,CommDaoWnd& commDaoWnd);
 	void TranslateDelStaff(const std::string strPacket,CommDaoStaff& commDaoStaff);

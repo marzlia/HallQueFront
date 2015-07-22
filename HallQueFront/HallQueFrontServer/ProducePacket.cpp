@@ -312,6 +312,30 @@ int CProducePacket::JudgeSendPacket(const std::string strPacket)
 		if(orgID.empty())return -35;
 		return 35;
 	}
+	else if(head=="pauseTime")
+	{
+		firstIndex = strPacket.find("<organID>");
+		if(firstIndex==strPacket.npos)return -36;
+		lastIndex = strPacket.find("</organID>");
+		if(lastIndex==strPacket.npos)return -36;
+		std::string organID = strPacket.substr(firstIndex+strlen("<organID>"),lastIndex-firstIndex-strlen("<organID>"));
+		if(organID.empty())return -36;
+		firstIndex = strPacket.find("<staffID>");
+		if(firstIndex==strPacket.npos)return -36;
+		lastIndex = strPacket.find("</staffID>");
+		if(lastIndex==strPacket.npos)return -36;
+		std::string staffID = strPacket.substr(firstIndex+strlen("<staffID>"),lastIndex-firstIndex-strlen("<staffID>"));
+		if(staffID.empty())return -36;
+
+		firstIndex = strPacket.find("<windowID>");
+		if(firstIndex==strPacket.npos)return -36;
+		lastIndex = strPacket.find("</windowID>");
+		if(lastIndex==strPacket.npos)return -36;
+		std::string wndID = strPacket.substr(firstIndex+strlen("<windowID>"),lastIndex-firstIndex-strlen("<windowID>"));
+		if(wndID.empty())return -36;
+
+		return 36;
+	}
 	else
 	{
 		return 11;

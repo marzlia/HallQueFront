@@ -10,6 +10,7 @@
 #include "ComplSocketClient.h"
 #include "DealInterMsg.h"
 #include "UDPBrodcast.h"
+#include "ProduceClientPacket.h"
 
 
 extern void MyWriteConsole(CString str);
@@ -538,6 +539,7 @@ void CCallThread::OnCountTime(CallerCmd& callerCmd)
 			CountTime* pTime = new CountTime;
 			pTime->nTimeSec = theApp.m_logicVariables.nTimeMintue * 60;
 			pTime->window = Window;
+			pTime->startTime = CTime::GetCurrentTime();
 			AddCountTime(pTime);
 			callerCmd.SetSuccess(TRUE);
 		}
@@ -1014,7 +1016,9 @@ void CALLBACK CCallThread::MyDoCountTimeMsg( HWND hwnd, UINT uMsg, UINT idEvent,
 		if(pTime->nTimeSec <= 0)
 		{
 			CThroughWndScreenInfo wndScreenInfo;
-			CString strMsg = _T("                     ");
+			int nOverTimeSec = abs(pTime->nTimeSec);
+			 
+			CString strMsg = pCallThread->ChangeTimeToCstring(nOverTimeSec);
 			for(int i=0;i<pTime->window.m_throughscreen_array.GetCount();i++)
 			{
 				wndScreenInfo = pTime->window.m_throughscreen_array.GetAt(i);
@@ -1024,9 +1028,9 @@ void CALLBACK CCallThread::MyDoCountTimeMsg( HWND hwnd, UINT uMsg, UINT idEvent,
 				pWnd->AddThroughScreenMsg(strMsg,wndScreenInfo.GetPhyId(),wndScreenInfo.GetPipeId(),wndScreenInfo.GetLocalIp());
 			}
 
-			delete pTime;
-			pTime = NULL;
-			pCallThread->m_list_CountTime.erase(itera);
+// 			delete pTime;
+// 			pTime = NULL;
+// 			pCallThread->m_list_CountTime.erase(itera);
 			break;
 		}
 
@@ -1084,6 +1088,29 @@ void CCallThread::DeleteCountTimeWindow(UINT uWindowID)
 			m_mtCountTime.Lock();
 			m_list_CountTime.erase(itera);
 			m_mtCountTime.Unlock();
+			
+			pCountTime->endTime = CTime::GetCurrentTime();
+
+			CTimeSpan dealTime = pCountTime->endTime - pCountTime->startTime;
+			pCountTime->nTimeSec = (int)(dealTime.GetTotalSeconds() - theApp.m_logicVariables.nTimeMintue * 60);
+			if(pCountTime->nTimeSec<0)
+				pCountTime->nTimeSec = 0;
+
+			///发送到服务端
+			if(theApp.m_logicVariables.IsAutoSendToServer)
+			{
+				CString staffID = theApp.m_Controller.m_mapLoginList[pCountTime->window.GetWindowId()];//获取登录STAFFID
+				CProduceClientPacket packet;
+				CString wRetMsg = packet.ProducePauseTime(theApp.m_logicVariables.strOrganID,staffID,pCountTime->window.GetWindowId(),
+					pCountTime->startTime,pCountTime->endTime,pCountTime->nTimeSec);
+			
+				CComplSocketClient client;
+				std::string recvMsg;int actSize = 0;
+				client.SendData(wRetMsg,recvMsg,actSize);
+			}
+			//////////////////
+			delete pCountTime;
+			pCountTime = NULL;
 			break;
 		}
 	}

@@ -164,3 +164,22 @@ CString CProduceClientPacket::ProduceDelStaff(const CString& staffID,const CStri
 	packet.AppendFormat(_T("<orgID>%s</orgID>"),orgID);
 	return packet;
 }
+
+CString CProduceClientPacket::ProducePauseTime(const CString& organID,const CString& staffID,int windowID,const CTime& startTime,const CTime& endTime,int nSec)
+{
+	CString packet = _T("<?xml version=\"1.0\" encoding=\"UTF-8\"?><dataPacket version=\"1.0\"><headCode>pauseTime</headCode>");
+	packet.AppendFormat(_T("<organID>%s</organID>"),organID);
+	packet.AppendFormat(_T("<staffID>%s</staffID>"),staffID);
+	packet.AppendFormat(_T("<windowID>%d</windowID>"),windowID);
+	CString strStartTime,strEndTime;
+	strStartTime.Format(_T("%d-%d-%d %d:%d:%d"),startTime.GetYear(),startTime.GetMonth(),startTime.GetDay(),
+		startTime.GetHour(),startTime.GetMinute(),startTime.GetSecond());
+	strEndTime.Format(_T("%d-%d-%d %d:%d:%d"),endTime.GetYear(),endTime.GetMonth(),endTime.GetDay(),
+		endTime.GetHour(),endTime.GetMinute(),endTime.GetSecond());
+
+	packet.AppendFormat(_T("<startTime>%s</startTime>"),strStartTime);
+	packet.AppendFormat(_T("<endTime>%s</endTime>"),strEndTime);
+
+	packet.AppendFormat(_T("<overTime>%d</overTime>"),nSec);
+	return packet;
+}

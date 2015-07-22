@@ -39,7 +39,9 @@ private:
 	typedef struct CountTime
 	{
 		SLZWindow window;
-		int nTimeSec;
+		CTime startTime;//开始时间
+		CTime endTime;//结束时间
+		int nTimeSec;//暂停时间
 	};
 
 	virtual void Run();

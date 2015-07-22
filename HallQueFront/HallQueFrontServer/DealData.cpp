@@ -109,6 +109,12 @@ UINT CDealData::AnaPacket(LPVOID lpParam)
 				pThis->TranslateDelWnd(strPacket,commDaoWnd);
 				pThis->WriteDelWnd(commDaoWnd);
 			}
+			else if(head=="pauseTime")
+			{
+				CommDaoTime commDaoTime;
+				pThis->TranslatePacket(strPacket,commDaoTime);
+				pThis->WriteDataToDB(commDaoTime);
+			}
 		}
 	}
 	return 0;
@@ -297,6 +303,29 @@ BOOL CDealData::WriteDataToDB(const CommDao& commDao)
 	return FALSE;
 }
 
+BOOL CDealData::WriteDataToDB(const CommDaoTime& commDaoTime)
+{
+	if(!m_conMySql.IsConnect())
+	{
+		CDbaConfig dbaConfig;
+		CString account = dbaConfig.GetServerAcount();
+		CString ip = dbaConfig.GetServerIP();
+		CString pass = dbaConfig.GetServerPassword();
+		CString port = dbaConfig.GetDBPort();
+		int i_port = 0;
+		CCommonConvert::CStringToint(i_port,port);
+		m_conMySql.ConnectToDB(ip,i_port,account,pass);
+	}
+	if(m_conMySql.IsConnect())
+	{
+		CString sql;
+		sql.Format(_T("insert into leavetime (organID,workerID,windowID,leave_start_time,leave_end_time,over_time) values ('%s','%s','%s','%s','%s','%s')"),
+			commDaoTime.curOrgID,commDaoTime.staffID,commDaoTime.windowID,commDaoTime.startTime,commDaoTime.endTime,commDaoTime.overTime);
+		return m_conMySql.Execute(sql);
+	}
+	return FALSE;
+}
+
 BOOL CDealData::WriteDataToDB(const CommDaoQue& commDaoQue)
 {
 	if(!m_conMySql.IsConnect())
@@ -476,6 +505,39 @@ void CDealData::TranslatePacket(const std::string strPacket,CommDaoOrg& commDaoO
 // 	lastIndex = strPacket.find("</onlyID>");
 // 	std::string strOnlyID = strPacket.substr(firstIndex+8,lastIndex-firstIndex-8);
 // 	commDaoOrg.onlyID = strOnlyID.c_str();
+}
+
+void CDealData::TranslatePacket(const std::string strPacket,CommDaoTime& commDaoTime)
+{
+	std::string::size_type firstIndex = strPacket.find("<organID>");
+	std::string::size_type lastIndex = strPacket.find("</organID>");
+	std::string strCurOrgID = strPacket.substr(firstIndex+strlen("<organID>"),lastIndex-firstIndex-strlen("<organID>"));
+	commDaoTime.curOrgID = strCurOrgID.c_str();
+	///////////////////////////////////////////////
+	firstIndex = strPacket.find("<staffID>");
+	lastIndex = strPacket.find("</staffID>");
+	std::string strStaffID = strPacket.substr(firstIndex+strlen("<staffID>"),lastIndex-firstIndex-strlen("<staffID>"));
+	commDaoTime.staffID= strStaffID.c_str();
+	///////////////////////////////////////////////
+	firstIndex = strPacket.find("<windowID>");
+	lastIndex = strPacket.find("</windowID>");
+	std::string strWndID = strPacket.substr(firstIndex+strlen("<windowID>"),lastIndex-firstIndex-strlen("<windowID>"));
+	commDaoTime.windowID = strWndID.c_str();
+	////////////////////////////////////////////////
+	firstIndex = strPacket.find("<startTime>");
+	lastIndex = strPacket.find("</startTime>");
+	std::string strStartTime = strPacket.substr(firstIndex+strlen("<startTime>"),lastIndex-firstIndex-strlen("<startTime>"));
+	commDaoTime.startTime = strStartTime.c_str();
+	//////////////////////////////////////////////////
+	firstIndex = strPacket.find("<endTime>");
+	lastIndex = strPacket.find("</endTime>");
+	std::string strEndTime = strPacket.substr(firstIndex+strlen("<endTime>"),lastIndex-firstIndex-strlen("<endTime>"));
+	commDaoTime.endTime = strEndTime.c_str();
+	//////////////////////////////////////////////////
+	firstIndex = strPacket.find("<overTime>");
+	lastIndex = strPacket.find("</overTime>");
+	std::string strOverTime = strPacket.substr(firstIndex+strlen("<overTime>"),lastIndex-firstIndex-strlen("<overTime>"));
+	commDaoTime.overTime = strOverTime.c_str();
 }
 
 BOOL CDealData::WriteDataToDB(const CommDaoOrg& commDaoOrg)
