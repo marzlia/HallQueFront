@@ -165,6 +165,23 @@ BOOL SLZWindowQueryView::QueryWindowById(UINT iWindowId,SLZWindow& Window)
 	}
 	return flag;
 }
+
+BOOL SLZWindowQueryView::QueryWindowBySerialID(UINT iSerialID,SLZWindow& window)
+{
+	BOOL flag = FALSE;
+	std::map<UINT,SLZWindow>::const_iterator itera = m_mapIdWindow.begin();
+	for(itera;itera!=m_mapIdWindow.end();++itera)
+	{
+		SLZWindow temp = itera->second;
+		if(temp.GetShowWndId() == iSerialID)
+		{
+			flag = TRUE;
+			window = temp;
+			break;
+		}
+	}
+	return flag;
+}
 /*
 SLZWindow* SLZWindowQueryView::QueryWindowByCallerId(UINT iCallerId)
 {
