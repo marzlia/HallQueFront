@@ -675,11 +675,13 @@ void CCallThread::OnExChange(CallerCmd& callerCmd)
 		BOOL flag = FALSE;
 		CString queID = callerCmd.GetCarriedData();//获取转移的队列
 		if(queID.IsEmpty())return;
+		CQueueInfo queinfo;
 		for(int i=0;i<m_map_que.GetCount();i++)
 		{
-			if(m_map_que[i].GetQueID()==queID)//找到QUEID
+			if(m_map_que[i].GetQueManNum()==queID)//找到QUEID
 			{
 				flag = TRUE;
+				queinfo = m_map_que[i];
 				break;
 			}
 		}
@@ -690,9 +692,9 @@ void CCallThread::OnExChange(CallerCmd& callerCmd)
 			{
 				data.SetIsOpenEva(FALSE);data.SetIsFinshEva(FALSE);
 				m_rCalledQueData.DeleteCalledQueData(data);//删除正在呼叫队列的数据
-				data.SetBussinessType(queID);
+				data.SetBussinessType(queinfo.GetQueID());
 				//设置队列名称
-				data.SetBussName(GetQueNumFromID(queID));
+				data.SetBussName(GetQueNumFromID(queinfo.GetQueID()));
 				data.SetWindowId(0);//不设置指定窗口,返回初始状态
 				m_rInlineQueData.AddHeadData(data);//添加到排队队列最前
 				callerCmd.SetSuccess(TRUE);
@@ -707,16 +709,16 @@ void CCallThread::OnExChange(CallerCmd& callerCmd)
 		int i_winID = -1;
 		convert.CStringToint(i_winID,winID);
 		SLZWindow Window;
-		BOOL flag = m_rInlineQueData.m_rWindowTable.QueryWindowById(i_winID,Window);
+		BOOL flag = m_rInlineQueData.m_rWindowTable.QueryWindowBySerialID(i_winID,Window);
 		if(flag)//找到了窗口
 		{
 			if(m_rCalledQueData.GetCalledQueData(callerCmd.GetWindowId(),data))
 			{
-				if(JudgeWindowHaveQue(i_winID))//判断窗口ID下是否有可处理队列
+				if(JudgeWindowHaveQue(Window.GetWindowId()))//判断窗口ID下是否有可处理队列
 				{
 					data.SetIsOpenEva(FALSE);data.SetIsFinshEva(FALSE);
 					m_rCalledQueData.DeleteCalledQueData(data);//删除正在呼叫队列的数据
-					data.SetWindowId(i_winID);
+					data.SetWindowId(Window.GetWindowId());
 					m_rInlineQueData.AddHeadData(data);//添加到排队队列最前
 					callerCmd.SetSuccess(TRUE);
 				}

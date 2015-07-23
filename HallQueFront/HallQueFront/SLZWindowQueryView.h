@@ -18,6 +18,8 @@ public:
 	//SLZWindow* QueryWindowById(UINT iWindowId);
 	//
 	BOOL QueryWindowById(UINT iWindowId,SLZWindow& Window);
+
+	BOOL QueryWindowBySerialID(UINT iSerialID,SLZWindow& window);
 	//SLZWindow* QueryWindowByCallerId(UINT iCallerId);
 	//
 	BOOL QueryWindowByCallerId(UINT iCallerId,SLZWindow& Window);
