@@ -368,8 +368,13 @@ void CCallThread::OnCall(CallerCmd& callerCmd)
 					CString queSerialID;
 					theApp.m_Controller.GetQueSerialIDByManQueNum(queSerialID,data.GetQueSerialID());
 #ifdef _DEBUG
+					MyWriteConsole(_T("客户机接收到的报文:"));
+					CString wRecvMsg(recvMsg.c_str());
+					MyWriteConsole(wRecvMsg);
+					MyWriteConsole(_T("--------------------"));
 					MyWriteConsole(_T("客户机解析出来的队列id:"));
 					MyWriteConsole(queSerialID);
+					MyWriteConsole(_T("---------------------"));
 #endif
 					data.SetBussinessType(queSerialID);
 					bFind = TRUE;
