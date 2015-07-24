@@ -180,18 +180,18 @@ DWORD WINAPI CInterNumSocketServer::WorkerThread(LPVOID lpParam)
 					else
 					{
 						//接收到以后处理
-#ifdef _DEBUG
-						CString msg;
-						CCommonConvert::CharToCstring(msg,szMessage);
-						MyWriteConsole(msg);
-#endif
+// #ifdef _DEBUG
+// 						CString msg;
+// 						CCommonConvert::CharToCstring(msg,szMessage);
+// 						MyWriteConsole(msg);
+// #endif
 						std::string recvPacket(szMessage);
 						std::string retPacket;
 						pThis->DealMsg(recvPacket,retPacket);
-#ifdef _DEBUG
-						CString wRetPacket(retPacket.c_str());
-						MyWriteConsole(wRetPacket);
-#endif
+// #ifdef _DEBUG
+// 						CString wRetPacket(retPacket.c_str());
+// 						MyWriteConsole(wRetPacket);
+// #endif
 						
 						int size = retPacket.size();
 						int nTimeOut=1000;
@@ -329,10 +329,10 @@ void CInterNumSocketServer::DealMsg(const string& recvPacket,string& retPacket)
 		theApp.m_pView->ShowWaitNum(queserial_id,nWaitNum);///界面显示等待人数
 		if(theApp.IsLocal())
 			theApp.m_Controller.WriteInlineDataToFile();
-#ifdef _DEBUG
-		CString sendMsg(retPacket.c_str());
-		MyWriteConsole(sendMsg);
-#endif
+// #ifdef _DEBUG
+// 		CString sendMsg(retPacket.c_str());
+// 		MyWriteConsole(sendMsg);
+// #endif
 		CDealInterMsg::ProduceRetInterMsg(&data,nWaitNum,retPacket);
 	}
 	else if(headCode == "sendCallMsg")
@@ -349,6 +349,30 @@ void CInterNumSocketServer::DealMsg(const string& recvPacket,string& retPacket)
 				queserial_id_array.Add(queserial_id);
 		}
 		
+#ifdef _DEBUG
+		MyWriteConsole(_T("接收的叫号报文:"));
+		CString wRecvPacket(recvPacket.c_str());
+		MyWriteConsole(wRecvPacket);
+		MyWriteConsole(_T("---------------------------"));
+	
+		MyWriteConsole(_T("接收到的可处理队列编号:"));
+		CString showStrQueManNum;
+		for(int i=0;i<queManNumArray.GetCount();i++)
+		{
+			showStrQueManNum.AppendFormat(_T("%s"),queManNumArray.GetAt(i));
+			showStrQueManNum += _T(" ");
+		}
+		MyWriteConsole(showStrQueManNum);
+		MyWriteConsole(_T("解析出来的可处理队列的队列ID:"));
+		CString showStrQueID;
+		for(int i=0;i<queserial_id_array.GetCount();i++)
+		{
+			showStrQueID.AppendFormat(_T("%s"),queserial_id_array.GetAt(i));
+			showStrQueID += _T(" ");
+		}
+		MyWriteConsole(showStrQueID);
+		MyWriteConsole(_T("---------------------------------"));
+#endif
 		//////
 		SLZData data;
 		BOOL isSucced = m_pInlineQueData->DeleteInlineClientData(bIsUsePower,queserial_id_array,organId,&data);
@@ -366,6 +390,12 @@ void CInterNumSocketServer::DealMsg(const string& recvPacket,string& retPacket)
 		if(theApp.IsLocal())
 			///重新写file，保存没处理（呼叫）的数据
 			theApp.m_Controller.WriteInlineDataToFile();
+#ifdef _DEBUG
+		MyWriteConsole(_T("返回的叫号报文:"));
+		CString wRetPecket(retPacket.c_str());
+		MyWriteConsole(wRetPecket);
+		MyWriteConsole(_T("------------------------------"));
+#endif
 	}
 	else if(headCode == "sendStbMsg")//机顶盒信息
 	{

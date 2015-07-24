@@ -367,6 +367,10 @@ void CCallThread::OnCall(CallerCmd& callerCmd)
 					data.SetWindowId(callerCmd.GetWindowId());
 					CString queSerialID;
 					theApp.m_Controller.GetQueSerialIDByManQueNum(queSerialID,data.GetQueSerialID());
+#ifdef _DEBUG
+					MyWriteConsole(_T("客户机解析出来的队列id:"));
+					MyWriteConsole(queSerialID);
+#endif
 					data.SetBussinessType(queSerialID);
 					bFind = TRUE;
 				}
