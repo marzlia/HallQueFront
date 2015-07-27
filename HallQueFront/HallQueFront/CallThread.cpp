@@ -973,6 +973,15 @@ BOOL CCallThread::ShowViewWaitNum(const CString& queserial_id,const SLZData& dat
 				sendMsg,sendMsg.size(),recvMsg,actRecvSize) && actRecvSize)
 			{
 				//CDealInterMsg::AnaRetInterMsg(recvMsg,&iQueNum,pInlineNum);
+#ifdef _DEBUG
+				MyWriteConsole(_T("客户机发送队列人数报文:"));
+				CString wSendMsg(sendMsg.c_str());
+				MyWriteConsole(wSendMsg);
+				MyWriteConsole(_T("-----------------------------"));
+				MyWriteConsole(_T("客户机接收到的队列人数报文："));
+				CString wRecvMsg(recvMsg.c_str());
+				MyWriteConsole(wRecvMsg);
+#endif
 				UINT waitNum = 0;
 				CDealInterMsg::AnaRetInNumMsg(recvMsg,&waitNum);
 
@@ -987,7 +996,10 @@ BOOL CCallThread::ShowViewWaitNum(const CString& queserial_id,const SLZData& dat
 			}
 			else
 			{
-				goto Normal;
+#ifdef _DEBUG
+				MyWriteConsole(_T("客户机发送队列人数报文失败"));
+#endif
+				return FALSE;
 			}
 		}
 	}
