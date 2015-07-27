@@ -379,7 +379,7 @@ BOOL CInlineQueData::DeleteInlineClientData(BOOL bIsUsePower,const CStringArray&
 	CString strShow;
 	for(int i=0;i<queIDArray.GetCount();i++)
 	{
-		strShow.AppendFormat(_T("DeleteInlineClientData中的queidarry:"),queIDArray[i]);
+		strShow.AppendFormat(_T("DeleteInlineClientData中的queidarry:%s"),queIDArray[i]);
 		strShow+=_T(" ");
 	}
 	MyWriteConsole(strShow);
@@ -458,7 +458,7 @@ BOOL CInlineQueData::GetFirstTakeNumData(SLZData& data,const CStringArray& arrSt
 	BOOL flag = FALSE;
 	BOOL canDo = FALSE;
 	POSITION pos = m_lstInlineQue.GetHeadPosition();
-	SLZData tempdata;
+	SLZData tempdata,lastData;
 	while(pos)
 	{
 		tempdata = m_lstInlineQue.GetNext(pos);
@@ -475,12 +475,14 @@ BOOL CInlineQueData::GetFirstTakeNumData(SLZData& data,const CStringArray& arrSt
 		{
 			if(!flag)
 			{
+				lastData = data;
 				data = tempdata;
 				flag = TRUE;
 			}
 			else
 			{
-				data = data.GetIntQueNum() < tempdata.GetIntQueNum() ? data : tempdata;
+				if(!lastData.GetBussinessType().IsEmpty())
+					data = data.GetTakingNumTime() < lastData.GetTakingNumTime() ? data : lastData;
 			}
 		}
 	}
