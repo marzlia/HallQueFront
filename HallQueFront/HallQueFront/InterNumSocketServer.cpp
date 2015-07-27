@@ -282,6 +282,12 @@ void CInterNumSocketServer::DealMsg(const string& recvPacket,string& retPacket)
 		}
 
 		CDealInterMsg::ProduceRetInNumMsg(nWaitNum,retPacket);
+#ifdef _DEBUG
+		MyWriteConsole(_T("主机返回剩余人数报文:"));
+		CString wRetWaitNumPacket(retPacket.c_str());
+		MyWriteConsole(wRetWaitNumPacket);
+		MyWriteConsole(_T("------------------------"));
+#endif
 	}
 	else if(headCode == "sendInterMsg")//客户机发来取号申请
 	{

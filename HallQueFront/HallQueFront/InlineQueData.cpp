@@ -57,7 +57,8 @@ BOOL CInlineQueData::GetInlineQueData(const UINT iWinId,
 				data = m_lstInlineQue.GetNext(pos);
 				if(data.GetWindowId()==0)//如果没设置指定窗口
 				{
-					if(arrStrQueId[i].Compare(data.GetBussinessType()) == 0)
+					CString strQueIDTemp = arrStrQueId[i];
+					if(strQueIDTemp == data.GetBussinessType())
 					{
 						bFind = TRUE;
 						rdata = data;
@@ -84,48 +85,6 @@ BOOL CInlineQueData::GetInlineQueData(const UINT iWinId,
 	}
 	else//不使用优先级
 	{
-		/*
-		/////////////////////////////////////////首先找到可处理队列中哪几个队列有数据
-		CStringArray haveDataArray;
-		GetCandoQueHaveData(haveDataArray,arrStrQueId,iWinId);
-		if(haveDataArray.GetCount() == 0)
-		{
-			return FALSE;
-		}
-		/////////////////////////////////////////随机取数
-		int count = haveDataArray.GetCount();
-		time_t t;	
-		srand((unsigned) time(&t));	
-		int nRand = rand() % count;
-		CString strQueID = haveDataArray[nRand];
-		POSITION pos = m_lstInlineQue.GetHeadPosition();
-		while(pos)
-		{
-			SLZData data;
-			POSITION posLast = pos;
-			data = m_lstInlineQue.GetNext(pos);
-			if(data.GetWindowId()==0)//如果没设置指定窗口
-			{
-				if(strQueID.Compare(data.GetBussinessType()) == 0)
-				{
-					rdata = data;
-					m_lstInlineQue.RemoveAt(posLast);
-					bFind = TRUE;
-					break;
-				}
-			}
-			else//指定了窗口
-			{
-				if(iWinId == data.GetWindowId())
-				{
-					rdata = data;
-					m_lstInlineQue.RemoveAt(posLast);
-					bFind = TRUE;
-					break;
-				}
-			}
-		}
-		*/
 		bFind = GetFirstTakeNumData(rdata,arrStrQueId);
 		if(bFind)
 			bFind = RemoveFirstTakeNumData(rdata);
@@ -416,6 +375,15 @@ void CInlineQueData::GetAllBussCount(const CString& strBussid,UINT* pWaitNum)
 
 BOOL CInlineQueData::DeleteInlineClientData(BOOL bIsUsePower,const CStringArray& queIDArray,const CString& organId,SLZData* pData)
 {
+#ifdef _DEBUG
+	CString strShow;
+	for(int i=0;i<queIDArray.GetCount();i++)
+	{
+		strShow.AppendFormat(_T("DeleteInlineClientData中的queidarry:"),queIDArray[i]);
+		strShow+=_T(" ");
+	}
+	MyWriteConsole(strShow);
+#endif
 	m_mtInlineQue.Lock();
 	BOOL flag = FALSE;
 	if(bIsUsePower)
@@ -436,7 +404,8 @@ BOOL CInlineQueData::DeleteInlineClientData(BOOL bIsUsePower,const CStringArray&
 				data = m_lstInlineQue.GetNext(pos);
 				if(data.GetWindowId()==0)//如果没设置指定窗口
 				{
-					if(queIDArray[i].Compare(data.GetBussinessType()) == 0)
+					CString strQueIDTemp = queIDArray[i];
+					if(strQueIDTemp == data.GetBussinessType())
 					{
 						flag = TRUE;
 						*pData = data;
@@ -453,38 +422,6 @@ BOOL CInlineQueData::DeleteInlineClientData(BOOL bIsUsePower,const CStringArray&
 	}
 	else
 	{
-		/*
-		/////////////////////////////////////////首先找到可处理队列中哪几个队列有数据
-		CStringArray haveDataArray;
-		GetCandoQueHaveData(haveDataArray,queIDArray);
-		if(haveDataArray.GetCount() == 0)
-		{
-			return FALSE;
-		}
-		/////////////////////////////////////////随机取数
-		int count = haveDataArray.GetCount();
-		time_t t;	
-		srand((unsigned) time(&t));	
-		int nRand = rand() % count;
-		CString strQueID = haveDataArray[nRand];
-		POSITION pos = m_lstInlineQue.GetHeadPosition();
-		while(pos)
-		{
-			SLZData data;
-			POSITION posLast = pos;
-			data = m_lstInlineQue.GetNext(pos);
-			if(data.GetWindowId()==0)//如果没设置指定窗口
-			{
-				if(strQueID.Compare(data.GetBussinessType()) == 0)
-				{
-					*pData = data;
-					m_lstInlineQue.RemoveAt(posLast);
-					flag = TRUE;
-					break;
-				}
-			}
-		}
-		*/
 		flag = GetFirstTakeNumData(*pData,queIDArray);
 		if(flag)
 			flag = RemoveFirstTakeNumData(*pData);
@@ -527,7 +464,8 @@ BOOL CInlineQueData::GetFirstTakeNumData(SLZData& data,const CStringArray& arrSt
 		tempdata = m_lstInlineQue.GetNext(pos);
 		for(int i=0;i<arrStrQueId.GetCount();i++)
 		{
-			if(arrStrQueId[i].Compare(tempdata.GetBussinessType()) == 0)
+			CString strQueIDTemp = arrStrQueId[i];
+			if(strQueIDTemp == tempdata.GetBussinessType())
 			{
 				canDo = TRUE;
 				break;
@@ -542,7 +480,7 @@ BOOL CInlineQueData::GetFirstTakeNumData(SLZData& data,const CStringArray& arrSt
 			}
 			else
 			{
-				data = data.GetTakingNumTime() < tempdata.GetTakingNumTime() ? data : tempdata;
+				data = data.GetIntQueNum() < tempdata.GetIntQueNum() ? data : tempdata;
 			}
 		}
 	}
