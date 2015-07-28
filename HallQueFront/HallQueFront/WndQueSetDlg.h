@@ -1,6 +1,7 @@
 #pragma once
 #include "CommonConvert.h"
 #include "ListBoxPlus.h"
+#include "afxwin.h"
 // CWndQueSetDlg 对话框
 //可处理队列对话框
 class CWndQueSetDlg : public CDialog
@@ -27,6 +28,7 @@ public:
 	CStringArray m_AbleQueId;			//可处理队列ID 数组
 	CString m_AbleQueName;			//可处理队列名称
 	BOOL m_bMakeAll;		//是否应用到所有窗口
+	BOOL m_bIsUsePower;  //是否使用优先级
 private:
 	BOOL ReadQueInfoFromFile();
 	BOOL ReadWndQueInfo();
@@ -42,4 +44,5 @@ public:
 	afx_msg void OnBnClickedBtnUp();
 	afx_msg void OnBnClickedBtnDown();
 	afx_msg void OnBnClickedCheckMkall();
+	CButton m_check_usepower;
 };

@@ -14,6 +14,7 @@ IMPLEMENT_DYNAMIC(CWndQueSetDlg, CDialog)
 
 CWndQueSetDlg::CWndQueSetDlg(CWnd* pParent /*=NULL*/)
 	: CDialog(CWndQueSetDlg::IDD, pParent)
+	,m_bIsUsePower(FALSE)
 {
 	m_Queinfo_path = convert.GetExeFullFilePath();
 	m_Queinfo_path += _T("\\QueBasicInfo\\QueBasicInfo.dat");
@@ -30,6 +31,7 @@ void CWndQueSetDlg::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX,IDC_LIST_UNDSTQUE,m_list_undstque);
 	DDX_Control(pDX,IDC_LIST_ABLEQUE,m_list_ableque);
 	DDX_Control(pDX,IDC_CHECK_MKALL,m_check_makeall);
+	DDX_Control(pDX, IDC_CHECK_USEPOWER, m_check_usepower);
 }
 
 
@@ -77,6 +79,14 @@ BOOL CWndQueSetDlg::ReadWndQueInfo()
 	POSITION pos=pWndSet->m_ListCtr_Window.GetFirstSelectedItemPosition();
 	int index=pWndSet->m_ListCtr_Window.GetNextSelectedItem(pos);
 	SLZWindow windowinfo=pWndSet->m_List_WindowInfo.GetAt(pWndSet->m_List_WindowInfo.FindIndex(index));
+	if(windowinfo.GetIsUsePower())
+	{
+		m_check_usepower.SetCheck(BST_CHECKED);
+	}
+	else
+	{
+		m_check_usepower.SetCheck(BST_UNCHECKED);
+	}
 	CStringArray queidarray;
 	windowinfo.GetArrayQueId(queidarray);
 	CArray<int,int> aryListBoxSel;
@@ -231,6 +241,15 @@ void CWndQueSetDlg::OnBnClickedOk()
 			m_AbleQueName=m_AbleQueName+_T("  ")+ListQueName;
 		}
 
+	}
+
+	if(m_check_usepower.GetCheck() == BST_CHECKED)
+	{
+		m_bIsUsePower = TRUE;
+	}
+	else
+	{
+		m_bIsUsePower = FALSE;
 	}
 	OnOK();
 }

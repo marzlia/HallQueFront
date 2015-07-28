@@ -7,6 +7,8 @@
 
 #define MYBUFLEN 256
 #define DATABUFLEN 2048
+
+#define INTERPORT 10036
 /*指令类别枚举*/
 typedef enum _tagCmdType
 {
@@ -103,6 +105,8 @@ typedef struct _tagLogicVariables//系统综合逻辑变量
 	UINT iNumberCallType;	//数字播放格式 
 	BOOL IsAutoChangePage;	//按钮选择以后自动跳回主界面
 	BOOL IsOpenJudgeShortMsg;//是否开启评价器（出现差评时）发送短信到手机
+	BOOL IsOpenInterNum;//是否开启联机取号
+	WCHAR strInterIP[MYBUFLEN];//联机取号服务器ip
 }LogicVariables,*pLogicVariables;
 /*
 显示缺纸还是显示等候

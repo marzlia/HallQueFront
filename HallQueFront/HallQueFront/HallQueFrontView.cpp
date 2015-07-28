@@ -20,6 +20,7 @@
 #include "ShowWaitingDlg.h"
 #include "SLZCWndScreen.h"
 #include "CommonStrMethod.h"
+
 #ifdef _DEBUG
 #define new DEBUG_NEW
 #endif
@@ -1237,6 +1238,7 @@ void CHallQueFrontView::JudgeButtonWorkOut()
 		}
 	}
 }
+
 void CHallQueFrontView::OnStbset()
 {
 	// TODO: 在此添加命令处理程序代码

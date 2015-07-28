@@ -32,6 +32,7 @@ public:
 	BOOL OpenMsgQueue();
 	//取号时返回呼叫器等待人数变化
 	BOOL ShowCallerWaitNum(const CString& queID);
+	BOOL ShowCallerWaitNum(const CString& queID,int nWaitNum);
 private:
 	virtual void Run();
 	void DispatchCallerCmd(CallerCmd& callerCmd);
@@ -59,6 +60,8 @@ private:
 	BOOL SetLoginStaffID(const UINT iWinID,const CString& staffID);//设置窗口登录员工ID
 	BOOL DelWindowLoginStaffID(const UINT iWinID);//把窗口登录员工ID删除
 	CString GetCandoQueInlineCount(UINT iWinID);//获取该窗口能够处理的队列排队人数
+	BOOL ShowViewWaitNum(const CString& queserial_id,const SLZData& data,CallerCmd& callerCmd);//显示界面剩余人数
+	
 private:
 	CInlineQueData& m_rInlineQueData;//排队队列
 	CCalledQueData& m_rCalledQueData;//正在呼叫队列

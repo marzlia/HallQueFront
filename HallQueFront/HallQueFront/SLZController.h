@@ -1,6 +1,6 @@
 #pragma once
 #include "SLZCallerData.h"
-#include "SLZCardReader.h"
+
 #include "SLZCCaller.h"
 #include "SLZCEvaluator.h"
 #include "SLZData.h"
@@ -26,6 +26,10 @@
 #define WM_SHOWMSG WM_USER+3096
 #define WM_SHOWPAGE WM_USER+3097
 using namespace std;
+
+class CInterNumSocketServer; 
+class CUDPServer;
+class SLZCardReader;
 
 class SLZController//处理整个数组逻辑类           
 {
@@ -61,7 +65,7 @@ private:
 	CCallThread* m_pCallThread;
 	//处理评价线程类对象
 	CEvaThread* m_pEvaThread;
-	SLZCardReader m_cardread; //读卡，读身份证变量
+	SLZCardReader* m_pCardread; //读卡，读身份证变量
 	SLZPrinter m_print;//打印变量
 	////////////////////////////////////////
 	BOOL ReadQueInfoFromFile();//读队列信息
@@ -73,7 +77,7 @@ private:
 	SLZWindowQueryView m_windowTable;//从文件读出的窗口信息类
 	CMap<int,int,CQueueInfo,CQueueInfo&> m_map_que;//队列map
 	BOOL DataNumOut(CString QueId);
-	void InitThroughScreen();//初始化通屏
+//	void InitThroughScreen();//初始化通屏
 	///维护队列人数从0变为1的工作者线程
 	static UINT CountToCallerAlarm(LPVOID pParam);
 	CWinThread* m_pAlarmToCaller;
@@ -110,13 +114,12 @@ private:
 	CString m_InlineDataPath;//排队数据文件路径
 
 	int GetMaxQueNum(const CString QueID);//获取最大的排队号码
-	CMap<CString,LPCTSTR,UINT,UINT&> map_QueNum;//
+	
 	CString m_MapQuePath;
 	BOOL ReadListQueFromFile();
-	BOOL WriteListQueIntoFile();
 
-	CList<SLZData,SLZData&> m_list_Data;
-	BOOL InsertListData(SLZData data);
+	
+	
 	BOOL JudgeTodayOrNot(SLZData data);
 public:
 	SoundPlay* m_pPlaySound;//播放声音的对象
@@ -150,4 +153,35 @@ public:
 	CString GetStaffNameByID(const CString& staffID);
 	CString GetWindowNameByID(UINT nWindowID);
 	CString GetWindowCallNameByID(UINT nWindowID);
+
+private:
+	BOOL ShortMsgNum(const CString& queserial_id);//短信取号操作
+	void TakeViewNum(const CString& queserial_id);//取号操作
+	unsigned int GetQueNum(const CString& queserial_id,UINT* pInlineNum,BOOL* pIsClientData,SLZData* pData);//设置取号时的排队号码
+
+private:
+	CInterNumSocketServer* m_pInterNumServer;
+	BOOL InitInterNumServer();
+
+
+	CUDPServer* m_pUDPServer;
+	void InitUDPServer();
+
+	
+	CMutex m_mtModifyQueLock;
+public:
+	CMap<CString,LPCTSTR,UINT,UINT&> map_QueNum;//存储各个队列当前取号最大值
+	BOOL GetQueSerialIDByManQueNum(CString& queserial_id,const CString& manQueNum);
+	BOOL ModifyQueNum(const CString& queserial_id,UINT* pQueNum);//修改排队号码最大值
+
+	BOOL GetManQueNumByQueSerialID(const CString& queserial_id,CString& manQueNum);
+	BOOL GetQueueInfoBySerialID(const CString& queserial_id,CQueueInfo& queInfo);
+private:
+	void DoPrint(const SLZData& data,UINT inLineNum);
+	void ReturnMainFrame(const SLZData& data);
+	void TakeNumSetData(SLZData& data,int nQueNum);
+public:
+	CList<SLZData,SLZData&> m_list_Data;
+	BOOL InsertListData(SLZData data);
+	BOOL WriteListQueIntoFile();
 };

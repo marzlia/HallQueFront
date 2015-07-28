@@ -78,6 +78,9 @@ public:
 	void SetQueManNum(const CString& queManNum){m_queManNum = queManNum;}
 	CString GetQueManNum()const {return m_queManNum;}//获取队列编号
 
+//	void SetCurrWaitNum(UINT nNum){m_currWaitNum = nNum;}//该队列的排队人数，主要用于联机取号
+//	UINT GetCurrWaitNum(){return m_currWaitNum;}
+
 	virtual void Serialize( CArchive& ar );//支持序列化
 	DECLARE_SERIAL(CQueueInfo)
 private:
@@ -96,5 +99,6 @@ private:
 	//unsigned int m_stbId; //机顶盒ID
 	CString m_queserial_id; //队列唯一编号
 	CString m_queManNum;//队列编号，注意用于对接窗口信息管理系统
+//	UINT m_currWaitNum;//当前队列排队人数
 };
 

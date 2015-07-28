@@ -28,13 +28,23 @@ public:
 	{
 		m_cMsgComm = strCom;
 	}
+
+	//Ð¾Æ¬¿¨
+//	CString GetNewCardComm();
+//	void SetNewCardComm(const CString& strNewCardComm);
+	//´ò¿ªÐ¾Æ¬¿¨com
+//	int OpenNewCardComm(CString ICCardComm);
+	//¹Ø±ÕÐ¾Æ¬¿¨com
+//	int CloseNewCardComm();
 private:
 	//³õÊ¼»¯´®¿Ú
 	void InitCom();
+	void ReadComInfo();
 	CString m_cCardComm;
 	CString m_cWndComm;
 	CString m_cMsgComm;
 	CString m_strPath;
+//	CString m_cNewCardComm;
 public:
 	OVERLAPPED m_write_os,m_read_os;
 public:
