@@ -686,6 +686,10 @@ DWORD WINAPI SLZCardReader::ReadICCard(LPVOID pParam)
 				}
 			}
 		}
+		else
+		{
+			pThis->m_strCurrentCardNum.Empty();
+		}
 		Sleep(200);
 	}
 	return 0;

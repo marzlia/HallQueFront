@@ -322,21 +322,21 @@ BOOL CDealInterMsg::AnaSendCallMsg(const string& retSendMsg,CStringArray& queMan
 		if(!posTemp)
 		{
 			posTemp = aQueManNumArray.find(",",posTemp);
-			aQueManNum = aQueManNumArray.substr(posLast,posTemp);
+			aQueManNum = aQueManNumArray.substr(posLast,posTemp - posLast);
 		}
 		else
 		{
 			posTemp = aQueManNumArray.find(",",posTemp + 1);
-			aQueManNum = aQueManNumArray.substr(posLast + 1,posTemp);
+			aQueManNum = aQueManNumArray.substr(posLast + 1,posTemp - posLast - 1);
 		}
 		CString wQueManNum(aQueManNum.c_str());
 		queManNumArray.Add(wQueManNum);
 	}
-// 	string aQueManNum = aQueManNumArray.substr(posTemp,aQueManNumArray.npos);
-// 	CString wQueManNum(aQueManNum.c_str());
-// 	queManNumArray.Add(wQueManNum);
+	// 	string aQueManNum = aQueManNumArray.substr(posTemp,aQueManNumArray.npos);
+	// 	CString wQueManNum(aQueManNum.c_str());
+	// 	queManNumArray.Add(wQueManNum);
 
-	
+
 	pos1 = retSendMsg.find("<organId>");
 	pos2 = retSendMsg.find("</organId>");
 	if(pos1 == retSendMsg.npos || pos2 == retSendMsg.npos)

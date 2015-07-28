@@ -272,9 +272,6 @@ BOOL SLZController::InitInterNumServer()
 {
 	if(theApp.m_logicVariables.IsOpenInterNum)
 	{
-
-	//	if(throughID[i]>0)
-		//	pWndScreen->InitThroughScreen(throughID[i]);
 		if(theApp.m_logicVariables.strInterIP[0] == '\0')
 		{
 			if(!m_pInterNumServer)

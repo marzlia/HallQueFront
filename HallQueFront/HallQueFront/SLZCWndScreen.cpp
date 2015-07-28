@@ -631,7 +631,6 @@ BOOL SLZCWndScreen::SendDataToThroughScreen(const CString& str,int address,int c
 {
 
 	CString msg = str;
-
 	///自己公司协议
 // 	int height = 0;
 // 	int width = FindChannelWidth(address,channel,height);
@@ -645,7 +644,6 @@ BOOL SLZCWndScreen::SendDataToThroughScreen(const CString& str,int address,int c
 //  	{
 //  		msg = FlushCstringToFitWndScreen(msg,width,height);
 //  	}
-
 	char buf[512]={0};
 	int length = DoScreenMsg(msg,address+channel,buf);
 	WriteComMsg *pMsg = new WriteComMsg;
@@ -726,11 +724,6 @@ DWORD WINAPI SLZCWndScreen::DoThrWndMsgThread(LPVOID pParam)
 			msg = *itera;
 			pThis->m_list_sendThrMsg.pop_front();
 			pThis->m_ThrWndMutex.Unlock();
-//			WaitForSingleObject(pThis->m_hDoWndScreenMsgThread,3);
-
-
-
-
 			pThis->SendDataToThroughScreen(msg.msg,msg.address,msg.channel,msg.localIp);
 		}
 	}

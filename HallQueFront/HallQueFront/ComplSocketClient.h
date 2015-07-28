@@ -28,4 +28,5 @@ private:
 	void DealCache(const CString& msg);
 	void ReSendMsg();
 	BOOL AppendListMsg();
+	BOOL IsTheSameMsg(const CString& msg);
 };
