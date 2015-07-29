@@ -22,6 +22,7 @@ m_hReadCard(NULL)
 	////////卡等级信息文件路径
 	m_cardLev_path = doFile.GetExeFullFilePath();
 	m_cardLev_path += _T("\\CardConfigInfo\\CardLevInfo.dat");
+	////////////////////
 }
 
 SLZCardReader::~SLZCardReader(void)

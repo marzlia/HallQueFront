@@ -57,4 +57,5 @@ public:
 	BOOL ReFlushCardLevelInfo();//接口,刷新卡等级返回队列信息
 private:
 	string m_strCardNum;
+	///////////////////////////////
 };
