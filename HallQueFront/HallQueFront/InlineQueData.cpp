@@ -486,8 +486,8 @@ BOOL CInlineQueData::GetWindowCanDoQue(UINT nWindowID,CStringArray& queerial_id_
 
 BOOL CInlineQueData::GetFirstTakeNumData(SLZData& data,const CStringArray& arrStrQueId)
 {
-	BOOL flag = FALSE;
 	BOOL canDo = FALSE;
+	
 	POSITION pos = m_lstInlineQue.GetHeadPosition();
 	SLZData tempdata,lastdata;
 	while(pos)
@@ -503,20 +503,16 @@ BOOL CInlineQueData::GetFirstTakeNumData(SLZData& data,const CStringArray& arrSt
 		}
 		if(canDo)
 		{
-			if(!flag)
-			{
-				lastdata = data;
-				data = tempdata;
-				flag = TRUE;
-			}
-			else
-			{
-				if(!lastdata.GetBussinessType().IsEmpty())
-					data = data.GetTakingNumTime() < lastdata.GetTakingNumTime() ? data : lastdata;
-			}
+	
+			lastdata = data;
+			data = tempdata;
+			
+		
+			if(!lastdata.GetBussinessType().IsEmpty())
+				data = data.GetTakingNumTime() < lastdata.GetTakingNumTime() ? data : lastdata;
 		}
 	}
-	return flag;
+	return canDo;
 }
 
 BOOL CInlineQueData::RemoveFirstTakeNumData(const SLZData& data)
