@@ -175,6 +175,7 @@ BOOL SLZController::Start()
 	InitLoginMap();//初始化登录表
 //	InitThroughScreen();//初始化通屏
 	///////////////是否读取今天上次未处理完的数据到队列
+	/*
 	if(IsHaveLastData())
 	{
 		if(IDYES == AfxMessageBox(_T("是否读取上次排队信息?"),MB_YESNO|MB_ICONINFORMATION))
@@ -192,29 +193,29 @@ BOOL SLZController::Start()
 			}
 		}
 	}
-	else /*if ()*/
+	*/
+	ReadListQueFromFile();
+	int datacount = m_list_Data.GetCount();
+	if (datacount!=0)
 	{
-		ReadListQueFromFile();
-		int datacount = m_list_Data.GetCount();
-		if (datacount!=0)
+		if(IDYES == AfxMessageBox(_T("是否读取上次排队信息?"),MB_YESNO|MB_ICONINFORMATION))
 		{
-			if(IDYES == AfxMessageBox(_T("是否读取上次排队信息?"),MB_YESNO|MB_ICONINFORMATION))
+			for(int i = 0;i<datacount;i++)
 			{
-				for(int i = 0;i<datacount;i++)
+				SLZData data;
+				POSITION pos = m_list_Data.FindIndex(i);
+				if (pos!=NULL)
 				{
-					SLZData data;
-					POSITION pos = m_list_Data.FindIndex(i);
-					if (pos!=NULL)
+					data = m_list_Data.GetAt(pos);
+					if (JudgeTodayOrNot(data))
 					{
-						data = m_list_Data.GetAt(pos);
-						if (JudgeTodayOrNot(data))
-						{
-							CString queid = data.GetBussinessType();
-							map_QueNum[queid] = data.GetIntQueNum();
-						}
+						CString queid = data.GetBussinessType();
+						map_QueNum[queid] = data.GetIntQueNum();
 					}
 				}
 			}
+			///读上次没处理完的数据
+			ReadInlineDataFromFile();
 		}
 	}
 	///////////播放声音类对象
