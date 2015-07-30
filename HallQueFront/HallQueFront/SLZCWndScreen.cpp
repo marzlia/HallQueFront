@@ -6,14 +6,16 @@
 #include "ComputeFuncationTime.h"
 #include "DoComInOut.h"
 //#include "ComplSocketClient.h"
-//#include "UDPBrodcast.h"
 #include "MySocketUDP.h"
+#include "HallQueFront.h"
+#include "DealInterMsg.h"
 
 //SLZCWndScreen* SLZCWndScreen::m_pInstance=NULL;//new SLZCWndScreen;
 extern void MyWriteConsole(CString str);
 
 SLZCWndScreen::SLZCWndScreen(void) : 
 m_hDoWndScreenMsgThread(NULL)
+, m_ThrWndMutex(NULL)
 {
 	StartHardScreen();
 	////////////////////////窗口屏
@@ -462,6 +464,74 @@ CString SLZCWndScreen::FlushCstringToFitWndScreen(const CString& str,const int l
 }
 
 
+
+/*
+void SLZCWndScreen::AddThroughInitStr(const char* buf,const DWORD count)
+{
+	m_recvThroughInitStr.append(buf,count);
+}
+*/
+
+/*
+BOOL SLZCWndScreen::DoThroughInitMsg()
+{
+	CDoComInOut* pComInOut = CDoComInOut::GetInstance();
+	pComInOut->SetThroughInitDone(TRUE);
+	if(m_recvThroughInitStr.empty())return FALSE;
+	string::size_type position,oldPosition;
+	position = m_recvThroughInitStr.find("Get_Data");
+	while(position!=m_recvThroughInitStr.npos)
+	{
+		oldPosition = position;
+		position = m_recvThroughInitStr.find("Get_Data",position+1);
+		string temp = m_recvThroughInitStr.substr(oldPosition,position-oldPosition-1);
+		m_list_recvString.push_back(temp);
+	}
+	string recvMsg;
+	if(!m_list_recvString.empty())
+	{
+		std::list<string>::const_iterator itera = m_list_recvString.begin();
+		for(itera;itera!=m_list_recvString.end();itera++)
+		{
+			recvMsg= *itera;
+			if(!recvMsg.empty())
+			{
+				string::size_type first_pos = GetIpPos(recvMsg);
+				while(first_pos!=recvMsg.npos)//找到了
+				{
+					/////////////////////////////通屏基本信息如:屏地址
+					string::size_type last_Pos = first_pos;
+					ThrScreenBasicMsg ThrScreenMsg;
+					memset(&ThrScreenMsg,0,sizeof(ThrScreenMsg));
+					string basicInfo = recvMsg.substr(first_pos,10);
+					ThrScreenMsg.address = basicInfo[7];
+					
+					recvMsg = recvMsg.substr(first_pos+10);
+					first_pos = GetIpPos(recvMsg);
+					string temp = recvMsg.substr(0,first_pos);
+					
+					for(int i=0;i<(int)temp.size();i+=34)
+					{
+						string channel = temp.substr(i,34);
+						ThrScreenMsg.channel = channel[0];//通道号
+						ThrScreenMsg.fone = channel[8];//字体
+						memcpy(&ThrScreenMsg.width,&channel[4],2);
+						memcpy(&ThrScreenMsg.height,&channel[6],2);
+						AddThrBasicMsg(ThrScreenMsg);
+					}
+					
+					
+				}
+			}
+		}
+		m_list_recvString.clear();//删除
+	}
+	m_recvThroughInitStr.clear();
+	return TRUE;
+}
+*/
+
+
 // void SLZCWndScreen::AddThroughInitStr(const char* buf,const DWORD count)
 // {
 // 	m_recvThroughInitStr.append(buf,count);
@@ -541,6 +611,7 @@ CString SLZCWndScreen::FlushCstringToFitWndScreen(const CString& str,const int l
 // 	m_recvThroughInitStr.clear();
 // 	return TRUE;
 // }
+
 
 /*
 void SLZCWndScreen::AddThroughInitStr(const char* buf,const DWORD count)
@@ -629,11 +700,10 @@ void SLZCWndScreen::AddThrBasicMsg(ThrScreenBasicMsg msg)
 
 BOOL SLZCWndScreen::SendDataToThroughScreen(const CString& str,int address,int channel,const CString& localIp)
 {
-
-	CString msg = str;
 	///自己公司协议
 // 	int height = 0;
 // 	int width = FindChannelWidth(address,channel,height);
+	CString msg = str;
 // #ifdef _DEBUG
 //  	CString test;
 // 	test.Format(_T("through wnd:address:%d,channel:%d,width:%d"),address,channel,width);
@@ -657,8 +727,9 @@ BOOL SLZCWndScreen::SendDataToThroughScreen(const CString& str,int address,int c
 	if(!localIp.IsEmpty())//UDP发送
 	{
 		MySocketUDP Client;
-		Client.StartSocket();
+		Client.StartSocket(1024);
 		flag = Client.SendTo(buf,length,localIp,1024);
+		
 #ifdef _DEBUG
 		if(flag)
 		{
@@ -724,6 +795,15 @@ DWORD WINAPI SLZCWndScreen::DoThrWndMsgThread(LPVOID pParam)
 			msg = *itera;
 			pThis->m_list_sendThrMsg.pop_front();
 			pThis->m_ThrWndMutex.Unlock();
+//			WaitForSingleObject(pThis->m_hDoWndScreenMsgThread,3);
+#ifdef _DEBUG
+			CString strAddress;
+			strAddress.Format(_T("%d"),msg.address);
+			CString strChannel;
+			strChannel.Format(_T("%d"),msg.channel);
+
+			MyWriteConsole(_T("通屏信息:") + msg.msg + _T("地址:") + strAddress + _T("通道:") + strChannel + _T("ip:") + msg.localIp );
+#endif
 			pThis->SendDataToThroughScreen(msg.msg,msg.address,msg.channel,msg.localIp);
 		}
 	}
