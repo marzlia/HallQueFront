@@ -1,5 +1,6 @@
 #include "StdAfx.h"
 #include "SLZData.h"
+#include "HallQueFront.h"
 
 
 IMPLEMENT_SERIAL(SLZData,CObject,1);
@@ -44,8 +45,13 @@ SLZData::SLZData(const SLZData& obj)
 	m_iQueNum = obj.m_iQueNum;
 	m_strPhoneNum = obj.m_strPhoneNum;
 	m_strMsg = obj.m_strMsg;
+
 	m_leftNum = obj.m_leftNum;
 	m_custLev = obj.m_custLev;
+
+//	m_nCurrWaitNum = obj.m_nCurrWaitNum;
+//	m_isClientData = obj.m_isClientData;
+
 }
 
 SLZData& SLZData::operator=(const SLZData& obj)
@@ -74,8 +80,13 @@ SLZData& SLZData::operator=(const SLZData& obj)
 	m_iQueNum = obj.m_iQueNum;
 	m_strPhoneNum = obj.m_strPhoneNum;
 	m_strMsg = obj.m_strMsg;
+
 	m_leftNum = obj.m_leftNum;
 	m_custLev = obj.m_custLev;
+
+//	m_nCurrWaitNum = obj.m_nCurrWaitNum;
+//	m_isClientData = obj.m_isClientData;
+
 	return *this;
 }
 
@@ -105,7 +116,7 @@ void SLZData::Serialize(CArchive &ar)
 			<<m_strBussName<<m_strQueueNum<<(DWORD)m_CardType<<m_strCardNum<<m_CustName
 			<<m_iCusLevel<<m_timeTakingNum<<m_iWindowId<<m_strStaffId<<m_timeCall<<m_timeFinish
 			<<(DWORD)m_EvaLevel<<m_bIsOpenEva<<m_bIsFinshEva<<m_iWindowShowId<<m_queSerialId<<m_iQueNum
-			<<m_strPhoneNum<<m_strMsg;
+			<<m_strPhoneNum<<m_strMsg;//<<m_isClientData;
 	}
 	else
 	{
@@ -114,8 +125,13 @@ void SLZData::Serialize(CArchive &ar)
 			>>m_strBussName>>m_strQueueNum>>cardType>>m_strCardNum>>m_CustName
 			>>m_iCusLevel>>m_timeTakingNum>>m_iWindowId>>m_strStaffId>>m_timeCall>>m_timeFinish
 			>>evaLevel>>m_bIsOpenEva>>m_bIsFinshEva>>m_iWindowShowId>>m_queSerialId>>m_iQueNum>>m_strPhoneNum
-			>>m_strMsg;
+			>>m_strMsg;//>>m_isClientData;
 		m_EvaLevel = (EvaLevel)evaLevel;
 		m_CardType = (CardType)cardType;
 	}
+}
+
+BOOL SLZData::GetIsLocalData()const
+{
+	return theApp.m_logicVariables.strOrganID == m_strOrganId;
 }

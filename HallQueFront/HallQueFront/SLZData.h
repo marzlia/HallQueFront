@@ -223,9 +223,10 @@ public:
 	}
 	////设置开启评价
 	void SetIsOpenEva(const BOOL isOpen){m_bIsOpenEva = isOpen;}
-	BOOL GetIsOpenEva(){return m_bIsOpenEva;}
+	BOOL GetIsOpenEva()const{return m_bIsOpenEva;}
 	////设置完成评价
 	void SetIsFinshEva(const BOOL isFinsh){m_bIsFinshEva = isFinsh;}
+
 	BOOL GetIsFinshEva(){return m_bIsFinshEva;}
 	
 	
@@ -235,6 +236,14 @@ public:
 	////////福州返回信息
 	void SetFuZhouCustLev(CustLev custLev){m_custLev = custLev;}
 	CustLev GetFuZhouCustLev()const {return m_custLev;}
+
+	BOOL GetIsFinshEva()const {return m_bIsFinshEva;}
+	////获取当前数据对应的队列的人数
+// 	void SetCurrWaitNum(int nWaitNum){m_nCurrWaitNum = nWaitNum;}
+// 	int GetCurrWaitNum(void)const{return m_nCurrWaitNum;}
+
+	BOOL GetIsLocalData() const;
+
 
 	virtual void Serialize( CArchive& ar );//支持序列化
 	DECLARE_SERIAL(SLZData)
@@ -259,7 +268,7 @@ private:
 	EvaLevel m_EvaLevel;	//评价结果
 	BOOL m_bIsOpenEva; //单条信息是否开启了评价
 	BOOL m_bIsFinshEva;//单条信息是否完成了评价
-	CString m_queSerialId;//队列编号，用于与窗口信息管理系统对接
+	CString m_queSerialId;//队列编号，用于联机取号
 	UINT m_iQueNum;    //INT型排队号
 	CString m_strPhoneNum;   //要发送短信的电话号
 	CString m_strMsg; //发送短信的内容
@@ -267,6 +276,9 @@ private:
 	int GetSrand(const int &max);
 	CString GetOnlyId();//取号唯一ID
 
+
 	int m_leftNum;//当呼叫此条信息后，设置呼叫窗口可处理的所有队列的排队人数
 	CustLev m_custLev;//福州返回的客户等级信息
+
+
 };

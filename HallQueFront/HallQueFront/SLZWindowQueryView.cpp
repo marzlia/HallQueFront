@@ -110,21 +110,21 @@ BOOL SLZWindowQueryView::LoadWindows()
 					{
 						m_mapEvaIdWindow[iEvaId] = *pWindow;
 					}
-					UINT iLedPhyId = pWindow->GetLEDPhyId();
-					if (iLedPhyId > 0)
-					{
-						m_mapLedPhyIdWindow[iLedPhyId] = *pWindow;
-					}
-					UINT iWndScrId = pWindow->GetWndScreenId();
-					if (iWndScrId > 0)
-					{
-						m_mapWndScrIdWindow[iWndScrId] = *pWindow;
-					}
-					UINT iWndComId = pWindow->GetComScreenId();
-					if (iWndComId>0)
-					{
-						m_mapWndComIdWindow[iWndComId] = *pWindow;
-					}
+// 					UINT iLedPhyId = pWindow->GetLEDPhyId();
+// 					if (iLedPhyId > 0)
+// 					{
+// 						m_mapLedPhyIdWindow[iLedPhyId] = *pWindow;
+// 					}
+// 					UINT iWndScrId = pWindow->GetWndScreenId();
+// 					if (iWndScrId > 0)
+// 					{
+// 						m_mapWndScrIdWindow[iWndScrId] = *pWindow;
+// 					}
+// 					UINT iWndComId = pWindow->GetComScreenId();
+// 					if (iWndComId>0)
+// 					{
+// 						m_mapWndComIdWindow[iWndComId] = *pWindow;
+// 					}
 					delete pWindow;
 				}
 			}while(!ar.IsBufferEmpty());
@@ -162,6 +162,23 @@ BOOL SLZWindowQueryView::QueryWindowById(UINT iWindowId,SLZWindow& Window)
 	{
 		Window = itera->second;
 		flag = TRUE;
+	}
+	return flag;
+}
+
+BOOL SLZWindowQueryView::QueryWindowBySerialID(UINT iSerialID,SLZWindow& window)
+{
+	BOOL flag = FALSE;
+	std::map<UINT,SLZWindow>::const_iterator itera = m_mapIdWindow.begin();
+	for(itera;itera!=m_mapIdWindow.end();++itera)
+	{
+		SLZWindow temp = itera->second;
+		if(temp.GetShowWndId() == iSerialID)
+		{
+			flag = TRUE;
+			window = temp;
+			break;
+		}
 	}
 	return flag;
 }
@@ -247,22 +264,22 @@ SLZWindow* SLZWindowQueryView::QueryWindowByLedPhyId(UINT iLedPhyId)
 	return pWindow;
 }
 */
-BOOL SLZWindowQueryView::QueryWindowByLedPhyId(UINT iLedPhyId,SLZWindow& Window)
-{
-	//SLZWindow Window;
-	// 	if (!m_mapLedPhyIdWindow.Lookup(iLedPhyId,pWindow))
-	// 	{
-	// 		pWindow = NULL;
-	// 	}
-	BOOL flag = FALSE;
-	std::map<UINT,SLZWindow>::const_iterator itera = m_mapLedPhyIdWindow.find(iLedPhyId);
-	if(itera!=m_mapLedPhyIdWindow.end())
-	{
-		Window = itera->second;
-		flag = TRUE;
-	}
-	return flag;
-}
+// BOOL SLZWindowQueryView::QueryWindowByLedPhyId(UINT iLedPhyId,SLZWindow& Window)
+// {
+// 	//SLZWindow Window;
+// 	// 	if (!m_mapLedPhyIdWindow.Lookup(iLedPhyId,pWindow))
+// 	// 	{
+// 	// 		pWindow = NULL;
+// 	// 	}
+// 	BOOL flag = FALSE;
+// 	std::map<UINT,SLZWindow>::const_iterator itera = m_mapLedPhyIdWindow.find(iLedPhyId);
+// 	if(itera!=m_mapLedPhyIdWindow.end())
+// 	{
+// 		Window = itera->second;
+// 		flag = TRUE;
+// 	}
+// 	return flag;
+// }
 /*
 SLZWindow* SLZWindowQueryView::QueryWindowByWndScrId(UINT iWndScrId)
 {
@@ -280,33 +297,33 @@ SLZWindow* SLZWindowQueryView::QueryWindowByWndScrId(UINT iWndScrId)
 }
 */
 
-BOOL SLZWindowQueryView::QueryWindowByWndScrId(UINT iWndScrId,SLZWindow& Window)
-{
-	// 	if (!m_mapWndScrIdWindow.Lookup(iWndScrId,pWindow))
-	// 	{
-	// 		pWindow = NULL;
-	// 	}
-	BOOL flag = FALSE;
-	std::map<UINT,SLZWindow>::const_iterator itera = m_mapWndScrIdWindow.find(iWndScrId);
-	if(itera!=m_mapWndScrIdWindow.end())
-	{
-		Window = itera->second;
-		flag = TRUE;
-	}
-	return flag;
-}
+// BOOL SLZWindowQueryView::QueryWindowByWndScrId(UINT iWndScrId,SLZWindow& Window)
+// {
+// 	// 	if (!m_mapWndScrIdWindow.Lookup(iWndScrId,pWindow))
+// 	// 	{
+// 	// 		pWindow = NULL;
+// 	// 	}
+// 	BOOL flag = FALSE;
+// 	std::map<UINT,SLZWindow>::const_iterator itera = m_mapWndScrIdWindow.find(iWndScrId);
+// 	if(itera!=m_mapWndScrIdWindow.end())
+// 	{
+// 		Window = itera->second;
+// 		flag = TRUE;
+// 	}
+// 	return flag;
+// }
 
-BOOL SLZWindowQueryView::QueryWindowByWndComId(UINT iWndComId,SLZWindow& Window)
-{
-	BOOL flag = FALSE;
-	std::map<UINT,SLZWindow>::const_iterator itera = m_mapWndComIdWindow.find(iWndComId);
-	if(itera!=m_mapWndComIdWindow.end())
-	{
-		Window = itera->second;
-		flag = TRUE;
-	}
-	return flag;
-}
+// BOOL SLZWindowQueryView::QueryWindowByWndComId(UINT iWndComId,SLZWindow& Window)
+// {
+// 	BOOL flag = FALSE;
+// 	std::map<UINT,SLZWindow>::const_iterator itera = m_mapWndComIdWindow.find(iWndComId);
+// 	if(itera!=m_mapWndComIdWindow.end())
+// 	{
+// 		Window = itera->second;
+// 		flag = TRUE;
+// 	}
+// 	return flag;
+// }
 
 void SLZWindowQueryView::Clear()
 {
@@ -319,8 +336,8 @@ void SLZWindowQueryView::Clear()
 	m_mapIdWindow.clear();
 	m_mapCallerIdWindow.clear();
 	m_mapEvaIdWindow.clear();
-	m_mapLedPhyIdWindow.clear();
-	m_mapWndScrIdWindow.clear();
+// 	m_mapLedPhyIdWindow.clear();
+// 	m_mapWndScrIdWindow.clear();
 }
 /*
 BOOL SLZWindowQueryView::InitLoginMap()
@@ -360,38 +377,38 @@ BOOL SLZWindowQueryView::InitLoginMap()
 	return TRUE;
 }
 */
-int SLZWindowQueryView::GetAllThroughID(int throughID[])
-{
-	int size = 0;
-	int* tempID = new int[m_mapIdWindow.size()+1];
-	memset(tempID,0,4*(m_mapIdWindow.size()+1));
-	std::map<UINT,SLZWindow>::const_iterator itera = m_mapIdWindow.begin();
-	for(itera;itera!=m_mapIdWindow.end();itera++)
-	{
-		SLZWindow window = itera->second;
-		int phID = window.GetLEDPhyId();
-		if(phID>0)
-		{
-			BOOL flag = FALSE;
-			for(int i=0;i<(int)m_mapIdWindow.size()+1;i++)
-			{
-				if(tempID[i]==phID)
-				{
-					flag = TRUE;
-					break;
-				}
-			}
-			if(!flag)
-			{
-				tempID[size] = phID;
-				size++;
-			}
-		}
-	}
-	for(int j=0;j<size;j++)
-	{
-		throughID[j] = tempID[j];
-	}
-	delete [] tempID;
-	return size;
-}
+// int SLZWindowQueryView::GetAllThroughID(int throughID[])
+// {
+// 	int size = 0;
+// 	int* tempID = new int[m_mapIdWindow.size()+1];
+// 	memset(tempID,0,4*(m_mapIdWindow.size()+1));
+// 	std::map<UINT,SLZWindow>::const_iterator itera = m_mapIdWindow.begin();
+// 	for(itera;itera!=m_mapIdWindow.end();itera++)
+// 	{
+// 		SLZWindow window = itera->second;
+// 		int phID = window.GetLEDPhyId();
+// 		if(phID>0)
+// 		{
+// 			BOOL flag = FALSE;
+// 			for(int i=0;i<(int)m_mapIdWindow.size()+1;i++)
+// 			{
+// 				if(tempID[i]==phID)
+// 				{
+// 					flag = TRUE;
+// 					break;
+// 				}
+// 			}
+// 			if(!flag)
+// 			{
+// 				tempID[size] = phID;
+// 				size++;
+// 			}
+// 		}
+// 	}
+// 	for(int j=0;j<size;j++)
+// 	{
+// 		throughID[j] = tempID[j];
+// 	}
+// 	delete [] tempID;
+// 	return size;
+// }

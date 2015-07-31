@@ -15,6 +15,7 @@ public:
 	BOOL SendData(const CString& msg,std::string& recvMsg,int& actRecvSize);
 	BOOL SendData(USHORT port,CString IP,const CString& msg,std::string& recvMsg,int& actRecvSize);
 	BOOL SendData(USHORT port,CString IP,const std::string& msg,int size,std::string& recvMsg,int& actRecvSize);
+	BOOL SendData(USHORT port,CString IP,char buf[],int size);
 private:
 	CConnectConfig m_connect;
 	CString m_romoteIP;
@@ -27,4 +28,5 @@ private:
 	void DealCache(const CString& msg);
 	void ReSendMsg();
 	BOOL AppendListMsg();
+	BOOL IsTheSameMsg(const CString& msg);
 };

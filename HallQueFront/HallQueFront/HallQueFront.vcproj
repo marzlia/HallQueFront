@@ -46,6 +46,7 @@
 				Name="VCCLCompilerTool"
 				Optimization="0"
 				PreprocessorDefinitions="WIN32;_WINDOWS;_DEBUG"
+				StringPooling="false"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="3"
@@ -257,6 +258,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\DealInterMsg.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\DiscardQueData.cpp"
 				>
 			</File>
@@ -306,6 +311,10 @@
 			</File>
 			<File
 				RelativePath=".\InlineQueData.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\InterNumSocketServer.cpp"
 				>
 			</File>
 			<File
@@ -561,6 +570,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\ThroughWndScreenInfo.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\TrackContrl.cpp"
 				>
 			</File>
@@ -573,11 +586,23 @@
 				>
 			</File>
 			<File
+				RelativePath=".\UDPBrodcast.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\UDPServer.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\WaitQueData.cpp"
 				>
 			</File>
 			<File
 				RelativePath=".\WaringDlg.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\WndContentDlg.cpp"
 				>
 			</File>
 			<File
@@ -679,6 +704,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\DealInterMsg.h"
+				>
+			</File>
+			<File
 				RelativePath=".\DiscardQueData.h"
 				>
 			</File>
@@ -739,6 +768,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\InterNumSocketServer.h"
+				>
+			</File>
+			<File
 				RelativePath=".\jTTS_ML.h"
 				>
 			</File>
@@ -772,6 +805,10 @@
 			</File>
 			<File
 				RelativePath=".\MsgSetDlg.h"
+				>
+			</File>
+			<File
+				RelativePath=".\mtx_32.h"
 				>
 			</File>
 			<File
@@ -1019,6 +1056,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\ThroughWndScreenInfo.h"
+				>
+			</File>
+			<File
 				RelativePath=".\TrackContrl.h"
 				>
 			</File>
@@ -1035,11 +1076,23 @@
 				>
 			</File>
 			<File
+				RelativePath=".\UDPBrodcast.h"
+				>
+			</File>
+			<File
+				RelativePath=".\UDPServer.h"
+				>
+			</File>
+			<File
 				RelativePath=".\WaitQueData.h"
 				>
 			</File>
 			<File
 				RelativePath=".\WaringDlg.h"
+				>
+			</File>
+			<File
+				RelativePath=".\WndContentDlg.h"
 				>
 			</File>
 			<File

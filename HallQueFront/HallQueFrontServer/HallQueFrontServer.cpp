@@ -9,8 +9,8 @@
 #ifdef _DEBUG
 #define new DEBUG_NEW
 
-#pragma comment(lib,"C:/Program Files/Visual Leak Detector/lib/Win32/vld.lib")
-#include "C:\Program Files\Visual Leak Detector\include\vld.h"
+// #pragma comment(lib,"C:/Program Files/Visual Leak Detector/lib/Win32/vld.lib")
+// #include "C:\Program Files\Visual Leak Detector\include\vld.h"
 
 HANDLE g_hStdOutput;
 void MyWriteConsole(CString str)
