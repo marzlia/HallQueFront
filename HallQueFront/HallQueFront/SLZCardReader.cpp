@@ -337,8 +337,6 @@ DWORD WINAPI SLZCardReader::ReadCard(LPVOID pParam)
 				}
 //				theApp.m_pView->ShowPage(cardinfo.nAttchPageID);
 				SendMessage(theApp.m_pView->m_hWnd,WM_SHOWPAGE,(WPARAM)cardinfo.nAttchPageID,NULL);
-
-				pCard->DealCardInfo(&cardinfo);
 			}
 		}
 		Sleep(20);
@@ -745,14 +743,24 @@ void SLZCardReader::DealCardInfo(CARDINFO* pCardinfo)
 	}
 	else
 	{
-		//这里对接
-		/*int nLev = pCard->GetCustLev(cardinfo.strCardNumber);
-		if(nLev!=-1)
+		CustLev LevValue;
+		int nCustLev = GetCustLev(pCardinfo->strCardNumber,&LevValue);
+		CWriteLogError writeLogErr;
+		if (LevValue.isSucced)
 		{
-		CString queID = pCard->JudgeCardAttchQue(nLev);
-		cardinfo.strAttchQueID = queID;
-		cardinfo.iCustLevel = nLev;
-		}*/
+			writeLogErr.WriteErrLog(_T("LevValue成功"));
+		}
+		else writeLogErr.WriteErrLog(_T("LevValue失败"));
+		if(nCustLev != -1 && LevValue.isSucced){
+			//以客户等级去判断
+			pCardinfo->custLev = LevValue;
+			pCardinfo->strAttchQueID = JudgeCardAttchQue(LevValue.custLev);
+			pCardinfo->nAttchPageID = JudgeCardAttchPageID(LevValue.custLev);
+		}
+		else{//以本地判断
+			pCardinfo->strAttchQueID = JudgeCardAttchQue(pCardinfo->strCardNumber);
+			pCardinfo->nAttchPageID = JudgeCardAttchPageID(pCardinfo->strCardNumber);
+		}
 	}
 	//判断是否超出工作时间
 	if(!theApp.m_Controller.JudgeWorkTimeOut(pCardinfo->strAttchQueID)&&!pCardinfo->strAttchQueID.IsEmpty())
@@ -784,7 +792,25 @@ void SLZCardReader::DealIDCardInof(CARDINFO* pCardinfo)
 		//	m_CardInfoList.AddTail(cardinfo); //加入缓冲区
 		//	m_CardReaderMutex.Unlock();
 		//}
-
+		//这里对接,返回的是卡等级
+		CustLev LevValue;
+		int nCustLev = GetCustLev(pCardinfo->strCardNumber,&LevValue);
+		CWriteLogError writeLogErr;
+		if (LevValue.isSucced)
+		{
+			writeLogErr.WriteErrLog(_T("LevValue成功"));
+		}
+		else writeLogErr.WriteErrLog(_T("LevValue失败"));
+		if(nCustLev != -1 && LevValue.isSucced){
+			//以客户等级去判断
+			pCardinfo->custLev = LevValue;
+			pCardinfo->strAttchQueID = JudgeCardAttchQue(LevValue.custLev);
+			pCardinfo->nAttchPageID = JudgeCardAttchPageID(LevValue.custLev);
+		}
+		else{//以本地判断
+			pCardinfo->strAttchQueID = JudgeCardAttchQue(pCardinfo->strCardNumber);
+			pCardinfo->nAttchPageID = JudgeCardAttchPageID(pCardinfo->strCardNumber);
+		}
 	}
 	else//不对接
 	{
