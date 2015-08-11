@@ -177,25 +177,7 @@ BOOL SLZController::Start()
 	}
 	/////////////////////////数据逻辑重要初始化工作
 	InitLoginMap();//初始化登录表
-//	InitThroughScreen();//初始化通屏
-	///////////////是否读取今天上次未处理完的数据到队列
-// 	if(IsHaveLastData())
-// 	{
-// 		if(IDYES == AfxMessageBox(_T("是否读取上次排队信息?"),MB_YESNO|MB_ICONINFORMATION))
-// 		{
-// 			ReadInlineDataFromFile();
-// 			int QueCount = m_map_que.GetCount();
-// 			for (int i=0;i<QueCount;i++)
-// 			{
-// 				CQueueInfo queinfo;
-// 				if(m_map_que.Lookup(i,queinfo))
-// 				{
-// 					CString queid = queinfo.GetQueID();
-// 					map_QueNum[queid] = m_pInlineQueData->GetMaxQueNum(queid);
-// 				}
-// 			}
-// 		}
-// 	}
+
 	ReadListQueFromFile();
 	int datacount = m_list_Data.GetCount();
 	if (datacount!=0)
