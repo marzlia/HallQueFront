@@ -850,11 +850,9 @@ BOOL CCallThread::ShowCallerWaitNum(const CString& queID)
 
 BOOL CCallThread::ReadCardConnectInfo()
 {
-	CString path;
+	memset(&m_cardConnectInfo,0,sizeof(m_cardConnectInfo));
 	CDoFile doFile;
-	path = doFile.GetExeFullFilePath();
-	path += _T("\\CardConfigInfo\\CardConnectInfo.dat");
-//	memset(&m_cardConnectInfo,0,sizeof(m_cardConnectInfo));
+	CString path = doFile.GetExeFullFilePath() + _T("\\CardConfigInfo") + _T("\\CardConnectInfo.dat");
 	CFile file;
 	CFileException e;
 	if (file.Open(path,CFile::modeRead,&e))
