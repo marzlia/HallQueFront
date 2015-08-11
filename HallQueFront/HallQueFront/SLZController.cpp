@@ -174,27 +174,8 @@ BOOL SLZController::Start()
 	}
 	/////////////////////////数据逻辑重要初始化工作
 	InitLoginMap();//初始化登录表
-//	InitThroughScreen();//初始化通屏
 	///////////////是否读取今天上次未处理完的数据到队列
-	/*
-	if(IsHaveLastData())
-	{
-		if(IDYES == AfxMessageBox(_T("是否读取上次排队信息?"),MB_YESNO|MB_ICONINFORMATION))
-		{
-			ReadInlineDataFromFile();
-			int QueCount = m_map_que.GetCount();
-			for (int i=0;i<QueCount;i++)
-			{
-				CQueueInfo queinfo;
-				if(m_map_que.Lookup(i,queinfo))
-				{
-					CString queid = queinfo.GetQueID();
-					map_QueNum[queid] = m_pInlineQueData->GetMaxQueNum(queid);
-				}
-			}
-		}
-	}
-	*/
+
 	ReadListQueFromFile();
 	int datacount = m_list_Data.GetCount();
 	if (datacount!=0)
@@ -442,71 +423,6 @@ UINT SLZController::TakingViewThreadProc(LPVOID pParam)
 				{
 					if(pControl->VerifyCountLimit(queserial_id))//上下午、全天人数限制
 					{
-						SLZData data;
-						if (pControl->DataNumOut(queserial_id))
-						{
-							AfxMessageBox(_T("取号失败，已取到最大号码！"));
-						}
-						else
-						{
-							//设置排队号码
-							unsigned int CurNum=0;
-							UINT iQueNum;
-							pControl->map_QueNum.Lookup(queserial_id,CurNum);
-							UINT beginnum = pControl->GetQueBeginNum(queserial_id);
-							if (beginnum!=0&&CurNum==0)
-							{
-								iQueNum = CurNum+beginnum;
-							}
-							else
-							{
-								iQueNum = CurNum+1;
-							}
-							CString QueCount;
-							CString StrQueNum;
-							StrQueNum.Format(_T("%03d"),iQueNum);
-							StrQueNum=pControl->m_queinfo.GetFrontID()+StrQueNum;
-							data.SetQueueNumber(StrQueNum);
-							pControl->map_QueNum.SetAt(queserial_id,iQueNum);
-							data.SetIntQueNum(iQueNum);
-							CTime GetTime;
-							GetTime=GetTime.GetCurrentTime();
-							CString QueName;
-							QueName=pControl->m_queinfo.GetBussName();
-							data.SetBussName(QueName);
-							data.SetTakingNumTime(GetTime);
-							data.SetBussinessType(queserial_id);
-							/////设置机构代码和名称
-							data.SetOrganId(theApp.m_logicVariables.strOrganID);
-							data.SetOrganName(theApp.m_logicVariables.strOrganNmae);
-							data.SetQueSerialID(pControl->m_queinfo.GetQueManNum());//队列编号
-							if (!pControl->InsertListData(data))
-							{
-								pControl->m_list_Data.AddTail(data);
-							}
-							pControl->WriteListQueIntoFile();
-							////////////////////
-							pControl->m_pInlineQueData->Add(data);
-							//////////////////保存信息到本地文件
-							pControl->WriteInlineDataToFile();
-							CurNum=pControl->m_pInlineQueData->GetBussCount(queserial_id);
-							///处理打印
-							EnumPrintStaus status = pControl->m_print.CheckPrinterStatus();
-							pControl->DoPrintStatus(status,data,CurNum);
-							///界面显示等待人数
-							theApp.m_pView->ShowWaitNum(data.GetBussinessType(),CurNum);
-							///呼叫器更新等待人数
-							pControl->m_pCallThread->ShowCallerWaitNum(data.GetBussinessType());
-							//流程结束后是否返回主界面
-							if(theApp.m_pView->m_pTrackCtrl->GetSerialID()!=0 && theApp.m_logicVariables.IsAutoChangePage)
-							{
-//								Sleep(1000);
-//								theApp.m_pView->ShowPage(0);//返回主界面
-								UINT nPageID = 0;
-								SendMessage(theApp.m_pView->m_hWnd,WM_SHOWPAGE,(WPARAM)nPageID,NULL);
-							}
-							break;
-						}
 						pControl->TakeViewNum(queserial_id);
 					}
 					else 

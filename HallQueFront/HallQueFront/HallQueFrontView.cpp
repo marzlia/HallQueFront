@@ -779,7 +779,7 @@ void CHallQueFrontView::OnInitialUpdate()
 	pShowWaitDlg->UpdateWindow();
 	SetCursor(LoadCursor(NULL,IDC_WAIT));
 	////////////////启动数据处理
-	theApp.m_Controller.Start();
+ 	theApp.m_Controller.Start();
 	//等待DoComInout线程1秒,等待通屏读取通道的信息
 	CDoComInOut* pDoComInout = CDoComInOut::GetInstance();
 	WaitForSingleObject(pDoComInout->m_hReadCallerThread,2000);
