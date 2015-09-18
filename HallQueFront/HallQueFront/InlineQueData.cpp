@@ -25,7 +25,7 @@ CInlineQueData::~CInlineQueData()
 BOOL CInlineQueData::GetInlineQueData(const UINT iWinId, 
 									  SLZData& rdata)
 {
-	if(m_lstInlineQue.GetCount() < 1)
+	if(GetCount() < 1)
 	{
 		return FALSE;
 	}
@@ -147,7 +147,10 @@ void CInlineQueData::AddHeadData(const SLZData& data)
 
 UINT CInlineQueData::GetCount()
 {
-	return m_lstInlineQue.GetCount();
+	m_mtInlineQue.Lock();
+	int nCount = m_lstInlineQue.GetCount();
+	m_mtInlineQue.Unlock();
+	return nCount;
 }
 
 UINT CInlineQueData::GetBussCount(const CString& strBussId)
@@ -162,12 +165,6 @@ UINT CInlineQueData::GetBussCount(const CString& strBussId)
 		CString queID = data.GetBussinessType();
 		if(queID == strBussId)
 		{
-			//只返回本机的人数
-// 			if(data.GetIsClientData() && theApp.m_logicVariables.IsOpenInterNum)
-// 			{
-// 				if(theApp.m_logicVariables.strInterIP[0] == '\0')//主机
-// 					continue;
-// 			}
 			iCount++;
 		}
 	}
@@ -233,22 +230,7 @@ int CInlineQueData::GetMaxQueNum(const CString queID)
 			maxNum = maxNum > queNum ? maxNum : queNum;
 		}
 	}
-// 	CString num;
-// 	if(!maxNum.IsEmpty())
-// 	{
-// 		for(int i=0;i<maxNum.GetLength();i++)
-// 		{
-// 			WCHAR w = maxNum.GetAt(i);
-// 			if(w>'0'&&w<'9')
-// 			{
-// 				num+=w;
-// 			}
-// 		}
-// 	}
 	m_mtInlineQue.Unlock();
-// 	int iNum = 0;
-// 	CCommonConvert convert;
-// 	convert.CStringToint(iNum,num);
 	return maxNum;
 }
 
@@ -384,7 +366,7 @@ BOOL CInlineQueData::DeleteInlineClientData(BOOL bIsUsePower,const CStringArray&
 	}
 	MyWriteConsole(strShow);
 #endif
-	m_mtInlineQue.Lock();
+	
 	BOOL flag = FALSE;
 	if(bIsUsePower)
 	{
@@ -393,6 +375,8 @@ BOOL CInlineQueData::DeleteInlineClientData(BOOL bIsUsePower,const CStringArray&
 			return FALSE;
 		}
 		
+		m_mtInlineQue.Lock();
+
 		int count = queIDArray.GetCount();
 		for(int i = 0; i < count; i++)
 		{
@@ -419,6 +403,7 @@ BOOL CInlineQueData::DeleteInlineClientData(BOOL bIsUsePower,const CStringArray&
 				break;
 			}
 		}
+		m_mtInlineQue.Unlock();
 	}
 	else
 	{
@@ -426,7 +411,7 @@ BOOL CInlineQueData::DeleteInlineClientData(BOOL bIsUsePower,const CStringArray&
 		if(flag)
 			flag = RemoveFirstTakeNumData(*pData);
 	}
-	m_mtInlineQue.Unlock();
+
 	return flag;
 }
 
@@ -455,6 +440,7 @@ BOOL CInlineQueData::GetWindowCanDoQue(UINT nWindowID,CStringArray& queerial_id_
 
 BOOL CInlineQueData::GetFirstTakeNumData(SLZData& data,const CStringArray& arrStrQueId)
 {
+	m_mtInlineQue.Lock();
 	BOOL canDo = FALSE;
 	POSITION pos = m_lstInlineQue.GetHeadPosition();
 	SLZData tempdata,lastData;
@@ -475,15 +461,17 @@ BOOL CInlineQueData::GetFirstTakeNumData(SLZData& data,const CStringArray& arrSt
 			lastData = data;
 			data = tempdata;
 		
-				if(!lastData.GetBussinessType().IsEmpty())
-					data = data.GetTakingNumTime() < lastData.GetTakingNumTime() ? data : lastData;
+			if(!lastData.GetBussinessType().IsEmpty())
+				data = data.GetTakingNumTime() < lastData.GetTakingNumTime() ? data : lastData;
 		}
 	}
+	m_mtInlineQue.Unlock();
 	return canDo;
 }
 
 BOOL CInlineQueData::RemoveFirstTakeNumData(const SLZData& data)
 {
+	m_mtInlineQue.Lock();
 	BOOL flag = FALSE;
 	POSITION pos = m_lstInlineQue.GetHeadPosition();
 	POSITION poslast;
@@ -499,5 +487,6 @@ BOOL CInlineQueData::RemoveFirstTakeNumData(const SLZData& data)
 			break;
 		}
 	}
+	m_mtInlineQue.Unlock();
 	return flag;
 }
