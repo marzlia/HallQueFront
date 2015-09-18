@@ -13,6 +13,21 @@
 #include "ProduceClientPacket.h"
 
 
+class CYC_LOCK
+{//崔，我定义的临界区类，用于同步线程
+private:
+	CRITICAL_SECTION g_criSection;//定义临界区变量
+public:
+	void lock(){EnterCriticalSection(&g_criSection); };
+	void unlock(){LeaveCriticalSection(&g_criSection);};
+
+	CYC_LOCK(){InitializeCriticalSection(&g_criSection);  };
+	~CYC_LOCK(){::DeleteCriticalSection(&g_criSection);};
+
+} cyclock;
+
+
+extern void CYC_WRITE_LOGFILE(CString ss);
 extern void MyWriteConsole(CString str);
 
 CCallThread* pCallThread;
@@ -306,6 +321,9 @@ void CCallThread::OnCall(CallerCmd& callerCmd)
 	SLZData callingData;//正在呼叫的data
 	if(m_rCalledQueData.GetCalledQueData(callerCmd.GetWindowId(),callingData))//有一条数据在正在呼叫队列没有处理完（包括评价）
 	{
+
+		CYC_WRITE_LOGFILE(CString(_T("，正在呼叫队列正在处理，排队号码是：") + callingData.GetQueueNumber()));//崔，我加的调试
+
 		if(callingData.GetIsOpenEva()==TRUE &&  callingData.GetIsFinshEva()==FALSE)
 			//打开了评价但还没有评价，流程没完等待用户评价，如15秒后没有评价自动发送未评价消息
 		{
@@ -318,6 +336,8 @@ void CCallThread::OnCall(CallerCmd& callerCmd)
 			CTime curTime = CTime::GetCurrentTime();
 			callingData.SetFinishTime(curTime);//设置完成时间
 			m_rFinshQueData.Add(callingData);//添加到完成队列
+
+			CYC_WRITE_LOGFILE(CString(_T("，一个排队者进入到完成队列，排队号码是：") + callingData.GetQueueNumber()));//崔，我加的调试
 		}
 	}
 	///////////////////////呼叫
@@ -329,8 +349,12 @@ void CCallThread::OnCall(CallerCmd& callerCmd)
 	{
 		if(m_rWaitQueData.GetWaitQueData(callerCmd.GetWindowId(),data))
 		{
+			cyclock.lock();//崔，我加的
+
 			//加入正在呼叫队列
 			m_rCalledQueData.Add(data);
+
+			cyclock.unlock();//崔，我加的
 		}
 	}
 	else
@@ -392,8 +416,11 @@ void CCallThread::OnCall(CallerCmd& callerCmd)
 	}
 	if(!data.GetBussinessType().IsEmpty() && bFind)
 	{
-	
+		cyclock.lock();//崔，我加的
+
 		m_rCalledQueData.Add(data);//添加到正在呼叫队列
+
+		cyclock.lock();//崔，我加的
 		
 		//界面剩余人数更新
 			//theApp.m_pView->ShowWaitNum(data.GetBussinessType(),m_rInlineQueData.GetBussCount(data.GetBussinessType()));

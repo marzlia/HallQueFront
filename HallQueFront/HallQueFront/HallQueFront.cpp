@@ -11,8 +11,31 @@
 #include "CommonConvert.h"
 #include "CommonStrMethod.h"
 #include "LicenseMaker.h"
+#include "MyString.h"
 
 #pragma comment(lib, "QueSystemLicense.lib")
+
+
+void CYC_WRITE_LOGFILE(CString ss)
+{//崔，这是我写的函数CYC_WRITE_LOGFILE()，这是我添加的log日志函数
+
+	CTime time = CTime::GetCurrentTime();
+	CString str = time.Format(_T("%Y-%m-%d %H:%M:%S  ")) + ss + _T("\r\n");
+
+	CDoFile doFile;
+	CString strExePath = doFile.GetExeFullFilePath();
+	strExePath += _T("\\cyc_log.txt");
+
+	CFile file(LPCTSTR(strExePath),CFile::modeCreate | CFile::modeNoTruncate | CFile::modeWrite | CFile::shareExclusive);  
+	CHAR* szBuf = (CHAR*)malloc(str.GetLength()*2 + 1);
+	memset(szBuf, 0, str.GetLength()*2 + 1);
+	MyString::WChar2Char(szBuf, str.GetLength()*2 + 1, str.GetBuffer());
+	file.SeekToEnd();
+	file.Write(szBuf, strlen(szBuf));
+	file.Close();  
+}
+
+
 
 #ifdef _DEBUG
 #define new DEBUG_NEW

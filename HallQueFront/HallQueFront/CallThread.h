@@ -16,6 +16,8 @@
 
 ////////////////´¦Àíºô½ĞÃüÁîÀà
 using namespace std;
+
+
 class CCallThread : public CMyThread
 {
 public:
