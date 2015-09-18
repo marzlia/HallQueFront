@@ -43,9 +43,9 @@ BOOL CInlineQueData::GetInlineQueData(const UINT iWinId,
 	}
 	///////////////////////
 	BOOL bFind = FALSE;
-	m_mtInlineQue.Lock();
 	if(bIsUserPower)//使用优先级
 	{
+		m_mtInlineQue.Lock();
 		int count = arrStrQueId.GetCount();
 		for(int i = 0; i < count; i++)
 		{
@@ -82,6 +82,7 @@ BOOL CInlineQueData::GetInlineQueData(const UINT iWinId,
 				break;
 			}
 		}
+		m_mtInlineQue.Unlock();
 	}
 	else//不使用优先级
 	{
@@ -94,7 +95,7 @@ BOOL CInlineQueData::GetInlineQueData(const UINT iWinId,
 	rdata.SetStaffId(staffID);//设置员工ID,哪个员工呼叫
 	rdata.SetWindowId(iWinId);//设置哪个窗口呼叫
 	rdata.SetWindowShowId(Window.GetShowWndId());//设置窗口编号
-	m_mtInlineQue.Unlock();
+	
 	return bFind;
 }
 
