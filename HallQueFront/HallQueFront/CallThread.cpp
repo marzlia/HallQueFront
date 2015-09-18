@@ -1069,13 +1069,14 @@ void CALLBACK CCallThread::MyDoCountTimeMsg( HWND hwnd, UINT uMsg, UINT idEvent,
 			int nOverTimeSec = abs(pTime->nTimeSec);
 			 
 			CString strMsg = pCallThread->ChangeTimeToCstring(nOverTimeSec);
+			CString strTimeMsg = _T("--")+strMsg;
 			for(int i=0;i<pTime->window.m_throughscreen_array.GetCount();i++)
 			{
 				wndScreenInfo = pTime->window.m_throughscreen_array.GetAt(i);
 
-				pWnd->AddScreenMsg(strMsg,wndScreenInfo.GetWndScreenId());
-				pWnd->AddScreenMsg(strMsg,wndScreenInfo.GetComScreenId());
-				pWnd->AddThroughScreenMsg(strMsg,wndScreenInfo.GetPhyId(),wndScreenInfo.GetPipeId(),wndScreenInfo.GetLocalIp());
+				pWnd->AddScreenMsg(strTimeMsg,wndScreenInfo.GetWndScreenId());
+				pWnd->AddScreenMsg(strTimeMsg,wndScreenInfo.GetComScreenId());
+				pWnd->AddThroughScreenMsg(strTimeMsg,wndScreenInfo.GetPhyId(),wndScreenInfo.GetPipeId(),wndScreenInfo.GetLocalIp());
 			}
 
 // 			delete pTime;
