@@ -20,7 +20,13 @@
 #include "ShowWaitingDlg.h"
 #include "SLZCWndScreen.h"
 #include "CommonStrMethod.h"
+
 //#include "PropSTDSetDlg.h"
+
+
+
+
+
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -1243,6 +1249,7 @@ void CHallQueFrontView::JudgeButtonWorkOut()
 void CHallQueFrontView::OnStbset()
 {
 	// TODO: 在此添加命令处理程序代码
+<<<<<<< HEAD
 	CPropSTDSetDlg dlg(this);
 	if(IDOK == dlg.DoModal())
 	{
@@ -1250,6 +1257,8 @@ void CHallQueFrontView::OnStbset()
 		pSLZWnd->ReFlushStbContentInfo();
 		pSLZWnd->UpdateStbTitleAndNotice();
 	}
+=======
+>>>>>>> origin/master
 }
 */
 LRESULT CHallQueFrontView::OnMyShowMessage(WPARAM wParam, LPARAM lParam)
