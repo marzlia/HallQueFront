@@ -20,8 +20,7 @@
 #include "ShowWaitingDlg.h"
 #include "SLZCWndScreen.h"
 #include "CommonStrMethod.h"
-
-
+//#include "PropSTDSetDlg.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -75,7 +74,7 @@ BEGIN_MESSAGE_MAP(CHallQueFrontView, CView)
 	ON_COMMAND(ID_PRINTSET, &CHallQueFrontView::OnPrintset)
 	ON_COMMAND(ID_CARDSET, &CHallQueFrontView::OnCardset)
 	ON_COMMAND(ID_COMPREHSET, &CHallQueFrontView::OnComprehset)
-	ON_COMMAND(ID_STBSET, &CHallQueFrontView::OnStbset)
+//	ON_COMMAND(ID_STBSET, &CHallQueFrontView::OnStbset)
 	ON_MESSAGE(WM_SHOWMSG,&CHallQueFrontView::OnMyShowMessage)
 	ON_MESSAGE(WM_SHOWPAGE,&CHallQueFrontView::OnMyShowPage)
 	ON_COMMAND(ID_VIEWMINSIZE, &CHallQueFrontView::OnViewminsize)
@@ -1240,11 +1239,19 @@ void CHallQueFrontView::JudgeButtonWorkOut()
 		}
 	}
 }
+/*
 void CHallQueFrontView::OnStbset()
 {
 	// TODO: 在此添加命令处理程序代码
+	CPropSTDSetDlg dlg(this);
+	if(IDOK == dlg.DoModal())
+	{
+		SLZCWndScreen* pSLZWnd = SLZCWndScreen::GetInstance();
+		pSLZWnd->ReFlushStbContentInfo();
+		pSLZWnd->UpdateStbTitleAndNotice();
+	}
 }
-
+*/
 LRESULT CHallQueFrontView::OnMyShowMessage(WPARAM wParam, LPARAM lParam)
 {
 	ShowVariables* pShowVaria = (ShowVariables*)wParam;

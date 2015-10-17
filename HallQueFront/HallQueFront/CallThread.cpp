@@ -11,6 +11,18 @@
 #include "DealInterMsg.h"
 #include "UDPBrodcast.h"
 
+class CYC_LOCK
+{//崔，我定义的临界区类，用于同步线程
+private:
+	CRITICAL_SECTION g_criSection;//定义临界区变量
+public:
+	void lock(){EnterCriticalSection(&g_criSection); };
+	void unlock(){LeaveCriticalSection(&g_criSection);};
+
+	CYC_LOCK(){InitializeCriticalSection(&g_criSection);  };
+	~CYC_LOCK(){::DeleteCriticalSection(&g_criSection);};
+
+} cyclock;
 
 extern void MyWriteConsole(CString str);
 
@@ -315,8 +327,10 @@ void CCallThread::OnCall(CallerCmd& callerCmd)
 	{
 		if(m_rWaitQueData.GetWaitQueData(callerCmd.GetWindowId(),data))
 		{
+			cyclock.lock();//崔，我加的
 			//加入正在呼叫队列
 			m_rCalledQueData.Add(data);
+			cyclock.unlock();//崔，我加的
 		}
 	}
 	else
@@ -367,8 +381,9 @@ void CCallThread::OnCall(CallerCmd& callerCmd)
 	}
 	if(!data.GetBussinessType().IsEmpty())
 	{
-	
+		cyclock.lock();//崔，我加的
 		m_rCalledQueData.Add(data);//添加到正在呼叫队列
+		cyclock.unlock();//崔，我加的
 		
 		//界面剩余人数更新
 			//theApp.m_pView->ShowWaitNum(data.GetBussinessType(),m_rInlineQueData.GetBussCount(data.GetBussinessType()));

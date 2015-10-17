@@ -159,7 +159,7 @@ private:
 	//清除界面内存
 	void ClearPage();
 public:
-	afx_msg void OnStbset();
+//	afx_msg void OnStbset();
 	afx_msg LRESULT OnMyShowMessage(WPARAM wParam, LPARAM lParam);//接受界面显示缺纸消息函数
 	afx_msg LRESULT OnMyShowPage(WPARAM wParam,LPARAM lParam);//接受界面重画消息,用于slzcontrol线程调用
 	ShowVariables m_showVaria;
