@@ -44,6 +44,7 @@ private:
 		CTime startTime;//开始时间
 		CTime endTime;//结束时间
 		int nTimeSec;//暂停时间
+		bool bState;//0代表离开1代表暂停
 	};
 
 	virtual void Run();

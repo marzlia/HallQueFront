@@ -553,6 +553,16 @@ void CCallThread::OnPause(CallerCmd& callerCmd)
 			pWnd->AddThroughScreenMsg(msg,wndScreenInfo.GetPhyId(),wndScreenInfo.GetPipeId(),wndScreenInfo.GetLocalIp());
 		}
 		
+		///////ÔÝÍ£µ¹¼ÆÊ±
+		if(theApp.m_logicVariables.IsOpenCountTime)
+		{
+			CountTime* pTime = new CountTime;
+			pTime->nTimeSec = theApp.m_logicVariables.nTimeMintue * 60;
+			pTime->window = Window;
+			pTime->startTime = CTime::GetCurrentTime();
+			pTime->bState = true;//ÔÝÍ£
+			AddCountTime(pTime);
+		}
 		callerCmd.SetSuccess(TRUE);
 	}
 }
@@ -576,6 +586,7 @@ void CCallThread::OnCountTime(CallerCmd& callerCmd)
 			pTime->nTimeSec = theApp.m_logicVariables.nTimeMintue * 60;
 			pTime->window = Window;
 			pTime->startTime = CTime::GetCurrentTime();
+			pTime->bState = false;//Àë¿ª
 			AddCountTime(pTime);
 			callerCmd.SetSuccess(TRUE);
 		}
@@ -1153,7 +1164,7 @@ void CCallThread::DeleteCountTimeWindow(UINT uWindowID)
 				CString staffID = theApp.m_Controller.m_mapLoginList[pCountTime->window.GetWindowId()];//»ñÈ¡µÇÂ¼STAFFID
 				CProduceClientPacket packet;
 				CString wRetMsg = packet.ProducePauseTime(theApp.m_logicVariables.strOrganID,staffID,pCountTime->window.GetWindowId(),
-					pCountTime->startTime,pCountTime->endTime,pCountTime->nTimeSec);
+					pCountTime->startTime,pCountTime->endTime,pCountTime->nTimeSec,pCountTime->bState);
 			
 				CComplSocketClient client;
 				std::string recvMsg;int actSize = 0;

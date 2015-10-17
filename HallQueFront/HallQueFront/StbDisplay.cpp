@@ -293,5 +293,6 @@ CString StbDisplay::CovertColorString(CString strSrc)
 
 BOOL StbDisplay::Start()
 {
-	return InitDisplay() && InitNetServer();
+	return InitDisplay() && InitNetServer();//xpоб
+	//return InitDisplay();//win7об
 }

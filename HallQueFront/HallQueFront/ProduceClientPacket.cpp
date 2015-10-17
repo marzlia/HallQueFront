@@ -165,7 +165,7 @@ CString CProduceClientPacket::ProduceDelStaff(const CString& staffID,const CStri
 	return packet;
 }
 
-CString CProduceClientPacket::ProducePauseTime(const CString& organID,const CString& staffID,int windowID,const CTime& startTime,const CTime& endTime,int nSec)
+CString CProduceClientPacket::ProducePauseTime(const CString& organID,const CString& staffID,int windowID,const CTime& startTime,const CTime& endTime,int nSec,bool bState)
 {
 	CString packet = _T("<?xml version=\"1.0\" encoding=\"UTF-8\"?><dataPacket version=\"1.0\"><headCode>pauseTime</headCode>");
 	packet.AppendFormat(_T("<organID>%s</organID>"),organID);
@@ -181,5 +181,6 @@ CString CProduceClientPacket::ProducePauseTime(const CString& organID,const CStr
 	packet.AppendFormat(_T("<endTime>%s</endTime>"),strEndTime);
 
 	packet.AppendFormat(_T("<overTime>%d</overTime>"),nSec);
+	packet.AppendFormat(_T("<state>%d</state>"),bState);//0代表离开1代表暂停
 	return packet;
 }

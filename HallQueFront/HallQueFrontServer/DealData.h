@@ -71,6 +71,7 @@ private:
 		CString startTime;
 		CString endTime;
 		CString overTime;
+		BOOL bState;//0代表离开1代表暂停
 	};
 	
 	static UINT AnaPacket(LPVOID lpParam);

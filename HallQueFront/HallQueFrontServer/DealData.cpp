@@ -319,8 +319,8 @@ BOOL CDealData::WriteDataToDB(const CommDaoTime& commDaoTime)
 	if(m_conMySql.IsConnect())
 	{
 		CString sql;
-		sql.Format(_T("insert into leavetime (organID,workerID,windowID,leave_start_time,leave_end_time,over_time) values ('%s','%s','%s','%s','%s','%s')"),
-			commDaoTime.curOrgID,commDaoTime.staffID,commDaoTime.windowID,commDaoTime.startTime,commDaoTime.endTime,commDaoTime.overTime);
+		sql.Format(_T("insert into leavetime (organID,workerID,windowID,leave_start_time,leave_end_time,over_time,state) values ('%s','%s','%s','%s','%s','%s','%d')"),
+			commDaoTime.curOrgID,commDaoTime.staffID,commDaoTime.windowID,commDaoTime.startTime,commDaoTime.endTime,commDaoTime.overTime,commDaoTime.bState);
 		return m_conMySql.Execute(sql);
 	}
 	return FALSE;
@@ -538,6 +538,12 @@ void CDealData::TranslatePacket(const std::string strPacket,CommDaoTime& commDao
 	lastIndex = strPacket.find("</overTime>");
 	std::string strOverTime = strPacket.substr(firstIndex+strlen("<overTime>"),lastIndex-firstIndex-strlen("<overTime>"));
 	commDaoTime.overTime = strOverTime.c_str();
+	//////////////////////////////////////////////////
+	firstIndex = strPacket.find("<state>");
+	lastIndex = strPacket.find("</state>");
+	std::string strState = strPacket.substr(firstIndex+strlen("<state>"),lastIndex-firstIndex-strlen("<state>"));
+	int nState = atoi(strState.c_str());
+	commDaoTime.bState = nState; //0代表离开1代表暂停
 }
 
 BOOL CDealData::WriteDataToDB(const CommDaoOrg& commDaoOrg)
