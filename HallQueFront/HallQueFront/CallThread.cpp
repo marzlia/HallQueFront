@@ -1074,38 +1074,41 @@ void CALLBACK CCallThread::MyDoCountTimeMsg( HWND hwnd, UINT uMsg, UINT idEvent,
 	{
 		CountTime* pTime = *itera;
 		pTime->nTimeSec -= 2;
-		if(pTime->nTimeSec <= 0)
+		if(!pTime->bState)
 		{
-			CThroughWndScreenInfo wndScreenInfo;
-			int nOverTimeSec = abs(pTime->nTimeSec);
+			if(pTime->nTimeSec <= 0)
+			{
+				CThroughWndScreenInfo wndScreenInfo;
+				int nOverTimeSec = abs(pTime->nTimeSec);
 			 
-			CString strMsg = pCallThread->ChangeTimeToCstring(nOverTimeSec);
-			CString strTimeMsg = _T("--")+strMsg;
+				CString strMsg = pCallThread->ChangeTimeToCstring(nOverTimeSec);
+				CString strTimeMsg = _T("--")+strMsg;
+				for(int i=0;i<pTime->window.m_throughscreen_array.GetCount();i++)
+				{
+					wndScreenInfo = pTime->window.m_throughscreen_array.GetAt(i);
+
+					pWnd->AddScreenMsg(strTimeMsg,wndScreenInfo.GetWndScreenId());
+					pWnd->AddScreenMsg(strTimeMsg,wndScreenInfo.GetComScreenId());
+					pWnd->AddThroughScreenMsg(strTimeMsg,wndScreenInfo.GetPhyId(),wndScreenInfo.GetPipeId(),wndScreenInfo.GetLocalIp());
+				}
+
+// 				delete pTime;
+// 				pTime = NULL;
+// 				pCallThread->m_list_CountTime.erase(itera);
+				break;
+			}
+		
+			CString strTime = pCallThread->ChangeTimeToCstring(pTime->nTimeSec);
+			CString strMsg = _T("«Î…‘∫Ú ") + strTime;
+			CThroughWndScreenInfo wndScreenInfo;
 			for(int i=0;i<pTime->window.m_throughscreen_array.GetCount();i++)
 			{
 				wndScreenInfo = pTime->window.m_throughscreen_array.GetAt(i);
 
-				pWnd->AddScreenMsg(strTimeMsg,wndScreenInfo.GetWndScreenId());
-				pWnd->AddScreenMsg(strTimeMsg,wndScreenInfo.GetComScreenId());
-				pWnd->AddThroughScreenMsg(strTimeMsg,wndScreenInfo.GetPhyId(),wndScreenInfo.GetPipeId(),wndScreenInfo.GetLocalIp());
+				pWnd->AddScreenMsg(strMsg,wndScreenInfo.GetWndScreenId());
+				pWnd->AddScreenMsg(strMsg,wndScreenInfo.GetComScreenId());
+				pWnd->AddThroughScreenMsg(strMsg,wndScreenInfo.GetPhyId(),wndScreenInfo.GetPipeId(),wndScreenInfo.GetLocalIp());
 			}
-
-// 			delete pTime;
-// 			pTime = NULL;
-// 			pCallThread->m_list_CountTime.erase(itera);
-			break;
-		}
-
-		CString strTime = pCallThread->ChangeTimeToCstring(pTime->nTimeSec);
-		CString strMsg = _T("«Î…‘∫Ú ") + strTime;
-		CThroughWndScreenInfo wndScreenInfo;
-		for(int i=0;i<pTime->window.m_throughscreen_array.GetCount();i++)
-		{
-			wndScreenInfo = pTime->window.m_throughscreen_array.GetAt(i);
-
-			pWnd->AddScreenMsg(strMsg,wndScreenInfo.GetWndScreenId());
-			pWnd->AddScreenMsg(strMsg,wndScreenInfo.GetComScreenId());
-			pWnd->AddThroughScreenMsg(strMsg,wndScreenInfo.GetPhyId(),wndScreenInfo.GetPipeId(),wndScreenInfo.GetLocalIp());
 		}
 	}
 }
